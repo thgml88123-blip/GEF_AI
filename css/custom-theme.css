@@ -250,10 +250,20 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
   border-radius: 12px;
   background: #EFF6FF;
   color: var(--ai-accent);
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 1.3rem;
+  line-height: 1;
+}
+
+.step-icon-wrapper i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  margin: 0;
+  padding: 0;
 }
 
 .step-footer-btn {
