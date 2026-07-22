@@ -728,7 +728,7 @@
     document.body.appendChild(script);
   }
 
-  // FAQ JSONP 콜백
+  // FAQ JSONP 콜백 (구글 시트 FAQ 탭 1:1 동적 연동)
   window.processFaqData = function(data) {
     try {
       const rows = data.table.rows;
@@ -738,20 +738,7 @@
         if(!row || !row.c || !row.c[0] || !row.c[0].v) return;
         const q = String(row.c[0].v).trim();
         const a = row.c[1] && row.c[1].v ? String(row.c[1].v).trim() : '';
-
-        // "컨설팅 보고서 제출 기한" 관련 질문을 2개의 개별 항목으로 분리
-        if (q.includes("컨설팅 보고서 제출 기한") || q.includes("보고서 제출 기한")) {
-          FAQ_LIST.push({
-            q: "AI훈련로드맵 컨설팅 보고서 제출 기한은 언제인가요?",
-            a: "1차 컨설팅 진행 기준 4주(28일) 이내로 제출하셔야 합니다."
-          });
-          FAQ_LIST.push({
-            q: "PBL 과정개발 컨설팅 보고서 제출 기한은 언제인가요?",
-            a: "1차 컨설팅 진행 기준 1달 이내로 제출하셔야 합니다."
-          });
-        } else {
-          FAQ_LIST.push({ q, a });
-        }
+        FAQ_LIST.push({ q, a });
       });
 
       if (FAQ_LIST.length === 0) {
