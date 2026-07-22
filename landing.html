@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI로 만드는 업무관리 웹보드 4시간 실무 특강 | 경남경영자총협회</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="비전공자도 4시간 만에 끝내는 나만의 실무 자동화 툴 제작! 생성형 AI 활용 맞춤형 업무관리 웹보드 구축 특강">
+  <meta name="keywords" content="경남경영자총협회, AI교육, 업무관리웹보드, 노코드, AI자동화, 무료특강">
+  
+  <!-- Bootstrap 5.3 & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      background-color: #F8FAFC;
+      color: #1E293B;
+      letter-spacing: -0.02em;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* 딥 네이비 & 인디고 포인트 히어로 */
+    .landing-hero {
+      background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 50%, #312E81 100%);
+      color: #FFFFFF;
+      padding: 70px 0 65px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .landing-hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1000px;
+      height: 1000px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .purple-highlight {
+      background: linear-gradient(135deg, #818CF8 0%, #C084FC 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* 브랜드 로고 박스 */
+    .brand-logo-strip {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 6px 16px;
+      border-radius: 50px;
+    }
+
+    .kef-logo-tag {
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      padding: 2px 6px;
+      font-weight: 900;
+      font-size: 0.7rem;
+      border-radius: 4px;
+      line-height: 1;
+    }
+
+    /* 3단계 비주얼 플로우 카드 */
+    .flow-card-container {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 24px;
+      padding: 36px 28px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    }
+
+    .flow-node {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 18px;
+      padding: 24px 18px;
+      text-align: center;
+      height: 100%;
+      transition: all 0.25s ease;
+    }
+
+    .flow-node:hover {
+      transform: translateY(-4px);
+      border-color: #6366F1;
+      box-shadow: 0 12px 24px rgba(99, 102, 241, 0.1);
+    }
+
+    /* 4단계 깔끔한 커리큘럼 카드 */
+    .curriculum-card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 20px;
+      padding: 26px 22px;
+      height: 100%;
+      transition: all 0.25s ease;
+    }
+
+    .curriculum-card:hover {
+      transform: translateY(-4px);
+      border-color: #6366F1;
+      box-shadow: 0 12px 24px rgba(99, 102, 241, 0.1);
+    }
+
+    .step-tag {
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: #6366F1;
+      letter-spacing: -0.01em;
+    }
+
+    /* 개요 카운터 박스 */
+    .overview-card-pure {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 20px;
+      padding: 22px 20px;
+      height: 100%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+    }
+
+    /* 한글 파일 다운로드 CTA 버튼 */
+    .btn-hwp-download {
+      background: linear-gradient(135deg, #4F46E5 0%, #6366F1 50%, #7C3AED 100%);
+      color: #FFFFFF;
+      font-weight: 800;
+      padding: 16px 36px;
+      border-radius: 50px;
+      border: none;
+      box-shadow: 0 10px 25px rgba(79, 70, 229, 0.35);
+      transition: all 0.25s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-hwp-download:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(79, 70, 229, 0.45);
+      color: #FFFFFF;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Top Navigation Bar -->
+<nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top py-2.5 shadow-sm">
+  <div class="container">
+    <a class="navbar-brand text-dark fw-extrabold d-flex align-items-center gap-2" href="index.html" style="font-size: 1.05rem;">
+      <div class="step-icon-wrapper" style="width: 34px; height: 34px; font-size: 0.95rem; background: linear-gradient(135deg, #4F46E5 0%, #6366F1 100%); color: #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+        <i class="bi bi-cpu-fill"></i>
+      </div>
+      <span>경남경영자총협회 <span style="color: #4F46E5;">중소기업AI훈련확산센터</span></span>
+    </a>
+    
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-center mt-2 mt-lg-0" style="gap: 16px !important;">
+        <li class="nav-item">
+          <a class="nav-link fw-bold text-dark px-3" href="index.html">메인 홈</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link fw-bold text-dark px-3" href="about.html">사업소개</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link fw-bold text-dark px-3" href="process.html">지원절차</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Section (Simple & High Impact) -->
+<header class="landing-hero text-center">
+  <div class="container" style="max-width: 860px;">
+    
+    <!-- Top Organization Strip -->
+    <div class="mb-4">
+      <div class="brand-logo-strip">
+        <span class="kef-logo-tag">KEF</span>
+        <span class="fw-bold small">경남경영자총협회 | 2026 고용노동부 지원 사업</span>
+      </div>
+    </div>
+
+    <!-- Main Headline -->
+    <div class="py-2">
+      <div class="mb-3">
+        <span class="badge rounded-pill px-3.5 py-2 fw-extrabold fs-6 shadow-sm me-2" style="background-color: #FBBF24; color: #0F172A;">
+          <i class="bi bi-gift-fill me-1"></i> 전액 무료 교육
+        </span>
+        <span class="badge bg-white text-dark rounded-pill px-3.5 py-2 fw-extrabold fs-6 shadow-sm">
+          <i class="bi bi-clock-history me-1 text-primary"></i> 8월 7일(금) 마감 (선착순 30명)
+        </span>
+      </div>
+
+      <h2 class="fw-black mb-1 text-white opacity-90" style="font-size: 2.5rem; letter-spacing: -0.03em;">
+        AI로 만드는
+      </h2>
+      <h1 class="fw-black purple-highlight mb-3" style="font-size: 3.6rem; letter-spacing: -0.04em; line-height: 1.15;">
+        업무관리 웹보드
+      </h1>
+      
+      <p class="fs-4 fw-bold text-white mb-4 opacity-90" style="letter-spacing: -0.02em;">
+        비전공자도 4시간 만에 끝내는 나만의 실무 자동화 툴 제작
+      </p>
+
+      <!-- HWP Download Main Button (Single & Unique CTA) -->
+      <div class="pt-2">
+        <a href="6. 이벤트 페이지/[신청서_기업명] 생성형 AI 기반 업무관리 웹보드 개발 및 리포트 자동화 교육.hwp" download class="btn-hwp-download fs-5 px-5 py-3.5 shadow-lg">
+          <i class="bi bi-file-earmark-arrow-down-fill fs-4 me-1"></i>
+          <span>신청서 양식 다운로드 (.hwp)</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</header>
+
+<!-- Visual Concept Flow Graphic (Clean Vector Icon Flow - Crisp & Sharp) -->
+<section class="py-5 bg-white">
+  <div class="container" style="max-width: 960px;">
+    
+    <div class="text-center" style="margin-bottom: 32px !important;">
+      <span class="badge text-white fw-extrabold px-4 py-2.5 rounded-pill fs-6 shadow-sm d-inline-block" style="background: linear-gradient(135deg, #4F46E5 0%, #6366F1 100%); letter-spacing: -0.01em; margin-bottom: 16px !important;">실무 혁신 프로젝트</span>
+      <h3 class="fw-black text-dark mb-0" style="font-size: 2.1rem; letter-spacing: -0.03em; margin-top: 4px;">엑셀 서류 중심에서 AI 기반 웹보드로의 전환</h3>
+    </div>
+
+    <div class="flow-card-container">
+      <div class="row g-2 align-items-center justify-content-center text-center">
+        
+        <!-- Node 1: Manual Excel Paperwork -->
+        <div class="col-md-3.5 col-lg-3">
+          <div class="flow-node px-2 py-3">
+            <div class="mb-2" style="font-size: 2.8rem; color: #10B981;">
+              <i class="bi bi-file-earmark-spreadsheet-fill"></i>
+            </div>
+            <h5 class="fw-extrabold text-dark mb-1" style="white-space: nowrap; font-size: 1.05rem;">복잡한 엑셀 서류</h5>
+            <p class="small text-secondary mb-0" style="white-space: nowrap;">반복 수작업 업무</p>
+          </div>
+        </div>
+
+        <!-- Arrow 1 -->
+        <div class="col-md-1 text-center d-none d-md-block px-0">
+          <i class="bi bi-arrow-right-circle-fill fs-3" style="color: #6366F1;"></i>
+        </div>
+
+        <!-- Node 2: Generative AI Engine -->
+        <div class="col-md-4">
+          <div class="flow-node px-2 py-3" style="background: linear-gradient(135deg, #EEF2FF 0%, #F5F3FF 100%); border: 1.5px solid #A5B4FC;">
+            <span class="badge text-white px-3 py-1 rounded-pill mb-1 fw-bold" style="background: #4F46E5;">No-Code AI</span>
+            <div class="mb-1" style="font-size: 2.9rem; color: #4F46E5;">
+              <i class="bi bi-cpu-fill"></i>
+            </div>
+            <h4 class="fw-black text-dark mb-0" style="white-space: nowrap; font-size: 1.15rem;">생성형 AI 구축</h4>
+            <p class="small text-primary fw-bold mb-0 mt-0.5" style="white-space: nowrap;">4시간 실무 자동화</p>
+          </div>
+        </div>
+
+        <!-- Arrow 2 -->
+        <div class="col-md-1 text-center d-none d-md-block px-0">
+          <i class="bi bi-arrow-right-circle-fill fs-3" style="color: #6366F1;"></i>
+        </div>
+
+        <!-- Node 3: Smart Webboard Dashboard -->
+        <div class="col-md-3.5 col-lg-3">
+          <div class="flow-node px-2 py-3">
+            <div class="mb-2" style="font-size: 2.8rem; color: #4F46E5;">
+              <i class="bi bi-display-fill"></i>
+            </div>
+            <h5 class="fw-extrabold text-dark mb-1" style="white-space: nowrap; font-size: 1.05rem;">실무 웹보드 대시보드</h5>
+            <p class="small text-secondary mb-0" style="white-space: nowrap;">원클릭 PDF 자동생성</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- 4-Step Curriculum Grid Section -->
+<section class="py-5" style="background: #F8FAFC; border-top: 1px solid #E2E8F0;">
+  <div class="container" style="max-width: 900px;">
+    
+    <div class="text-center" style="margin-bottom: 32px !important;">
+      <span class="badge text-white fw-extrabold px-4 py-2.5 rounded-pill fs-6 shadow-sm d-inline-block" style="background: linear-gradient(135deg, #4F46E5 0%, #6366F1 100%); letter-spacing: -0.01em; margin-bottom: 16px !important;">4시간 단기 과정</span>
+      <h3 class="fw-black text-dark mb-0" style="font-size: 2.1rem; letter-spacing: -0.03em; margin-top: 4px;">교육 커리큘럼 4단계</h3>
+    </div>
+
+    <div class="row g-3">
+      
+      <!-- Step 1 -->
+      <div class="col-md-6 col-lg-3">
+        <div class="curriculum-card">
+          <span class="step-tag mb-2 d-block">Step.1</span>
+          <h5 class="fw-extrabold text-dark mb-2">업무 분석</h5>
+          <p class="small text-secondary mb-0 lh-base">
+            핵심 업무 흐름 파악 및 맞춤 프롬프트 수립
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="col-md-6 col-lg-3">
+        <div class="curriculum-card">
+          <span class="step-tag mb-2 d-block">Step.2</span>
+          <h5 class="fw-extrabold text-dark mb-2">프로그램 구축</h5>
+          <p class="small text-secondary mb-0 lh-base">
+            생성형 AI(No-Code) 직무 실행 코드 구축
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="col-md-6 col-lg-3">
+        <div class="curriculum-card">
+          <span class="step-tag mb-2 d-block">Step.3</span>
+          <h5 class="fw-extrabold text-dark mb-2">데이터 검증</h5>
+          <p class="small text-secondary mb-0 lh-base">
+            실제 엑셀 데이터 적합성 검토 및 오류 수정
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="col-md-6 col-lg-3">
+        <div class="curriculum-card">
+          <span class="step-tag mb-2 d-block">Step.4</span>
+          <h5 class="fw-extrabold text-dark mb-2">기능 고도화</h5>
+          <p class="small text-secondary mb-0 lh-base">
+            원클릭 PDF 자동 생성 기능 구현
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- Overview Summary & Submission Area -->
+<section class="py-5 bg-white">
+  <div class="container" style="max-width: 900px;">
+    
+    <div class="text-center mb-4">
+      <h3 class="fw-black text-dark mb-1">특강 개요 및 이메일 접수 안내</h3>
+      <p class="text-secondary small fw-semibold">상단에서 다운로드받으신 한글 신청서를 작성 후 아래 이메일로 접수해 주세요.</p>
+    </div>
+
+    <!-- 4-Grid Overview -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="overview-card-pure text-center">
+          <div class="fw-bold text-indigo small mb-1" style="color: #4F46E5;"><i class="bi bi-calendar-event me-1"></i> 교육 일시</div>
+          <div class="fw-black text-dark fs-6">8월 14일 (금)</div>
+          <div class="small text-secondary">13:00 ~ 17:00 (4시간)</div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="overview-card-pure text-center">
+          <div class="fw-bold text-indigo small mb-1" style="color: #4F46E5;"><i class="bi bi-geo-alt-fill me-1"></i> 교육 장소</div>
+          <div class="fw-black text-dark fs-6">경남경영자총협회</div>
+          <div class="small text-secondary">5층 교육실</div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="overview-card-pure text-center">
+          <div class="fw-bold text-indigo small mb-1" style="color: #4F46E5;"><i class="bi bi-people-fill me-1"></i> 교육 대상</div>
+          <div class="fw-black text-dark fs-6">경남 소재 기업 재직자</div>
+          <div class="small text-secondary">기업당 최대 2명 (30명)</div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="overview-card-pure text-center">
+          <div class="fw-bold text-success small mb-1"><i class="bi bi-cash-stack me-1"></i> 교육 비용</div>
+          <div class="fw-black text-success fs-6">전액 무료</div>
+          <div class="small text-secondary">경남경총 회원/참여기업</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submission Action Info Box (No Duplicate Download Button) -->
+    <div class="p-4 p-md-5 text-center rounded-4 shadow-sm" style="background: linear-gradient(135deg, #EEF2FF 0%, #F5F3FF 100%); border: 1px solid #C7D2FE;">
+      
+      <div class="mb-3">
+        <span class="badge bg-danger text-white fw-bold px-3 py-1.5 rounded-pill fs-6 mb-2">신청 마감: ~ 8월 7일(금)까지 (선착순 30명)</span>
+      </div>
+
+      <!-- Submission Info -->
+      <div class="pt-2">
+        <h5 class="fw-extrabold text-dark mb-2">
+          <i class="bi bi-envelope-check-fill text-primary me-2"></i>신청서 접수처 및 문의
+        </h5>
+        <p class="fs-5 text-dark fw-bold mb-2">
+          이메일 접수: <span class="text-primary fw-black">thgml8812@gef.or.kr</span>
+        </p>
+        <p class="small text-secondary mb-0 fw-semibold">
+          문의처: 경남경영자총협회 중소기업AI훈련확산센터 T. 055-266-1939 (담당자: 김소희 전임)
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-white border-top py-4 text-center text-muted small">
+  <div class="container">
+    <p class="mb-1 fw-semibold text-dark">경남경영자총협회 중소기업AI훈련확산센터 (고용지원팀)</p>
+    <p class="mb-0">경상남도 창원시 성산구 중앙대로 228번길 6 센트랄빌딩 5층 | 문의 T. 055-266-1939 | E. thgml8812@gef.or.kr</p>
+    <p class="mt-2 text-secondary" style="font-size: 0.78rem;">© 2026 Gyeongnam Employers Federation. All rights reserved.</p>
+  </div>
+</footer>
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
