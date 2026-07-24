@@ -687,7 +687,8 @@
   function loadNoticesFromSheet() {
     const SHEET_ID = '1FPC06ZjhCXKIzgX51Zkpfi8VNdz_SAGs302vHUWYEs4';
     const cb = new Date().getTime();
-    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=responseHandler:processNoticeData&sheet=공지사항&t=${cb}`;
+    const sheetParam = encodeURIComponent('공지사항');
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=responseHandler:processNoticeData&sheet=${sheetParam}&t=${cb}`;
     const script = document.createElement('script');
     script.src = url;
     document.body.appendChild(script);
@@ -699,10 +700,12 @@
       const rows = data.table.rows;
       NOTICES = [];
       rows.forEach((row, idx) => {
-        if(idx === 0) return; // 무조건 첫 번째 줄(헤더) 무시
         if(!row || !row.c || !row.c[0] || !row.c[0].v) return;
         
         const title = String(row.c[0].v).trim();
+        // 헤더행 무시 (제목 또는 title)
+        if(idx === 0 && (title === "제목" || title.toLowerCase() === "title")) return;
+
         let content = row.c[1] && row.c[1].v ? String(row.c[1].v) : '';
         // 개행문자를 <br>로 치환하여 보존
         content = content.replace(/\n/g, '<br>');
@@ -835,7 +838,7 @@
             <button class="accordion-button collapsed py-3" type="button" data-bs-toggle="collapse" data-bs-target="#${accordionId}">
               <div class="d-flex w-100 justify-content-between align-items-center pe-3">
                 <div class="pe-2" style="word-break: keep-all;">
-                  ${badgeHTML}<span class="fw-bold text-dark" style="font-size: 0.85rem; line-height: 1.4;">${notice.title}</span>
+                  ${badgeHTML}<span class="fw-bold text-dark" style="font-size: 0.85rem; line-height: 1.4;">${formatRichText(notice.title)}</span>
                 </div>
                 ${notice.date ? `
                 <div class="text-muted small flex-shrink-0" style="white-space: nowrap;">
