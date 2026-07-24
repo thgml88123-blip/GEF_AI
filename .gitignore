@@ -1,0 +1,14 @@
+# Windows 탐색기 캐시
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+
+# 임시 파일
+*.tmp
+~$*
+
+# 로컬 개발 도구 설정 (미리보기 서버 등)
+.claude/

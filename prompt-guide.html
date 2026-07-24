@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>공통 프롬프트 가이드 | 중소기업 AI훈련 확산센터</title>
+
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta name="description" content="AI 훈련 공통 프롬프트 가이드 - 실무에 바로 쓰는 프롬프트 예시와 작성 요령을 제공합니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="공통 프롬프트 가이드 | 중소기업 AI훈련 확산센터">
+  <meta property="og:description" content="실무에 바로 쓰는 프롬프트 예시와 작성 요령을 제공합니다.">
+  <meta property="og:image" content="favicon.svg">
+  <meta name="twitter:card" content="summary">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+
+  <!-- Custom Modern Design System -->
+  <link rel="stylesheet" href="css/custom-theme.css">
+
+  <style>
+    .nav-breadcrumb {
+      background: #FFFFFF;
+      padding: 14px 0;
+      border-bottom: 1px solid #E2E8F0;
+      box-shadow: var(--ai-shadow-sm);
+    }
+    .hero-banner {
+      background: #FFFFFF;
+      background-image: 
+        radial-gradient(at 10% 10%, rgba(224, 242, 254, 0.75) 0px, transparent 50%),
+        radial-gradient(at 90% 90%, rgba(238, 242, 255, 0.75) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(240, 249, 255, 0.5) 0px, transparent 60%);
+      color: #0F172A;
+      padding: 50px 0;
+      border-bottom: 1px solid #E2E8F0;
+      border-radius: 0 0 var(--ai-radius-xl) var(--ai-radius-xl);
+    }
+    
+    /* 콤팩트 그리드 카드 */
+    .prompt-step-card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: var(--ai-radius-lg);
+      padding: 24px 20px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      transition: var(--ai-transition);
+      position: relative;
+      box-shadow: var(--ai-shadow-sm);
+    }
+    .prompt-step-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--ai-shadow-lg);
+      border-color: var(--ai-accent);
+    }
+
+    footer {
+      background: var(--ai-primary-dark);
+      color: rgba(255, 255, 255, 0.7);
+      padding: 40px 0;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="nav-breadcrumb">
+  <div class="container d-flex justify-content-between align-items-center">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="index.html" class="text-decoration-none text-secondary"><i class="bi bi-house-door-fill me-1"></i>홈</a></li>
+        <li class="breadcrumb-item"><a href="coach.html" class="text-decoration-none text-secondary">코치 전용관</a></li>
+        <li class="breadcrumb-item active fw-bold text-primary">공통 프롬프트 가이드</li>
+      </ol>
+    </nav>
+    <a href="coach.html" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold">
+      <i class="bi bi-arrow-left me-1"></i> 코치 전용관으로 돌아가기
+    </a>
+  </div>
+</div>
+
+<header class="hero-banner text-center shadow-sm">
+  <div class="container">
+    <span class="badge bg-primary-subtle text-primary mb-3 fw-bold rounded-pill px-3 py-1.5 border border-primary-subtle fs-6"><i class="bi bi-cpu-fill me-1"></i> 2026 중소기업 AI훈련 확산센터 지침</span>
+    <h1 class="fw-black mb-2 text-dark" style="font-size: 2.2rem; color: #0F172A !important;">프로세스별 공통 프롬프트 가이드</h1>
+    <p class="text-secondary mx-auto fs-6 mb-4 fw-semibold" style="max-width: 720px; line-height: 1.7; color: #475569 !important;">
+      필요한 단계를 클릭하시면 프롬프트 복사와 활용 지침을 확인하실 수 있습니다.
+    </p>
+    <div>
+      <a href="4.AI훈련표준모델/표준모델_프롬프트_예시.txt" download class="btn btn-ai-primary btn-lg px-4 py-2.5 rounded-pill shadow-sm fw-bold">
+        <i class="bi bi-file-earmark-arrow-down-fill me-2"></i>전체 프롬프트 다운로드 (.txt)
+      </a>
+    </div>
+  </div>
+</header>
+
+<main class="container py-5">
+  
+  <div class="alert alert-info border-0 p-4 rounded-4 shadow-sm mb-5" style="background-color: #EFF6FF; border-left: 5px solid var(--ai-accent) !important;">
+    <h5 class="fw-bold text-primary mb-2"><i class="bi bi-info-circle-fill me-2"></i>AI 코치(컨설턴트) 사용 안내</h5>
+    <p class="small text-secondary mb-0 lh-base">
+      실무자가 AI와 쉽게 대화하며 업무 자동화 프로그램을 완성할 수 있도록 돕는 <strong>실전 프롬프트(명령어) 모음</strong>입니다. 아래 각 단계별 <strong>[프롬프트 보기 & 복사]</strong> 버튼을 눌러 손쉽게 복사해서 사용하세요.
+    </p>
+  </div>
+
+  <!-- 5단계 콤팩트 카드 그리드 -->
+  <div class="row g-4 justify-content-center">
+    
+    <!-- 1단계 -->
+    <div class="col-md-6 col-lg-4">
+      <div class="prompt-step-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="step-badge-pill">STEP 1</span>
+          <div class="step-icon-wrapper"><i class="bi bi-box-seam-fill"></i></div>
+        </div>
+        <h5 class="fw-bold text-dark mb-2" style="font-size: 1.15rem;">1단계: 직무 이해 및 AI 기획</h5>
+        <span class="badge bg-primary-subtle text-primary fw-bold mb-3 align-self-start"><i class="bi bi-clock me-1"></i> 필수 1시간</span>
+        <p class="text-muted small lh-base mb-4">
+          AI에게 실무자의 도메인(직무) 지식을 학습시키고, 시스템에 담을 핵심 병목 프로세스를 구조화합니다.
+        </p>
+        <button onclick="openPromptModal(1)" class="btn btn-ai-primary w-100 py-2.5 shadow-sm mt-auto">
+          <i class="bi bi-terminal-fill me-2"></i>프롬프트 보기 & 복사
+        </button>
+      </div>
+    </div>
+
+    <!-- 2단계 -->
+    <div class="col-md-6 col-lg-4">
+      <div class="prompt-step-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="step-badge-pill">STEP 2</span>
+          <div class="step-icon-wrapper"><i class="bi bi-code-square"></i></div>
+        </div>
+        <h5 class="fw-bold text-dark mb-2" style="font-size: 1.15rem;">2단계: 프로그램 생성</h5>
+        <span class="badge bg-primary-subtle text-primary fw-bold mb-3 align-self-start"><i class="bi bi-clock me-1"></i> 필수 1시간</span>
+        <p class="text-muted small lh-base mb-4">
+          1단계 기능을 바탕으로 외부 서버 없이 브라우저 오프라인 구동 단일 'index.html' 기초 뼈대를 구축합니다.
+        </p>
+        <button onclick="openPromptModal(2)" class="btn btn-ai-primary w-100 py-2.5 shadow-sm mt-auto">
+          <i class="bi bi-terminal-fill me-2"></i>프롬프트 보기 & 복사
+        </button>
+      </div>
+    </div>
+
+    <!-- 3단계 -->
+    <div class="col-md-6 col-lg-4">
+      <div class="prompt-step-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="step-badge-pill" style="background: linear-gradient(135deg, #D97706 0%, #F59E0B 100%);">STEP 3</span>
+          <div class="step-icon-wrapper" style="color: #D97706; background: #FEF3C7;"><i class="bi bi-database-check"></i></div>
+        </div>
+        <h5 class="fw-bold text-dark mb-2" style="font-size: 1.15rem;">3단계: 데이터 검증 및 연동</h5>
+        <span class="badge bg-warning-subtle text-warning-emphasis fw-bold mb-3 align-self-start"><i class="bi bi-clock me-1"></i> 필수 2시간</span>
+        <p class="text-muted small lh-base mb-4">
+          기업의 실제 샘플 데이터를 연동하고 오류 수정 및 경고 알림 로직을 자기주도적으로 반영합니다.
+        </p>
+        <button onclick="openPromptModal(3)" class="btn btn-ai-primary w-100 py-2.5 shadow-sm mt-auto">
+          <i class="bi bi-terminal-fill me-2"></i>프롬프트 보기 & 복사
+        </button>
+      </div>
+    </div>
+
+    <!-- 4단계 -->
+    <div class="col-md-6 col-lg-4">
+      <div class="prompt-step-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="step-badge-pill">STEP 4</span>
+          <div class="step-icon-wrapper"><i class="bi bi-file-earmark-pdf-fill"></i></div>
+        </div>
+        <h5 class="fw-bold text-dark mb-2" style="font-size: 1.15rem;">4단계: 리포트 고도화 & UI 최적화</h5>
+        <span class="badge bg-primary-subtle text-primary fw-bold mb-3 align-self-start"><i class="bi bi-clock me-1"></i> 필수 1시간</span>
+        <p class="text-muted small lh-base mb-4">
+          경영진 보고용 원클릭 PDF 리포트 다운로드 기능을 완성하고 대시보드 UI를 최종 세련화합니다.
+        </p>
+        <button onclick="openPromptModal(4)" class="btn btn-ai-primary w-100 py-2.5 shadow-sm mt-auto">
+          <i class="bi bi-terminal-fill me-2"></i>프롬프트 보기 & 복사
+        </button>
+      </div>
+    </div>
+
+    <!-- 5단계 -->
+    <div class="col-md-6 col-lg-4">
+      <div class="prompt-step-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="step-badge-pill">STEP 5</span>
+          <div class="step-icon-wrapper"><i class="bi bi-cloud-arrow-up-fill"></i></div>
+        </div>
+        <h5 class="fw-bold text-dark mb-2" style="font-size: 1.15rem;">[심화] 5단계: 현장 배포 및 확산</h5>
+        <span class="badge bg-primary-subtle text-primary fw-bold mb-3 align-self-start"><i class="bi bi-clock me-1"></i> 심화 2시간</span>
+        <p class="text-muted small lh-base mb-4">
+          무료 웹 URL 상시 배포 구동 인프라를 구축하고 사내 표준 활용 가이드북을 작성합니다.
+        </p>
+        <button onclick="openPromptModal(5)" class="btn btn-ai-primary w-100 py-2.5 shadow-sm mt-auto">
+          <i class="bi bi-terminal-fill me-2"></i>프롬프트 보기 & 복사
+        </button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- 대화형 모달 팝업 (Modal Popup Window) -->
+<div class="modal fade" id="promptModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+      <div class="modal-header border-bottom p-4" style="background: var(--ai-gradient-hero); color: white;">
+        <div class="d-flex align-items-center gap-3">
+          <div class="step-icon-wrapper" style="background: rgba(255,255,255,0.15); color: #00E5FF;"><i id="modalIcon" class="bi bi-terminal-fill"></i></div>
+          <div>
+            <h5 class="fw-bold text-white mb-0" id="modalTitle">프롬프트 템플릿</h5>
+            <span class="badge bg-info text-dark fw-bold mt-1" id="modalBadge">필수 1시간</span>
+          </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4 bg-light">
+        <div class="alert alert-warning border-0 p-3 rounded-3 mb-3 d-flex align-items-center gap-2" style="background-color: #FEF3C7; color: #78350F;">
+          <i class="bi bi-lightbulb-fill fs-5 text-warning"></i>
+          <span class="small fw-semibold">💡 <strong>복사 팁</strong>: [복사하기] 후 대괄호 <code class="bg-white text-danger px-1 rounded border border-warning">[ ]</code> 문구를 우리 회사 상황에 맞게 변경하세요.</span>
+        </div>
+        <p class="small text-muted fw-bold mb-2" id="modalPurpose"></p>
+
+        <div class="terminal-box mt-0">
+          <div class="terminal-header">
+            <span class="terminal-title" id="modalFilename"><i class="bi bi-terminal-fill text-info"></i> prompt.txt</span>
+            <button class="terminal-copy-btn" id="modalCopyBtn" onclick="copyCurrentPrompt(this)"><i class="bi bi-copy me-1"></i> 복사하기</button>
+          </div>
+          <pre id="modalPromptText" class="terminal-body"></pre>
+        </div>
+      </div>
+      <div class="modal-footer bg-white p-3 d-flex justify-content-between">
+        <button class="btn btn-outline-secondary rounded-pill px-3 fw-bold small" id="prevStepBtn" onclick="navigateStep(-1)"><i class="bi bi-chevron-left me-1"></i> 이전 단계</button>
+        <div class="small fw-bold text-secondary" id="stepCounter">1 / 5</div>
+        <button class="btn btn-outline-primary rounded-pill px-3 fw-bold small" id="nextStepBtn" onclick="navigateStep(1)">다음 단계 <i class="bi bi-chevron-right ms-1"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="text-center">
+  <div class="container">
+    <p class="fw-bold text-white mb-2">경남경영자총협회 중소기업AI훈련확산센터</p>
+    <p class="mb-1 opacity-75">창원시 성산구 중앙대로 228번길 6 씨티알빌딩 5층 | T. 055-266-1939</p>
+    <hr class="border-secondary my-4 opacity-25">
+    <p class="small mb-0 opacity-50">© 2026 Gyeongnam Employers Federation. All rights reserved.</p>
+  </div>
+</footer>
+
+<!-- Copy Toast Notification -->
+<div id="copyToast" class="copy-toast">
+  <i class="bi bi-check-circle-fill text-success fs-5"></i>
+  <span>프롬프트 명령어가 클립보드에 복사되었습니다!</span>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  const promptData = {
+    1: {
+      title: "1단계: 직무 이해 및 AI 기획",
+      badge: "필수 1시간",
+      icon: "bi-box-seam-fill",
+      filename: "prompt_template_step1.txt",
+      purpose: "AI에게 실무자의 도메인(직무) 지식을 학습시키고, 시스템에 담을 핵심 흐름을 구조화합니다.",
+      text: `"나는 제조업에서 [본인의 직무: 예-품질관리/자재구매/설비보전 등]을 담당하고 있는 실무자야. \n우리 회사는 중소기업이라서 전용 시스템이 없고 주로 엑셀로 업무를 처리하고 있어. \n1. 이 직무를 수행할 때 가장 핵심적인 업무 프로세스 5가지 흐름을 정의해 줘.\n2. 이 중에서 매일 데이터를 입력하고 일일/주간 보고서를 작성할 때 시간이 가장 많이 걸리는 '병목 구간'이 어디일지 실무 관점에서 분석해 줘.\n3. 이 병목 업무를 자동화하기 위한 No-Code 웹 프로그램(웹보드)을 기획하려고 하는데, 어떤 기능과 데이터 항목(필드)들이 필수로 들어가야 할지 제안해 줘."`
+    },
+    2: {
+      title: "2단계: 프로그램 생성",
+      badge: "필수 1시간",
+      icon: "bi-code-square",
+      filename: "prompt_template_step2.txt",
+      purpose: "1단계에서 도출된 기능을 바탕으로, 단일 파일로 동작하는 웹 프로그램의 기초 뼈대 코드를 구축합니다.",
+      text: `"[역할] 너는 제조업 [직무명] 업무 효율화 프로그램 개발 전문가야.\n[환경] 외부 서버나 DB 연동 없이 브라우저에서 오프라인으로 즉시 실행 가능한 단일 'index.html' 파일 코드를 작성해 줘. Bootstrap 5와 Chart.js 라이브러리를 CDN으로 포함하고, 데이터는 브라우저 LocalStorage에 JSON 형태로 저장·확인되도록 해줘.\n[기능] \n1. 핵심 데이터 입력 폼 (데이터 항목: [1단계에서 제안된 항목들]) 및 실시간 누적 현황판(대시보드)\n2. 주요 현황을 시각적으로 보여주는 그래프 1종 (Chart.js 활용)\n[디자인] 현장 실무자가 쓰기 편하도록 가독성이 높은 모던한 [원하는 테마: 예-다크모드 또는 블루 테마] UI.\n[제약조건] 코드 생략 없이 메모장에 복사해서 바로 'index.html'로 저장해 실행할 수 있는 전체 완성 코드로 주석을 포함해서 작성해 줘."`
+    },
+    3: {
+      title: "3단계: 데이터 검증 및 연동",
+      badge: "필수 2시간",
+      icon: "bi-database-check",
+      filename: "prompt_template_step3.txt",
+      purpose: "생성된 웹 프로그램에 기업의 실제 데이터를 적용하고, 발생하는 오류를 자기주도적으로 수정합니다.",
+      text: `"위에서 네가 만들어준 'index.html' 코드를 실행해서 우리 회사의 실제 샘플 데이터를 입력해 봤어. 그런데 다음과 같은 문제와 수정 요청 사항이 발생했어. 기존 코드에서 이 부분을 수정한 전체 코드를 다시 작성해 줘.\n1. [오류 및 수정사항 기술: 예 - '데이터를 입력하고 추가 버튼을 눌렀는데 테이블에 실시간으로 반영이 안 돼', '기존에 축적된 엑셀 데이터를 복사해서 한 번에 붙여넣을 수 있는 엑셀 업로드(SheetJS) 기능이 필요해']\n2. 실무에서 데이터 입력 실수를 방지할 수 있도록, [특정 조건: 예 - 재고가 10개 이하로 떨어지거나, 불량률이 5%를 초과할 때] 화면에 직관적인 경고 알림(Highlight 및 텍스트 문구)이 뜨는 시스템 안정화 로직을 추가해 줘."`
+    },
+    4: {
+      title: "4단계: 리포트 고도화 및 UI 최적화",
+      badge: "필수 1시간",
+      icon: "bi-file-earmark-pdf-fill",
+      filename: "prompt_template_step4.txt",
+      purpose: "경영진 보고 업무를 혁신할 수 있도록 '원클릭 PDF 리포트 다운로드' 기능을 강화하고 화면을 최적화합니다.",
+      text: `"이제 프로그램의 기본 기능은 잘 작동해. 마지막으로 이 웹보드를 관리자나 경영진 보고용 시스템으로 쓸 수 있게 보고 기능을 완성하고 싶어.\n1. 화면에 축적된 대시보드 현황과 핵심 통계 데이터를 깔끔한 표준 비즈니스 보고서 양식으로 레이아웃을 잡아서, 원클릭으로 '일일 업무 보고서(PDF)'를 다운로드할 수 있는 기능을 내장해 줘 (html2pdf 또는 jsPDF 라이브러리 CDN 활용).\n2. 대시보드의 주요 지표 박스들과 그래프가 한눈에 들어오도록 UI 디자인을 더 세련되게 리디자인해 주고, 마우스 오버(Hover) 효과 등 시각적 완성도를 높여줘.\n3. 전체 완성된 'index.html' 최종 코드를 전달해 줘."`
+    },
+    5: {
+      title: "5단계: 현장 배포 및 확산",
+      badge: "심화 2시간",
+      icon: "bi-cloud-arrow-up-fill",
+      filename: "prompt_template_step5.txt",
+      purpose: "완성된 파일의 상시 구동 인프라를 구축하고 타 부서로의 AI 활용 확산을 유도합니다.",
+      text: `"완성된 'index.html' 파일을 우리 부서원들과 공장 현장 작업자들도 태블릿이나 모바일로 접속해서 함께 사용할 수 있게 하고 싶어. \n1. 외부 서버 비용 없이 GitHub Pages를 활용해서 이 파일을 무료 웹 주소(URL)로 배포하고 상시 구동하는 방법을 초보자 눈높이에 맞춰 단계별 가이드로 설명해 줘.\n2. 다른 부서에서도 이 AI 기반 업무 자동화 방식을 벤치마킹할 수 있도록, 내가 이 프로그램을 기획하고 AI와 소통하며 개발한 프로세스를 '사내 AI 표준 활용 가이드북' 양식(텍스트 초안)으로 정리해 줘."`
+    }
+  };
+
+  let currentStep = 1;
+  let bsModal = null;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    bsModal = new bootstrap.Modal(document.getElementById('promptModal'));
+  });
+
+  function openPromptModal(stepNum) {
+    currentStep = stepNum;
+    updateModalContent();
+    bsModal.show();
+  }
+
+  function updateModalContent() {
+    const data = promptData[currentStep];
+    document.getElementById('modalTitle').innerText = data.title;
+    document.getElementById('modalBadge').innerText = data.badge;
+    document.getElementById('modalIcon').className = 'bi ' + data.icon;
+    document.getElementById('modalFilename').innerHTML = `<i class="bi bi-terminal-fill text-info me-1"></i> ${data.filename}`;
+    document.getElementById('modalPurpose').innerText = '🎯 훈련 목적: ' + data.purpose;
+    document.getElementById('modalPromptText').innerText = data.text;
+    document.getElementById('stepCounter').innerText = `${currentStep} / 5`;
+
+    document.getElementById('prevStepBtn').disabled = (currentStep === 1);
+    document.getElementById('nextStepBtn').disabled = (currentStep === 5);
+  }
+
+  function navigateStep(dir) {
+    const newStep = currentStep + dir;
+    if (newStep >= 1 && newStep <= 5) {
+      currentStep = newStep;
+      updateModalContent();
+    }
+  }
+
+  function copyCurrentPrompt(btn) {
+    const text = document.getElementById('modalPromptText').innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      const originalHTML = btn.innerHTML;
+      btn.innerHTML = '<i class="bi bi-check-lg text-success"></i> 복사완료';
+      btn.style.borderColor = '#10B981';
+
+      const toast = document.getElementById('copyToast');
+      toast.classList.add('show');
+
+      setTimeout(() => {
+        btn.innerHTML = originalHTML;
+        btn.style.borderColor = '';
+        toast.classList.remove('show');
+      }, 2000);
+    });
+  }
+</script>
+</body>
+</html>

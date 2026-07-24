@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>우리 회사 연차 및 인사관리 대시보드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        #hrModal, #resignModal, #vacationDetailModal, #docStorageModal { display: none; }
+        #hrModal.show, #resignModal.show, #vacationDetailModal.show, #docStorageModal.show { display: flex !important; }
+        .risk-row { background-color: rgba(244, 63, 94, 0.08); }
+        .active-emp-row { background-color: #ffffff; color: #0f172a; }
+        .resigned-row { opacity: 0.35; background-color: #f8fafc; text-decoration: line-through; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .tab-btn.active { border-bottom-color: #2563eb; color: #2563eb; font-weight: 800; }
+    </style>
+</head>
+<body class="bg-slate-50 p-8 text-slate-800 font-sans">
+
+<div class="max-w-[1500px] mx-auto">
+    <header class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-600">📊 부서별 급여 & 인사관리 시스템</h1>
+            <p class="text-slate-500 mt-1 font-medium text-sm">실시간 법정 연차 자동 계산 및 실시간 인사 보고서 빌더 통합 플랫폼</p>
+        </div>
+        <div class="flex gap-2 items-center">
+            <button id="restoreBtn" onclick="restoreBackup()" class="hidden bg-rose-100 text-rose-700 px-4 py-3 rounded-2xl font-bold hover:bg-rose-200 transition-all text-xs">↩️ 업로드 취소</button>
+            <button id="loadPreviousBtn" onclick="loadPreviousData()" class="hidden bg-amber-100 text-amber-800 px-4 py-3 rounded-2xl font-bold hover:bg-amber-200 transition-all text-xs">🕒 이전 데이터 로드</button>
+            <button onclick="openDocStorage()" class="bg-indigo-100 text-indigo-700 px-4 py-3 rounded-2xl font-bold hover:bg-indigo-200 transition-all text-xs">📁 문서 스토리지</button>
+            <button onclick="downloadSample()" class="bg-slate-200 text-slate-700 px-4 py-3 rounded-2xl font-bold hover:bg-slate-300 transition-all text-xs">📄 양식 다운로드</button>
+            <label class="bg-emerald-600 text-white px-5 py-3 rounded-2xl font-bold hover:bg-emerald-700 shadow-md cursor-pointer transition-all text-sm text-center">
+                📂 CSV 업로드
+                <input type="file" id="csvFile" accept=".csv" class="hidden" onchange="uploadCSV(event)">
+            </label>
+            <button onclick="openForm(-1)" class="bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-blue-700 shadow-md transition-all active:scale-95 text-sm">+ 신규 입사자 등록</button>
+        </div>
+    </header>
+
+    <div class="flex border-b border-slate-200 mb-6">
+        <button onclick="switchTab('main-tab')" id="btn-main-tab" class="tab-btn active px-6 py-3 border-b-4 border-transparent text-slate-500 font-bold text-sm transition-all">🏠 대시보드 및 인력 관리</button>
+        <button onclick="switchTab('report-tab')" id="btn-report-tab" class="tab-btn px-6 py-3 border-b-4 border-transparent text-slate-500 font-bold text-sm transition-all">📋 인사 통계 보고서 빌더</button>
+    </div>
+
+    <div id="main-tab" class="tab-content active">
+        <div id="statBoard" class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8"></div>
+
+        <div class="flex items-center justify-between mb-6 p-2 bg-white rounded-2xl border border-slate-200 shadow-sm">
+            <div class="flex items-center gap-2 overflow-x-auto">
+                <span class="text-xs font-bold text-slate-400 px-4 whitespace-nowrap">부서 필터 :</span>
+                <div id="filterArea" class="flex gap-2"></div>
+            </div>
+            <div class="flex items-center gap-2 px-4 border-l border-slate-100">
+                <input type="checkbox" id="hideResigned" onchange="render()" class="w-4 h-4 cursor-pointer accent-blue-600">
+                <label for="hideResigned" class="text-xs font-bold text-slate-500 cursor-pointer">퇴사자 제외 보기</label>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+            <table class="w-full text-left">
+                <thead class="bg-slate-900 text-white text-xs font-bold text-center">
+                    <tr>
+                        <th class="p-5 text-left">성명 (부서/직급 - 클릭 시 상세관리)</th>
+                        <th class="p-5">입사일 / 퇴사일</th>
+                        <th class="p-5">총 근속기간</th>
+                        <th class="p-5 text-indigo-300">법정 발생 연차 (잔여/총 발생)</th>
+                        <th class="p-5">당해 주기 사용 연차</th>
+                        <th class="p-5 text-yellow-300">월 기본급</th>
+                        <th class="p-5">행정 관리</th>
+                    </tr>
+                </thead>
+                <tbody id="empList" class="divide-y divide-slate-100 text-sm font-medium text-slate-700"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="report-tab" class="tab-content">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+                <h3 class="text-base font-black text-slate-900 mb-2">⚙️ 보고서 구성 옵션</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">체크를 해제하거나 선택하면 우측의 보고서 양식에 실시간으로 반영됩니다.</p>
+                
+                <div class="space-y-3 pt-2">
+                    <label class="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
+                        <input type="checkbox" id="repSummary" checked onchange="buildLiveReport()" class="w-4 h-4 accent-blue-600"> 1. 요약 지표 (인원/인건비)
+                    </label>
+                    <label class="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
+                        <input type="checkbox" id="repCharts" checked onchange="buildLiveReport()" class="w-4 h-4 accent-blue-600"> 2. 통계 시각화 그래프 3종
+                    </label>
+                    <label class="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
+                        <input type="checkbox" id="repRisk" checked onchange="buildLiveReport()" class="w-4 h-4 accent-blue-600"> 3. 연차 미사용 위험군 명단
+                    </label>
+                    <label class="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
+                        <input type="checkbox" id="repTable" checked onchange="buildLiveReport()" class="w-4 h-4 accent-blue-600"> 4. 전체 부서별 임직원 명부
+                    </label>
+                </div>
+                
+                <div class="pt-4 border-t border-slate-100">
+                    <button onclick="exportLiveReportToPDF()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3.5 rounded-xl font-black text-sm shadow-md hover:from-blue-700 hover:to-indigo-700 transition active:scale-95">
+                        📥 정식 PDF 보고서 다운로드
+                    </button>
+                </div>
+            </div>
+
+            <div class="lg:col-span-3 bg-white p-10 rounded-3xl border border-slate-300 shadow-xl overflow-x-auto">
+                <div id="live-report-print-zone" class="bg-white text-slate-900 font-sans p-2 mx-auto" style="min-width: 900px;">
+                    </div>
+                <div class="absolute top-[-9999px] left-[-9999px] no-print" style="width: 300px; height: 200px;">
+                    <canvas id="hiddenDeptEmpChart"></canvas>
+                    <canvas id="hiddenDeptSalaryChart"></canvas>
+                    <canvas id="hiddenStatusRatioChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="docStorageModal" class="fixed inset-0 bg-slate-900/60 z-[9999] backdrop-blur-sm items-center justify-center p-4">
+    <div class="bg-white w-full max-w-lg rounded-3xl p-8 shadow-2xl">
+        <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold text-slate-900">📁 사내 증빙서류 및 서식 스토리지</h3><button onclick="closeDocStorage()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button></div>
+        <div class="mb-4"><label class="block text-xs font-bold text-slate-400 mb-2">공유할 증빙/인사 문서 업로드 (PDF, 이미지 등)</label><input type="file" id="docStorageInput" class="w-full text-xs border border-slate-200 rounded-xl px-3 py-2 bg-slate-50" onchange="uploadStorageFile()"></div>
+        <h4 class="text-xs font-bold text-slate-400 mb-2 uppercase">공유 파일 리스트</h4>
+        <div class="border border-slate-100 rounded-2xl p-2 bg-slate-50 max-h-[200px] overflow-y-auto"><ul id="sharedFileList" class="space-y-1 text-xs"></ul></div>
+    </div>
+</div>
+
+<div id="hrModal" class="fixed inset-0 bg-slate-900/60 z-[9999] backdrop-blur-sm items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-3xl p-8 shadow-2xl">
+        <h3 id="formTitle" class="text-2xl font-bold mb-6 text-slate-900">직원 정보 입력</h3><input type="hidden" id="targetIdx">
+        <div class="space-y-4">
+            <div><label class="block text-sm font-semibold mb-1">성명</label><input type="text" id="fName" class="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none shadow-sm"></div>
+            <div class="grid grid-cols-2 gap-4">
+                <div><label class="block text-sm font-semibold mb-1 text-xs text-slate-400">부서</label><input list="deptList" id="fDept" class="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none shadow-sm"><datalist id="deptList"><option value="경영기획팀"><option value="기업지원팀"><option value="청년지원팀"><option value="일자리창출팀"><option value="고용창출팀"><option value="중소기업AI확산팀"></datalist></div>
+                <div><label class="block text-sm font-semibold mb-1 text-xs text-slate-400">직급</label><select id="fRank" class="w-full border border-slate-200 rounded-xl px-4 py-3 bg-white shadow-sm"><option>전임</option><option>선임</option><option>책임</option><option>수석</option></select></div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div><label class="block text-sm font-semibold mb-1 text-xs text-slate-400">입사일</label><input type="date" id="fDate" class="w-full border border-slate-200 rounded-xl px-4 py-3 shadow-sm"></div>
+                <div><label class="block text-sm font-semibold text-blue-600 text-xs font-bold mb-1">월 기본급 (원)</label><input type="number" id="fSalary" class="w-full border border-blue-200 rounded-xl px-4 py-3 outline-none shadow-sm"></div>
+            </div>
+        </div>
+        <div class="flex gap-3 mt-8"><button onclick="closeForm()" class="flex-1 py-3 font-bold text-slate-500 hover:bg-slate-100 rounded-xl">취소</button><button onclick="saveData()" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold shadow-md hover:bg-blue-700">저장하기</button></div>
+    </div>
+</div>
+
+<div id="resignModal" class="fixed inset-0 bg-slate-900/60 z-[9999] backdrop-blur-sm items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl p-8 shadow-2xl text-center">
+        <h3 class="text-xl font-bold mb-2">퇴사 일자 기록</h3><p id="resignTargetName" class="text-sm text-slate-500 mb-6 font-bold"></p><input type="hidden" id="resignTargetIdx">
+        <div class="text-left mb-6"><label class="block text-xs font-bold text-slate-400 mb-2">퇴사일을 선택해주세요</label><input type="date" id="resignDateInput" class="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none"></div>
+        <div class="flex gap-3"><button onclick="closeResignModal()" class="flex-1 py-3 font-bold text-slate-500 hover:bg-slate-100 rounded-xl">취소</button><button onclick="confirmResign()" class="flex-1 bg-red-500 text-white py-3 rounded-xl font-bold">퇴사 확정</button></div>
+    </div>
+</div>
+
+<div id="vacationDetailModal" class="fixed inset-0 bg-slate-900/60 z-[9999] backdrop-blur-sm items-center justify-center p-4">
+    <div class="bg-white w-full max-w-3xl rounded-3xl p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-start mb-6 border-b border-slate-100 pb-4">
+            <div><h3 id="detailModalTitle" class="text-2xl font-black text-slate-900">연차 사용 내역 상세 관리</h3><p id="detailModalSubtitle" class="text-xs text-slate-400 font-bold mt-1"></p></div>
+            <button onclick="closeVacationModal()" class="text-slate-400 hover:text-slate-600 text-2xl font-bold">&times;</button>
+        </div>
+        <input type="hidden" id="detailTargetIdx">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="md:col-span-2 bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                <h4 class="text-sm font-bold text-slate-700 mb-3">✏️ 건별 직접 등록</h4>
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <div><label class="block text-xs font-bold text-slate-400 mb-1">사용 일자</label><input type="date" id="vUseDate" class="w-full text-xs border border-slate-200 rounded-xl px-3 py-2 bg-white"></div>
+                    <div><label class="block text-xs font-bold text-slate-400 mb-1">휴가 종류</label><select id="vType" class="w-full text-xs border border-slate-200 rounded-xl px-3 py-2 bg-white"><option value="연차">연차 (1.0일 차감)</option><option value="오전반차">오전반차 (0.5일 차감)</option><option value="오후반차">오후반차 (0.5일 차감)</option><option value="경조휴가">경조휴가 (0.0일 차감)</option><option value="공가">공가 (0.0일 차감)</option></select></div>
+                </div>
+                <div class="mb-4"><label class="block text-xs font-bold text-slate-400 mb-1">상세 사용 사유</label><input type="text" id="vReason" placeholder="예: 개인 사정" class="w-full text-xs border border-slate-200 rounded-xl px-3 py-2 bg-white"></div>
+                <button id="addVacActionBtn" onclick="addVacationRow()" class="w-full bg-blue-600 text-white text-xs font-bold py-2.5 rounded-xl hover:bg-blue-700">추가 및 메인 연동</button>
+            </div>
+            <div class="bg-amber-50/50 p-5 rounded-2xl border border-amber-200 flex flex-col justify-between">
+                <div><h4 class="text-sm font-bold text-amber-900 mb-2">📂 개별 내역 업로드</h4><p class="text-[11px] text-amber-700 leading-relaxed mb-3">CSV 연차 히스토리 파일 일괄 업로드</p></div>
+                <label id="addVacUploadLabel" class="w-full bg-amber-600 text-white text-xs font-bold py-3 rounded-xl hover:bg-amber-700 text-center cursor-pointer">CSV 내역 가져오기<input type="file" id="vacCsvFile" accept=".csv" class="hidden" onchange="uploadVacationCSV(event)"></label>
+            </div>
+        </div>
+        <h4 class="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">📋 사용 내역 히스토리</h4>
+        <div class="border border-slate-200 rounded-xl overflow-hidden bg-white max-h-[250px] overflow-y-auto"><table class="w-full text-xs text-center"><thead class="bg-slate-100 text-slate-600 font-bold"><tr><th class="p-3">사용 일자</th><th class="p-3">휴가 종류</th><th class="p-3 text-left">상세 사유</th><th class="p-3">차감 일수</th><th class="p-3">관리</th></tr></thead><tbody id="vacationHistoryList" class="divide-y divide-slate-100 text-slate-600"></tbody></table></div>
+    </div>
+</div>
+
+<script>
+    let employees = []; 
+    let currentFilter = '전체';
+    let globalFiles = JSON.parse(localStorage.getItem('hr_shared_files')) || [];
+    let hiddenCharts = { deptEmp: null, deptSalary: null, statusRatio: null };
+
+    // 탭 메뉴 대전환 처리 스위치 함수
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById(tabId).classList.add('active');
+        document.getElementById('btn-' + tabId).classList.add('active');
+        
+        if (tabId === 'report-tab') {
+            buildLiveReport(); // 보고서 탭 이동 시 동적 렌더링 동기화 구동
+        }
+    }
+
+    function downloadSample() {
+        const header = "성명,부서,직급,입사일,당해주기사용연차,기본급,퇴사여부(O/X),퇴사일\n";
+        const sample = "홍길동,중소기업AI확산팀,선임,2024-01-01,3,3200000,X,\n성춘향,청년지원팀,전임,2025-05-10,1,2600000,X,\n이몽룡,일자리창출팀,전임,2025-02-15,0,2500000,O,2026-03-24";
+        const blob = new Blob(["\uFEFF" + header + sample], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.setAttribute("download", "경남경총_인사관리_표준양식.csv"); link.click();
+    }
+
+    function getWorkInfo(dateStr, resignDateStr) {
+        const join = new Date(dateStr); const end = resignDateStr ? new Date(resignDateStr) : new Date();
+        let totalMonths = (end.getFullYear() - join.getFullYear()) * 12 + (end.getMonth() - join.getMonth());
+        if (end.getDate() < join.getDate()) totalMonths--; totalMonths = Math.max(0, totalMonths);
+        const totalYears = Math.floor(totalMonths / 12); const remainingMonths = totalMonths % 12;
+        let totalVac = totalMonths < 12 ? totalMonths : Math.min(25, 15 + Math.floor((totalYears - 1) / 2));
+        return { tenure: `${totalYears}년 ${remainingMonths}개월`, months: totalMonths, totalVac: totalVac };
+    }
+
+    // 메인 화면 관리 정보 렌더링
+    function render() {
+        const list = document.getElementById('empList'); const board = document.getElementById('statBoard'); const filterArea = document.getElementById('filterArea');
+        const hideResigned = document.getElementById('hideResigned').checked; const restoreBtn = document.getElementById('restoreBtn'); const loadPreviousBtn = document.getElementById('loadPreviousBtn');
+        list.innerHTML = '';
+        
+        let stats = { total: 0, sumSalary: 0, risk: 0, sumMonths: 0 };
+
+        employees.forEach(emp => {
+            const isDeptMatch = currentFilter === '전체' || emp.dept === currentFilter;
+            if (!emp.isResigned) {
+                if (isDeptMatch) {
+                    const info = getWorkInfo(emp.date, emp.resignDate);
+                    const remainVac = info.totalVac - (emp.vac || 0);
+                    stats.total++; stats.sumSalary += (emp.salary || 0); stats.sumMonths += info.months;
+                    if (emp.vac >= 5 && remainVac < 3) stats.risk++;
+                }
+            }
+        });
+        
+        const deptSet = new Set(); employees.forEach(emp => { if(emp.dept && !emp.isResigned) deptSet.add(emp.dept); });
+        const finalDepts = ['전체', ...Array.from(deptSet).sort((a, b) => a.localeCompare(b, 'ko'))];
+        filterArea.innerHTML = '';
+        finalDepts.forEach(d => {
+            filterArea.innerHTML += `<button onclick="setFilter('${d}')" class="filter-btn ${currentFilter === d ? 'active' : ''} text-xs font-bold px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 transition-all">${d}</button>`;
+        });
+
+        if (employees.length === 0) {
+            list.innerHTML = `<tr><td colspan="7" class="p-12 text-slate-400 text-sm font-medium text-center">인사 데이터가 없습니다.</td></tr>`;
+        } else {
+            const filteredData = employees.filter(emp => !(hideResigned && emp.isResigned) && (currentFilter === '전체' || emp.dept === currentFilter));
+            filteredData.sort((a, b) => a.isResigned - b.isResigned);
+
+            filteredData.forEach((emp) => {
+                const info = getWorkInfo(emp.date, emp.resignDate); const usedVac = emp.vac || 0; const remainVac = Math.max(0, info.totalVac - usedVac); 
+                const isRisk = !emp.isResigned && (remainVac < 3 && info.totalVac >= 5); const realIdx = employees.findIndex(e => e === emp);
+
+                list.innerHTML += `
+                    <tr class="${emp.isResigned ? 'resigned-row' : 'active-emp-row'} ${isRisk ? 'risk-row' : ''} hover:bg-slate-50 transition text-center">
+                        <td class="p-5 font-bold text-slate-900 text-left leading-tight">
+                            <span onclick="openVacationModal(${realIdx})" class="${emp.isResigned ? 'text-slate-400' : 'text-blue-600 hover:text-blue-800'} hover:underline cursor-pointer font-black text-base">${emp.name}</span>
+                            <br><span class="text-[10px] text-slate-400 font-medium">${emp.dept} / ${emp.rank}</span>
+                        </td>
+                        <td class="p-5 text-slate-500 text-xs">${emp.date}<br><span class="text-red-500 font-bold">${emp.resignDate || '-'}</span></td>
+                        <td class="p-5"><span class="bg-slate-100 text-slate-600 px-2 py-1 rounded-md text-[10px] font-bold">${info.tenure}</span></td>
+                        <td class="p-5 font-bold ${remainVac < 3 && !emp.isResigned ? 'text-red-500 font-black' : 'text-slate-600'}">${emp.isResigned ? '-' : remainVac + ' / ' + info.totalVac + '일'}</td>
+                        <td class="p-5 font-bold text-slate-800 text-sm bg-slate-50/50">${usedVac}일</td>
+                        <td class="p-5 font-black text-blue-700 bg-blue-50/20 text-sm">${(emp.salary || 0).toLocaleString()}원</td>
+                        <td class="p-5 flex gap-2 justify-center items-center pt-6 h-full">
+                            <button onclick="openForm(${realIdx})" class="text-blue-600 hover:bg-blue-50 px-2.5 py-1.5 rounded-lg text-xs font-bold" ${emp.isResigned ? 'style="display:none;"' : ''}>수정</button>
+                            ${emp.isResigned ? `<button onclick="rehire(${realIdx})" class="text-emerald-600 hover:bg-emerald-50 px-2.5 py-1.5 rounded-lg text-xs font-bold">복직</button>` : `<button onclick="openResignModal(${realIdx})" class="text-slate-400 hover:bg-slate-100 px-2.5 py-1.5 rounded-lg text-xs font-bold">퇴사</button>`}
+                            <button onclick="del(${realIdx})" class="text-red-400 hover:bg-red-50 px-2.5 py-1.5 rounded-lg text-xs font-bold">삭제</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        const avgMonths = stats.total ? Math.round(stats.sumMonths / stats.total) : 0;
+        board.innerHTML = `
+            <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm text-center"><p class="text-[10px] font-bold text-slate-400 uppercase">현재 가동인력</p><p class="text-2xl font-black">${stats.total}명</p></div>
+            <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm text-center"><p class="text-[10px] font-bold text-slate-400 uppercase">평균 근속수명</p><p class="text-2xl font-black text-indigo-600">${Math.floor(avgMonths/12)}년 ${avgMonths%12}개월</p></div>
+            <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm text-center"><p class="text-[10px] font-bold text-slate-400 uppercase">가동 평균급여</p><p class="text-2xl font-black text-blue-600">${stats.total ? Math.round(stats.sumSalary/stats.total).toLocaleString() : 0}원</p></div>
+            <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm text-center"><p class="text-[10px] font-bold text-slate-400 uppercase">총 급여 인건비</p><p class="text-2xl font-black text-emerald-600">${stats.sumSalary.toLocaleString()}원</p></div>
+            <div class="bg-white p-5 rounded-3xl border border-red-100 shadow-sm text-center"><p class="text-[10px] font-bold text-red-400 uppercase">연차 촉구 대상</p><p class="text-2xl font-black text-red-600">${stats.risk}명</p></div>`;
+
+        if(localStorage.getItem('hr_backup')) restoreBtn.classList.remove('hidden'); else restoreBtn.classList.add('hidden');
+        if (localStorage.getItem('hr_v14_data') && employees.length === 0) loadPreviousBtn.classList.remove('hidden'); else loadPreviousBtn.classList.add('hidden');
+        if (employees.length > 0) localStorage.setItem('hr_v14_data', JSON.stringify(employees));
+    }
+
+    // [핵심 기획 고도화] 눈으로 실시간 확인하며 커스텀 빌드하는 화이트 인사 보고서 생성기
+    function buildLiveReport() {
+        const reportZone = document.getElementById('live-report-print-zone');
+        reportZone.innerHTML = ''; // 공세 초기화
+
+        // 선택 컨트롤 옵션 값 바인딩
+        const optSummary = document.getElementById('repSummary').checked;
+        const optCharts = document.getElementById('repCharts').checked;
+        const optRisk = document.getElementById('repRisk').checked;
+        const optTable = document.getElementById('repTable').checked;
+
+        const today = new Date().toISOString().split('T')[0];
+
+        // 기초 핵심 연산 집계
+        let totalActive = 0, resignedCount = 0, sumSalary = 0, totalRisk = 0;
+        let deptCountMap = {}; let deptSalarySumMap = {};
+
+        employees.forEach(e => {
+            if (e.isResigned) { resignedCount++; } else {
+                totalActive++; sumSalary += e.salary;
+                const info = getWorkInfo(e.date, e.resignDate);
+                if(e.vac >= 5 && (info.totalVac - e.vac) < 3) totalRisk++;
+                if (e.dept) {
+                    deptCountMap[e.dept] = (deptCountMap[e.dept] || 0) + 1;
+                    deptSalarySumMap[e.dept] = (deptSalarySumMap[e.dept] || 0) + e.salary;
+                }
+            }
+        });
+
+        // 1단계 기본 기안 결재선 뼈대 구축
+        let htmlBuilder = `
+            <div class="p-6 text-slate-800 border border-slate-100 shadow-inner rounded-2xl bg-white">
+                <div class="flex justify-between items-start border-b-2 border-slate-800 pb-4 mb-6">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-slate-900">[정기] 경영보고용 인사/연차 종합 데이터 리포트</h2>
+                        <p class="text-[11px] text-slate-400 mt-1 font-bold">출력 기준일: ${today} | 보안 등급: 대외비(내부)</p>
+                    </div>
+                    <table class="border-collapse border border-slate-400 text-[11px] text-center">
+                        <tr>
+                            <th class="border border-slate-400 p-1 bg-slate-50 font-bold" rowspan="2">결<br>재</th>
+                            <td class="border border-slate-400 p-1 w-16 bg-slate-50 text-slate-500">인사담당</td>
+                            <td class="border border-slate-400 p-1 w-16 bg-slate-50 text-slate-500">부서장</td>
+                            <td class="border border-slate-400 p-1 w-16 bg-slate-50 text-slate-500">대표이사</td>
+                        </tr>
+                        <tr style="height: 35px;"><td class="border border-slate-400 text-[9px] text-slate-300 align-bottom">인</td><td class="border border-slate-400 text-[9px] text-slate-300 align-bottom">인</td><td class="border border-slate-400 text-[9px] text-slate-300 align-bottom">인</td></tr>
+                    </table>
+                </div>
+        `;
+
+        // 요약 정보 모듈 조건 렌더링
+        if (optSummary) {
+            htmlBuilder += `
+                <div class="mb-6">
+                    <h4 class="text-sm font-black text-slate-900 border-l-4 border-blue-600 pl-2 mb-3">1. 총괄 노무관리 요약 지표</h4>
+                    <div class="grid grid-cols-4 gap-2 text-center text-xs">
+                        <div class="border border-slate-200 p-3 rounded-lg bg-slate-50"><p class="text-[10px] text-slate-400 font-bold">재직 근로자</p><p class="text-sm font-black text-slate-800 mt-1">${totalActive} 명</p></div>
+                        <div class="border border-slate-200 p-3 rounded-lg bg-slate-50"><p class="text-[10px] text-slate-400 font-bold">월 총 인건비</p><p class="text-sm font-black text-blue-600 mt-1">${sumSalary.toLocaleString()} 원</p></div>
+                        <div class="border border-slate-200 p-3 rounded-lg bg-slate-50"><p class="text-[10px] text-slate-400 font-bold">평균 급여액</p><p class="text-sm font-black text-slate-800 mt-1">${totalActive ? Math.round(sumSalary/totalActive).toLocaleString() : 0} 원</p></div>
+                        <div class="border border-slate-200 p-3 rounded-lg bg-rose-50 border-rose-200"><p class="text-[10px] text-red-500 font-bold">연차 주의군</p><p class="text-sm font-black text-red-600 mt-1">${totalRisk} 명</p></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 그래프 이미지 스냅샷 모듈 조건 렌더링
+        if (optCharts) {
+            htmlBuilder += `
+                <div class="mb-6">
+                    <h4 class="text-sm font-black text-slate-900 border-l-4 border-blue-600 pl-2 mb-3">2. 구조화 조직 통계 분석 그래프</h4>
+                    <div class="grid grid-cols-3 gap-3 text-center">
+                        <div class="border border-slate-200 p-2 rounded-xl bg-white"><p class="text-[10px] font-bold text-slate-500 mb-2">[부서별 인원 비중]</p><img id="imgChart1" class="mx-auto h-32 object-contain"></div>
+                        <div class="border border-slate-200 p-2 rounded-xl bg-white"><p class="text-[10px] font-bold text-slate-500 mb-2">[부서별 평균 급여 대역]</p><img id="imgChart2" class="mx-auto h-32 object-contain"></div>
+                        <div class="border border-slate-200 p-2 rounded-xl bg-white"><p class="text-[10px] font-bold text-slate-500 mb-2">[인력 운영 안정성 현황]</p><img id="imgChart3" class="mx-auto h-32 object-contain"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 위험군 테이블 조건 렌더링
+        if (optRisk) {
+            let trs = '';
+            employees.forEach(e => {
+                if(!e.isResigned) {
+                    const info = getWorkInfo(e.date, e.resignDate); const remain = info.totalVac - e.vac;
+                    if(e.vac >= 5 && remain < 3) {
+                        trs += `<tr class="bg-rose-50/40 text-center text-[11px]"><td class="border border-slate-200 p-1.5 font-bold">${e.name}</td><td class="border border-slate-200 p-1.5">${e.dept}</td><td class="border border-slate-200 p-1.5">${e.date}</td><td class="border border-slate-200 p-1.5 text-red-500 font-bold">${remain}일 / ${info.totalVac}일</td><td class="border border-slate-200 p-1.5 font-bold">${e.vac}일</td></tr>`;
+                    }
+                }
+            });
+            if(!trs) trs = `<tr><td colspan="5" class="border border-slate-200 p-3 text-center text-xs text-slate-400">안정 관리 상태 (노무 위험군 없음)</td></tr>`;
+            htmlBuilder += `
+                <div class="mb-6">
+                    <h4 class="text-sm font-black text-slate-900 border-l-4 border-blue-600 pl-2 mb-3">3. 근로기준법 제61조 연차 촉구 상시 관리 대상</h4>
+                    <table class="w-full border-collapse border border-slate-300 text-[11px]"><thead class="bg-slate-50 font-bold text-center"><tr><th class="border border-slate-300 p-1.5">사원명</th><th class="border border-slate-300 p-1.5">소속 부서</th><th class="border border-slate-300 p-1.5">입사일자</th><th class="border border-slate-300 p-1.5 text-red-500">잔여 / 발생연차</th><th class="border border-slate-300 p-1.5">당해 사용연차</th></tr></thead><tbody>${trs}</tbody></table>
+                </div>
+            `;
+        }
+
+        // 전체 임직원 대장 명부 조건 렌더링
+        if (optTable) {
+            let trsAll = '';
+            employees.forEach(e => {
+                const info = getWorkInfo(e.date, e.resignDate);
+                trsAll += `<tr class="text-center text-[11px] ${e.isResigned ? 'text-slate-300 bg-slate-50' : ''}"><td class="border border-slate-200 p-1.5 font-bold">${e.name}</td><td class="border border-slate-200 p-1.5">${e.dept} / ${e.rank}</td><td class="border border-slate-200 p-1.5">${e.date}</td><td class="border border-slate-200 p-1.5 font-bold">${e.isResigned ? '-' : (info.totalVac - e.vac) + '일'}</td><td class="border border-slate-200 p-1.5">${e.vac}일</td><td class="border border-slate-200 p-1.5 font-bold">${e.salary.toLocaleString()}원</td><td class="border border-slate-200 p-1.5">${e.isResigned ? '<span class="text-red-400">퇴사</span>' : '재직'}</td></tr>`;
+            });
+            htmlBuilder += `
+                <div>
+                    <h4 class="text-sm font-black text-slate-900 border-l-4 border-blue-600 pl-2 mb-3">4. 회사 임직원 마스터 종합 대장</h4>
+                    <table class="w-full border-collapse border border-slate-300 text-[10px]"><thead class="bg-slate-900 text-white font-bold text-center"><tr><th class="border border-slate-300 p-1.5">성명</th><th class="border border-slate-300 p-1.5">부서 / 직급</th><th class="border border-slate-300 p-1.5">입사일자</th><th class="border border-slate-300 p-1.5">연차 잔여</th><th class="border border-slate-300 p-1.5">연차 사용</th><th class="border border-slate-300 p-1.5">월 기본급</th><th class="border border-slate-300 p-1.5">상태</th></tr></thead><tbody>${trsAll}</tbody></table>
+                </div>
+            `;
+        }
+
+        htmlBuilder += `</div>`;
+        reportZone.innerHTML = htmlBuilder;
+
+        // 오프스크린 캔버스에 백그라운드 Chart 생성 후 스냅샷 이미지 교정 연동
+        if (optCharts) {
+            buildHiddenCharts(deptCountMap, deptSalarySumMap, totalActive, resignedCount);
+        }
+    }
+
+    // 숨겨진 오프스크린 캔버스에 차트 렌더링 후 리포트 이미지 태그 소스 주입
+    function buildHiddenCharts(deptCount, deptSalarySum, activeCount, resignedCount) {
+        const depts = Object.keys(deptCount); const counts = Object.values(deptCount);
+        const avgSalaries = depts.map(dept => Math.round(deptSalarySum[dept] / deptCount[dept]));
+        const chartOptions = { animation: false, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true } } };
+
+        if (hiddenCharts.deptEmp) hiddenCharts.deptEmp.destroy();
+        hiddenCharts.deptEmp = new Chart(document.getElementById('hiddenDeptEmpChart').getContext('2d'), {
+            type: 'doughnut', data: { labels: depts, datasets: [{ data: counts, backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#a855f7', '#ec4899'] }] }, options: chartOptions
+        });
+        if (hiddenCharts.deptSalary) hiddenCharts.deptSalary.destroy();
+        hiddenCharts.deptSalary = new Chart(document.getElementById('hiddenDeptSalaryChart').getContext('2d'), {
+            type: 'bar', data: { labels: depts, datasets: [{ label: '평균 급여(원)', data: avgSalaries, backgroundColor: 'rgba(99, 102, 241, 0.75)' }] }, options: chartOptions
+        });
+        if (hiddenCharts.statusRatio) hiddenCharts.statusRatio.destroy();
+        hiddenCharts.statusRatio = new Chart(document.getElementById('hiddenStatusRatioChart').getContext('2d'), {
+            type: 'pie', data: { labels: ['재직', '퇴사'], datasets: [{ data: [activeCount, resignedCount], backgroundColor: ['#2563eb', '#cbd5e1'] }] }, options: chartOptions
+        });
+
+        // 차트 렌더링 직후 이미지 소스로 이관 (setTimeout 우회 안정성 확보)
+        setTimeout(() => {
+            const img1 = document.getElementById('imgChart1');
+            const img2 = document.getElementById('imgChart2');
+            const img3 = document.getElementById('imgChart3');
+            if(img1) img1.src = document.getElementById('hiddenDeptEmpChart').toDataURL();
+            if(img2) img2.src = document.getElementById('hiddenDeptSalaryChart').toDataURL();
+            if(img3) img3.src = document.getElementById('hiddenStatusRatioChart').toDataURL();
+        }, 150);
+    }
+
+    // 눈에 보이는 그대로 PDF 내보내기 모듈 (html2pdf 안정성 완전 복구)
+    function exportLiveReportToPDF() {
+        const element = document.getElementById('live-report-print-zone');
+        const today = new Date().toISOString().split('T')[0];
+        
+        const opt = {
+            margin: 10,
+            filename: `경남경총_인사노무종합보고서_${today}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, backgroundColor: '#ffffff', useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+        };
+
+        html2pdf().from(element).set(opt).save();
+    }
+
+    // 기존 데이터 관리 컴포넌트 편의 기능 모듈
+    function openDocStorage() { document.getElementById('docStorageModal').classList.add('show'); renderStorageFiles(); }
+    function closeDocStorage() { document.getElementById('docStorageModal').classList.remove('show'); }
+    function uploadStorageFile() {
+        const input = document.getElementById('docStorageInput'); const file = input.files[0]; if(!file) return;
+        const reader = new FileReader(); reader.onload = function(e) {
+            globalFiles.push({ name: file.name, data: e.target.result }); localStorage.setItem('hr_shared_files', JSON.stringify(globalFiles)); renderStorageFiles(); input.value = '';
+        }; reader.readAsDataURL(file);
+    }
+    function renderStorageFiles() {
+        const listHTML = document.getElementById('sharedFileList'); listHTML.innerHTML = globalFiles.length === 0 ? '<li class="text-slate-400 text-center py-4">공유 문서 없음</li>' : '';
+        globalFiles.forEach((f, idx) => {
+            listHTML.innerHTML += `<li class="flex justify-between items-center p-2 bg-white rounded-xl border border-slate-100 my-1"><a href="${f.data}" download="${f.name}" class="text-blue-600 hover:underline font-bold truncate max-w-[350px]">📄 ${f.name}</a><button onclick="deleteStorageFile(${idx})" class="text-red-500 font-bold px-1">❌</button></li>`;
+        });
+    }
+    function deleteStorageFile(idx) { if(confirm('삭제하시겠습니까?')) { globalFiles.splice(idx, 1); localStorage.setItem('hr_shared_files', JSON.stringify(globalFiles)); renderStorageFiles(); } }
+    function openVacationModal(idx) {
+        const emp = employees[idx]; if(!emp.vacHistory) emp.vacHistory = [];
+        if (emp.vacHistory.length === 0 && (emp.vac || 0) > 0) emp.vacHistory.push({ date: emp.date, type: '연차(초기분)', reason: '자동 이관', amount: emp.vac });
+        document.getElementById('vacationDetailModal').classList.add('show'); document.getElementById('detailTargetIdx').value = idx;
+        document.getElementById('detailModalTitle').innerText = `📊 ${emp.name}님의 연차 관리`; document.getElementById('detailModalSubtitle').innerText = `${emp.dept} / ${emp.rank}`;
+        document.getElementById('vUseDate').value = new Date().toISOString().split('T')[0]; document.getElementById('vType').value = "연차"; document.getElementById('vReason').value = "";
+        document.getElementById('addVacActionBtn').style.display = emp.isResigned ? 'none' : 'block'; document.getElementById('addVacUploadLabel').style.display = emp.isResigned ? 'none' : 'block';
+        renderVacationHistory(idx);
+    }
+    function closeVacationModal() { document.getElementById('vacationDetailModal').classList.remove('show'); }
+    function renderVacationHistory(idx) {
+        const emp = employees[idx]; const historyList = document.getElementById('vacationHistoryList'); historyList.innerHTML = '';
+        if (!emp.vacHistory || emp.vacHistory.length === 0) { historyList.innerHTML = `<tr><td colspan="5" class="p-8 text-slate-400 text-center">휴가 내역 없음</td></tr>`; return; }
+        [...emp.vacHistory].sort((a,b) => new Date(b.date) - new Date(a.date)).forEach((item) => {
+            const orgIdx = emp.vacHistory.findIndex(h => h === item);
+            historyList.innerHTML += `<tr class="hover:bg-slate-50 text-center"><td class="p-3 font-bold">${item.date}</td><td><span class="bg-slate-100 px-2 py-0.5 rounded-md font-bold text-[11px]">${item.type}</span></td><td class="text-left max-w-xs truncate">${item.reason || '-'}</td><td class="font-black text-indigo-600">${item.amount}일</td><td>${emp.isResigned ? '-' : `<button onclick="removeVacationRow(${idx}, ${orgIdx})" class="text-red-400 font-bold">삭제</button>`}</td></tr>`;
+        });
+    }
+    function addVacationRow() {
+        const idx = document.getElementById('detailTargetIdx').value; const date = document.getElementById('vUseDate').value; const type = document.getElementById('vType').value; const reason = document.getElementById('vReason').value;
+        let amount = (type === '오전반차' || type === '오후반차') ? 0.5 : (type === '경조휴가' || type === '공가' ? 0.0 : 1.0); employees[idx].vacHistory.push({ date, type, reason, amount });
+        calculateTotalVacation(idx); document.getElementById('vReason').value = ""; renderVacationHistory(idx); render();
+    }
+    function removeVacationRow(empIdx, historyIdx) { if (confirm('삭제하겠습니까?')) { employees[empIdx].vacHistory.splice(historyIdx, 1); calculateTotalVacation(empIdx); renderVacationHistory(empIdx); render(); } }
+    function calculateTotalVacation(idx) { employees[idx].vac = employees[idx].vacHistory.reduce((sum, item) => sum + item.amount, 0); }
+    function uploadVacationCSV(event) {
+        const idx = document.getElementById('detailTargetIdx').value; const file = event.target.files[0]; if(!file) return;
+        const reader = new FileReader(); reader.onload = e => {
+            rows = e.target.result.split(/\r?\n/).slice(1); rows.forEach(row => {
+                const cols = row.split(',').map(c => c.trim()); if(cols.length < 2) return; const [date, type, reason, amountStr] = cols; if(!date) return;
+                let amount = isNaN(Number(amountStr)) ? (type.includes('반차') ? 0.5 : (type.includes('경조') || type.includes('공가') ? 0.0 : 1.0)) : Number(amountStr);
+                employees[idx].vacHistory.push({ date, type, reason: reason || '', amount });
+            }); calculateTotalVacation(idx); alert('이관 완료.'); event.target.value = ''; renderVacationHistory(idx); render();
+        }; reader.readAsText(file, 'UTF-8');
+    }
+    function loadPreviousData() { const savedData = localStorage.getItem('hr_v14_data'); if (savedData) { employees = JSON.parse(savedData); render(); alert('이전 셋업 완료.'); } }
+    function restoreBackup() { const backup = localStorage.getItem('hr_backup'); if(backup && confirm('롤백?')) { employees = JSON.parse(backup); localStorage.removeItem('hr_backup'); render(); } }
+    function setFilter(dept) { currentFilter = dept; render(); }
+    function openResignModal(idx) { document.getElementById('resignModal').classList.add('show'); document.getElementById('resignTargetIdx').value = idx; document.getElementById('resignTargetName').innerText = `${employees[idx].name} (${employees[idx].dept})`; document.getElementById('resignDateInput').value = new Date().toISOString().split('T')[0]; }
+    function closeResignModal() { document.getElementById('resignModal').classList.remove('show'); }
+    function confirmResign() { const idx = document.getElementById('resignTargetIdx').value; const date = document.getElementById('resignDateInput').value; employees[idx].isResigned = true; employees[idx].resignDate = date; closeResignModal(); render(); }
+    function rehire(idx) { if(confirm('복직?')) { employees[idx].isResigned = false; delete employees[idx].resignDate; render(); } }
+    function openForm(idx) { document.getElementById('hrModal').classList.add('show'); document.getElementById('targetIdx').value = idx; if(idx === -1) { document.getElementById('formTitle').innerText = "신규 입사자 등록"; document.getElementById('fName').value = ""; document.getElementById('fDept').value = ""; document.getElementById('fDate').value = new Date().toISOString().split('T')[0]; document.getElementById('fSalary').value = ""; } else { const e = employees[idx]; document.getElementById('formTitle').innerText = `${e.name} 정보 수정`; document.getElementById('fName').value = e.name; document.getElementById('fDept').value = e.dept; document.getElementById('fRank').value = e.rank; document.getElementById('fDate').value = e.date; document.getElementById('fSalary').value = e.salary || 0; } }
+    function closeForm() { document.getElementById('hrModal').classList.remove('show'); }
+    function saveData() {
+        const idx = document.getElementById('targetIdx').value; const name = document.getElementById('fName').value; const dept = document.getElementById('fDept').value; if(!name || !dept) return alert("필수 값 누락");
+        const isNew = idx == -1; const obj = isNew ? { vac: 0, isResigned: false, vacHistory: [] } : employees[idx];
+        const newObj = { ...obj, name, dept, rank: document.getElementById('fRank').value, date: document.getElementById('fDate').value, salary: Number(document.getElementById('fSalary').value) || 0 };
+        if(isNew) employees.push(newObj); else employees[idx] = newObj; closeForm(); render();
+    }
+    function del(i) { if(confirm('삭제?')) { employees.splice(i,1); render(); } }
+    function uploadCSV(event) { 
+        const file = event.target.files[0]; if(!file) return; localStorage.setItem('hr_backup', JSON.stringify(employees));
+        const reader = new FileReader(); reader.onload = e => { 
+            const bytes = new Uint8Array(e.target.result); let isUtf8 = true;
+            for (let i = 0; i < bytes.length; i++) { if (bytes[i] > 0x7F) { if ((bytes[i] & 0xE0) === 0xC0 && i + 1 < bytes.length && (bytes[i+1] & 0xC0) === 0x80) { i += 1; } else if ((bytes[i] & 0xF0) === 0xE0 && i + 2 < bytes.length && (bytes[i+1] & 0xC0) === 0x80 && (bytes[i+2] & 0xC0) === 0x80) { i += 2; } else { isUtf8 = false; break; } } }
+            const textReader = new FileReader(); textReader.onload = evt => {
+                evt.target.result.split(/\r?\n/).forEach((row, rIdx) => {
+                    if(rIdx === 0 || !row.trim()) return; const cols = row.split(',').map(c => c.trim()); if(cols.length < 4) return; 
+                    let [name, dept, rank, date, vac, salary, isR, rDate] = cols; if(!name || !date) return; const idx = employees.findIndex(emp => emp.name === name && emp.date === date); 
+                    const obj = { name, dept, rank, date, vac: Number(vac) || 0, salary: Number(salary) || 0, isResigned: (isR === 'O'), resignDate: (rDate && rDate !== '-') ? rDate : null, vacHistory: (idx !== -1 && employees[idx].vacHistory) ? employees[idx].vacHistory : [] }; 
+                    if(idx !== -1) employees[idx] = obj; else employees.push(obj);
+                }); alert('인사 명부 연동 완료!'); event.target.value = ''; render(); 
+            }; textReader.readAsText(file, isUtf8 ? 'UTF-8' : 'EUC-KR');
+        }; reader.readAsArrayBuffer(file); 
+    }
+
+    // 기본 가동 더미 데이터 셋업
+    if(employees.length === 0) {
+        employees = [
+            { name: "홍길동", dept: "중소기업AI확산팀", rank: "선임", date: "2024-01-01", vac: 5, salary: 3200000, isResigned: false, vacHistory: [{date:"2026-05-11", type:"연차", reason:"개인사정", amount:1.0},{date:"2026-06-01", type:"연차", reason:"병원진료", amount:4.0}] },
+            { name: "성춘향", dept: "청년지원팀", rank: "전임", date: "2025-05-10", vac: 1, salary: 2600000, isResigned: false, vacHistory: [] },
+            { name: "이몽룡", dept: "일자리창출팀", rank: "전임", date: "2025-02-15", vac: 0, salary: 2500000, isResigned: true, resignDate: "2026-03-24", vacHistory: [] }
+        ];
+    }
+    render();
+</script>
+</body>
+</html>

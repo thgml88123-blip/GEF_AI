@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>직무별 웹보드 샘플 갤러리 | 중소기업 AI훈련 확산센터</title>
+
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta name="description" content="직무별 웹보드 샘플 갤러리 - 인사·자재·품질 등 직무별 표준 웹보드 샘플을 제공합니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="직무별 웹보드 샘플 갤러리 | 중소기업 AI훈련 확산센터">
+  <meta property="og:description" content="인사·자재·품질 등 직무별 표준 웹보드 샘플을 제공합니다.">
+  <meta property="og:image" content="favicon.svg">
+  <meta name="twitter:card" content="summary">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+
+  <!-- Custom Modern Design System -->
+  <link rel="stylesheet" href="css/custom-theme.css">
+
+  <style>
+    .nav-breadcrumb {
+      background: #FFFFFF;
+      padding: 14px 0;
+      border-bottom: 1px solid #E2E8F0;
+      box-shadow: var(--ai-shadow-sm);
+    }
+    .hero-banner {
+      background: #FFFFFF;
+      background-image: 
+        radial-gradient(at 10% 10%, rgba(224, 242, 254, 0.75) 0px, transparent 50%),
+        radial-gradient(at 90% 90%, rgba(238, 242, 255, 0.75) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(240, 249, 255, 0.5) 0px, transparent 60%);
+      color: #0F172A;
+      padding: 50px 0;
+      border-bottom: 1px solid #E2E8F0;
+      border-radius: 0 0 var(--ai-radius-xl) var(--ai-radius-xl);
+    }
+    .job-card {
+      background: white;
+      border: 1px solid #E2E8F0;
+      border-radius: var(--ai-radius-xl);
+      box-shadow: var(--ai-shadow-md);
+      transition: var(--ai-transition);
+      margin-bottom: 36px;
+      overflow: hidden;
+    }
+    .job-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--ai-shadow-lg);
+    }
+    
+    .preview-container { 
+      position: relative; 
+      width: 100%; 
+      height: 260px;
+      overflow: hidden; 
+      background: #F8FAFC; 
+    }
+    
+    .preview-window { 
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 200%;
+      height: 200%;
+      border: none;
+      transform: scale(0.5);
+      transform-origin: top left;
+      pointer-events: none;
+    }
+    
+    footer {
+      background: var(--ai-primary-dark);
+      color: rgba(255, 255, 255, 0.7);
+      padding: 40px 0;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="nav-breadcrumb">
+  <div class="container d-flex justify-content-between align-items-center">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="index.html" class="text-decoration-none text-secondary"><i class="bi bi-house-door-fill me-1"></i>홈</a></li>
+        <li class="breadcrumb-item"><a href="coach.html" class="text-decoration-none text-secondary">코치 전용관</a></li>
+        <li class="breadcrumb-item active fw-bold text-primary">웹보드 샘플 갤러리</li>
+      </ol>
+    </nav>
+    <a href="coach.html" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold">
+      <i class="bi bi-arrow-left me-1"></i> 코치 전용관으로 돌아가기
+    </a>
+  </div>
+</div>
+
+<header class="hero-banner text-center shadow-sm">
+  <div class="container">
+    <span class="badge bg-primary-subtle text-primary mb-3 fw-bold rounded-pill px-3 py-1.5 border border-primary-subtle fs-6"><i class="bi bi-layout-text-window-reverse me-1"></i> No-Code Prototype Gallery</span>
+    <h1 class="fw-black mb-2 text-dark" style="font-size: 2.2rem; color: #0F172A !important;">직무 맞춤형 AI 웹보드 샘플관</h1>
+    <p class="text-secondary mx-auto fs-6 mb-0 fw-semibold" style="color: #475569 !important;">현장 실무자가 바로 내려받아 사용하는 생성형 AI 표준 애플리케이션 프로토타입</p>
+  </div>
+</header>
+
+<main class="container py-5">
+  
+  <!-- 1번 카드 -->
+  <div class="card job-card border-top border-primary border-4">
+    <div class="card-header bg-white p-4 d-flex justify-content-between align-items-center border-0">
+      <div class="d-flex align-items-center gap-3">
+        <div class="step-icon-wrapper" style="width: 52px; height: 52px; font-size: 1.6rem; background: #EFF6FF; color: var(--ai-accent);">
+          <i class="bi bi-box-seam-fill"></i>
+        </div>
+        <div>
+          <span class="badge bg-primary-subtle text-primary fw-bold mb-1">제조 / 품질 / 자재</span>
+          <h3 class="fw-bold mb-0 text-dark" style="font-size: 1.35rem;">1. 통합 자재 및 품질관리 웹보드</h3>
+        </div>
+      </div>
+    </div>
+    <div class="card-body p-4 border-top">
+      <div class="row g-4 align-items-center">
+        <div class="col-lg-5">
+          <ul class="lh-lg text-secondary small ps-3 mb-4">
+            <li><i class="bi bi-check2-circle me-2 text-primary"></i>안전재고 자동 경고 시스템 연동</li>
+            <li><i class="bi bi-check2-circle me-2 text-primary"></i>공정 불량률(PPM) 실시간 분석 대시보드</li>
+            <li><i class="bi bi-check2-circle me-2 text-primary"></i>CSV 엑셀 데이터 마스터 즉시 임포트</li>
+          </ul>
+          <a href="4.AI훈련표준모델/웹보드샘플_자재품질관리.html" download class="btn btn-ai-primary py-3 rounded-pill fw-bold w-100 shadow-sm fs-6">
+            <i class="bi bi-download me-2"></i>웹보드 코드 다운로드 (.html)
+          </a>
+        </div>
+        <div class="col-lg-7">
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+            <h6 class="fw-bold mb-0 text-secondary small text-uppercase"><i class="bi bi-display me-1"></i> 미리보기 Mockup</h6>
+            <a href="4.AI훈련표준모델/웹보드샘플_자재품질관리.html" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 fw-bold" style="font-size: 0.78rem;">
+              <i class="bi bi-box-arrow-up-right me-1"></i> 새 창에서 전체 화면 체험하기
+            </a>
+          </div>
+          
+          <!-- Browser Mockup Wrapper -->
+          <div class="browser-mockup">
+            <div class="browser-header">
+              <div class="browser-dots">
+                <span class="browser-dot browser-dot-red"></span>
+                <span class="browser-dot browser-dot-yellow"></span>
+                <span class="browser-dot browser-dot-green"></span>
+              </div>
+              <div class="browser-address">
+                <i class="bi bi-lock-fill text-success"></i> https://ai-center.gef.or.kr/samples/material-quality.html
+              </div>
+            </div>
+            <div class="preview-container">
+              <iframe src="4.AI훈련표준모델/웹보드샘플_자재품질관리.html" class="preview-window" title="자재품질관리 웹보드 미리보기"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2번 카드 -->
+  <div class="card job-card border-top border-warning border-4">
+    <div class="card-header bg-white p-4 d-flex justify-content-between align-items-center border-0">
+      <div class="d-flex align-items-center gap-3">
+        <div class="step-icon-wrapper" style="width: 52px; height: 52px; font-size: 1.6rem; background: #FEF3C7; color: #D97706;">
+          <i class="bi bi-person-gear"></i>
+        </div>
+        <div>
+          <span class="badge bg-warning-subtle text-warning-emphasis fw-bold mb-1">인사 / 노무 / 총무</span>
+          <h3 class="fw-bold mb-0 text-dark" style="font-size: 1.35rem;">2. 사내 연차 및 인사관리 웹보드</h3>
+        </div>
+      </div>
+    </div>
+    <div class="card-body p-4 border-top">
+      <div class="row g-4 align-items-center">
+        <div class="col-lg-5">
+          <ul class="lh-lg text-secondary small ps-3 mb-4">
+            <li><i class="bi bi-check2-circle me-2 text-warning"></i>재직자 명부 및 퇴직 자동 추적 관리</li>
+            <li><i class="bi bi-check2-circle me-2 text-warning"></i>개인별 연차 상세 발생/사용 이력 추적</li>
+            <li><i class="bi bi-check2-circle me-2 text-warning"></i>급여 및 개인정보 실시간 마스킹 보관</li>
+          </ul>
+          <a href="4.AI훈련표준모델/웹보드샘플_인사관리.html" download class="btn btn-warning text-dark py-3 rounded-pill fw-bold w-100 shadow-sm fs-6">
+            <i class="bi bi-download me-2"></i>웹보드 코드 다운로드 (.html)
+          </a>
+        </div>
+        <div class="col-lg-7">
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+            <h6 class="fw-bold mb-0 text-secondary small text-uppercase"><i class="bi bi-display me-1"></i> 미리보기 Mockup</h6>
+            <a href="4.AI훈련표준모델/웹보드샘플_인사관리.html" target="_blank" class="btn btn-sm btn-outline-warning text-dark rounded-pill px-3 py-1 fw-bold" style="font-size: 0.78rem;">
+              <i class="bi bi-box-arrow-up-right me-1"></i> 새 창에서 전체 화면 체험하기
+            </a>
+          </div>
+
+          <!-- Browser Mockup Wrapper -->
+          <div class="browser-mockup">
+            <div class="browser-header">
+              <div class="browser-dots">
+                <span class="browser-dot browser-dot-red"></span>
+                <span class="browser-dot browser-dot-yellow"></span>
+                <span class="browser-dot browser-dot-green"></span>
+              </div>
+              <div class="browser-address">
+                <i class="bi bi-lock-fill text-success"></i> https://ai-center.gef.or.kr/samples/hr-vacation.html
+              </div>
+            </div>
+            <div class="preview-container">
+              <iframe src="4.AI훈련표준모델/웹보드샘플_인사관리.html" class="preview-window" title="인사관리 웹보드 미리보기"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="text-center">
+  <div class="container">
+    <p class="fw-bold text-white mb-2">경남경영자총협회 중소기업AI훈련확산센터</p>
+    <p class="mb-1 opacity-75">창원시 성산구 중앙대로 228번길 6 씨티알빌딩 5층 | T. 055-266-1939</p>
+    <hr class="border-secondary my-4 opacity-25">
+    <p class="small mb-0 opacity-50">© 2026 Gyeongnam Employers Federation. All rights reserved.</p>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NEXUS 품질 관제 프로토콜 v30.30.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        body { background: radial-gradient(circle at top right, #1e1b4b, #0f172a 40%, #020617); color: #f8fafc; font-family: 'Pretendard', sans-serif; overflow-x: hidden; overflow-y: auto; letter-spacing: -0.01em; }
+        @media (min-width: 1024px) { body { overflow: hidden; } }
+        .glass { background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1); }
+        .tab-btn { padding: 14px 22px; cursor: pointer; border-bottom: 3px solid transparent; color: #94a3b8; font-weight: 600; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); font-size: 14px; white-space: nowrap; }
+        .tab-btn:hover { color: #f8fafc; background: rgba(255, 255, 255, 0.04); border-radius: 12px 12px 0 0; }
+        .tab-btn.active { border-color: #f43f5e; color: #fecdd3; background: linear-gradient(180deg, rgba(244, 63, 94, 0.15) 0%, rgba(244, 63, 94, 0.02) 100%); font-weight: 800; text-shadow: 0 0 12px rgba(244, 63, 94, 0.5); border-radius: 12px 12px 0 0; }
+        .hidden-tab { display: none !important; }
+        select, input { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); color: white; border-radius: 10px; padding: 8px 14px; font-size: 13px; outline: none; transition: all 0.3s; }
+        select:focus, input:focus { border-color: #f43f5e; box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.25); }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+        .dropzone { transition: all 0.4s; border: 2px dashed rgba(148, 163, 184, 0.3); background: rgba(15, 23, 42, 0.4); }
+        .dropzone.dragover { background: rgba(244, 63, 94, 0.15); border-color: #f43f5e; transform: scale(1.02); }
+        tbody tr { transition: all 0.25s; }
+        tbody tr:hover { background: rgba(255, 255, 255, 0.05) !important; transform: translateY(-2px); }
+        #toastContainer { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+        .toast { padding: 12px 24px; border-radius: 14px; font-size: 14px; font-weight: 700; backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.15); }
+        .toast-success { background: linear-gradient(135deg, rgba(16, 185, 129, 0.95), rgba(5, 150, 105, 0.95)); color: white; }
+        .toast-error   { background: linear-gradient(135deg, rgba(244, 63, 94, 0.95), rgba(225, 29, 72, 0.95)); color: white; }
+        @media print {
+            body.printing-receipt > *:not(#modalBackdrop) { display: none !important; }
+            body.printing-receipt #modalBackdrop { background: white !important; position: absolute; top:0; left:0; display: block !important; }
+            body.printing-receipt #receiptModal { max-width: 100%; width: 100%; background: white; color: black; display: block !important; padding: 20mm; }
+            body.printing-receipt #receiptModal * { color: black !important; border-color: #555 !important; }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body class="min-h-screen lg:h-screen flex flex-col p-2 lg:p-4 gap-4 relative">
+    <div id="toastContainer"></div>
+
+    <header class="glass p-3 lg:p-4 flex flex-col md:flex-row justify-between items-start md:items-center shrink-0 gap-3 relative z-50">
+        <div class="flex items-center gap-3 w-full md:w-auto justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-rose-500 to-orange-600 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(244,63,94,0.5)] cursor-default">
+                    <i class="fa-solid fa-microscope text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg lg:text-xl font-black tracking-tighter uppercase text-white leading-tight">NEXUS 품질 관제 <span class="text-rose-400">CORE</span></h1>
+                    <p class="text-[9px] lg:text-[10px] text-slate-400 font-bold tracking-widest uppercase mt-0.5">V30.30.0 - Quality Intelligence Architecture</p>
+                </div>
+            </div>
+            <div class="md:hidden flex items-center gap-4">
+                <div class="relative cursor-pointer p-1.5" onclick="App.UI.toggleNotification()">
+                    <i class="fa-solid fa-bell text-slate-300 text-xl hover:text-white transition"></i>
+                    <span id="notifBadgeMobile" class="absolute top-0 right-0 bg-rose-500 text-white text-[9px] font-black w-5 h-5 flex items-center justify-center rounded-full hidden">0</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex flex-wrap gap-2 items-center w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+            <div class="hidden md:flex relative items-center justify-center w-9 h-9 rounded-full bg-slate-800 border border-slate-600 cursor-pointer hover:bg-slate-700 transition" onclick="App.UI.toggleNotification()">
+                <i class="fa-solid fa-bell text-slate-300 text-sm"></i>
+                <span id="notifBadgeDesktop" class="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full hidden animate-pulse">0</span>
+            </div>
+            <div class="flex items-center gap-1.5 border-r border-slate-700 pr-2 mr-1">
+                <button onclick="App.DB.download()" class="bg-rose-600/20 text-rose-400 border border-rose-600/30 px-3 py-1.5 rounded-lg text-[11px] font-bold hover:bg-rose-600/40 transition"><i class="fa-solid fa-download mr-1"></i>DB 백업</button>
+                <button onclick="document.getElementById('importDbInput').click()" class="bg-amber-600/20 text-amber-400 border border-amber-600/30 px-3 py-1.5 rounded-lg text-[11px] font-bold hover:bg-amber-600/40 transition"><i class="fa-solid fa-upload mr-1"></i>DB 복원</button>
+                <input type="file" id="importDbInput" class="hidden" accept=".sqlite,.db" onchange="App.DB.import(event)">
+            </div>
+            <button onclick="App.UI.exportToExcel()" class="bg-blue-600/20 text-blue-400 border border-blue-600/30 px-3 py-1.5 rounded-lg text-[11px] font-bold hover:bg-blue-600/40 transition">엑셀 저장</button>
+            <button onclick="App.UI.exportToPDF()" class="bg-rose-600/20 text-rose-400 border border-rose-600/30 px-3 py-1.5 rounded-lg text-[11px] font-bold hover:bg-rose-600/40 transition">PDF 저장</button>
+            <button onclick="App.Config.openSchemaModal()" class="bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg text-[11px] font-bold border border-slate-600 hover:bg-slate-700 transition">스키마 설정</button>
+            <button onclick="App.DB.resetSystem()" class="bg-rose-900/30 text-rose-400 border border-rose-700/50 px-3 py-1.5 rounded-lg text-[11px] font-bold hover:bg-rose-900/60 transition"><i class="fa-solid fa-power-off mr-1"></i>초기화</button>
+
+            <div id="notificationDropdown" class="absolute top-14 right-0 w-72 lg:w-80 bg-slate-800 border border-rose-900/60 rounded-xl shadow-2xl flex flex-col hidden z-[100] overflow-hidden">
+                <div class="bg-slate-900/90 border-b border-slate-700 p-3 flex justify-between items-center">
+                    <h3 class="text-xs font-black text-rose-400 tracking-wide"><i class="fa-solid fa-triangle-exclamation mr-1.5"></i>품질 한도 초과 경보망</h3>
+                    <button onclick="App.UI.toggleNotification()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+                <div id="notificationList" class="p-2 max-h-72 overflow-y-auto flex flex-col gap-1.5"></div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-end shrink-0 gap-2 z-10">
+        <nav class="flex overflow-x-auto w-full md:w-auto border-b border-slate-800 md:border-none gap-1">
+            <button class="tab-btn active rounded-t-xl" onclick="App.UI.switchTab(this, 'data')">1. 불량 검사 관제</button>
+            <button class="tab-btn rounded-t-xl" onclick="App.UI.switchTab(this, 'stock')">2. 품목별 합격망</button>
+            <button class="tab-btn rounded-t-xl" onclick="App.UI.switchTab(this, 'dash')">3. 품질 인텔리전스</button>
+            <button class="tab-btn rounded-t-xl text-amber-400/80 border-amber-400/30" onclick="App.UI.switchTab(this, 'master')"><i class="fa-solid fa-key mr-1"></i>4. 검사항목 마스터</button>
+        </nav>
+        <div class="hidden md:flex glass px-4 py-2 items-center gap-4 rounded-t-xl border-b-0 shadow-sm">
+            <i class="fa-solid fa-magnifying-glass text-rose-500 text-xs"></i>
+            <input type="text" id="globalSearch" placeholder="품질 데이터 통합 검색..." class="w-64 h-8 text-[12px] bg-transparent border-none p-0 text-white placeholder-slate-500">
+        </div>
+    </div>
+
+    <main class="flex-1 relative flex flex-col lg:overflow-hidden pb-24 lg:pb-0 z-0">
+        <section id="tab-data" class="h-auto lg:h-full flex flex-col lg:flex-row gap-4 lg:overflow-hidden">
+            <div class="w-full lg:w-1/4 flex flex-col gap-4 shrink-0 lg:overflow-y-auto">
+                <div class="bg-amber-900/30 border border-amber-500/50 text-amber-400 text-[10px] font-bold p-3.5 rounded-xl">
+                    <i class="fa-solid fa-triangle-exclamation text-xl mr-3 animate-pulse float-left"></i>
+                    <span>[주의] 공정 품질 실시간 전산망입니다. 검사 성적서 데이터 적재 후 반드시 <strong class="text-white">DB 백업</strong>을 실행하십시오.</span>
+                </div>
+                <div class="glass p-4 flex flex-col shrink-0">
+                    <h2 class="text-sm font-black text-rose-400 mb-1.5"><i class="fa-solid fa-cloud-arrow-up mr-2"></i>품질 성적서 인바운드</h2>
+                    <div id="dropzone" class="dropzone rounded-xl flex flex-col items-center justify-center p-5 text-center cursor-pointer min-h-[90px] bg-slate-900/60 shadow-inner">
+                        <i class="fa-solid fa-file-excel text-3xl text-slate-500 mb-2"></i>
+                        <p class="text-xs font-bold text-slate-300">검사 내역 엑셀 드롭</p>
+                        <input type="file" id="fileInput" class="hidden" accept=".xlsx, .xls, .csv">
+                    </div>
+                </div>
+                <div class="flex gap-2.5 shrink-0">
+                    <button onclick="App.Tx.openInsertModal()" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl font-black text-xs shadow-lg"><i class="fa-solid fa-pen-to-square mr-1"></i>단건 등록</button>
+                    <button onclick="App.UI.showHistoryLog()" class="flex-1 py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-xl font-black text-xs"><i class="fa-solid fa-clock-rotate-left mr-1"></i>감사 로그</button>
+                </div>
+                <div class="glass p-4 flex flex-col shrink-0">
+                    <h3 class="text-xs font-bold text-slate-300 mb-2"><i class="fa-solid fa-terminal mr-2"></i>정제 및 무결성 로그</h3>
+                    <div id="cleanseLogBox" class="bg-black/60 border-l-2 border-rose-500 p-2.5 rounded-lg text-[10px] text-slate-400 h-24 overflow-y-auto font-mono">대기 중...</div>
+                </div>
+                <div class="glass p-4 flex flex-col flex-1 min-h-[180px] lg:min-h-0">
+                    <h2 class="text-xs font-black text-rose-400 mb-2 border-b border-slate-700/50 pb-2">최근 검역 데이터 Preview</h2>
+                    <div class="flex-1 overflow-auto border border-slate-700/80 rounded-lg bg-slate-900/60">
+                        <table class="w-full text-[10px] text-left min-w-max">
+                            <thead id="cleanseThead" class="bg-slate-800 sticky top-0 font-bold text-slate-300"><tr><th class="p-2.5">대기 중...</th></tr></thead>
+                            <tbody id="cleanseTbody" class="divide-y divide-slate-800/80"><tr><td class="p-5 text-center text-slate-500">업로드 시 표시됨</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="w-full lg:flex-1 glass p-5 flex flex-col lg:overflow-hidden min-h-[500px] lg:min-h-0 relative">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-base font-black text-rose-400 tracking-wide"><i class="fa-solid fa-database mr-2"></i>공정 검사 품질 DB</h2>
+                        <span id="totalRecordCount" class="text-[10px] text-slate-400 bg-slate-900/80 px-2 py-1 rounded border border-slate-700 font-mono">Total: 0건</span>
+                    </div>
+                    <div class="flex gap-2 text-[11px] font-bold">
+                        <select id="sortCol" onchange="App.Tx.resetPagination(); App.Tx.loadData();" class="border-slate-600 bg-slate-800 text-slate-200"></select>
+                        <select id="sortDir" onchange="App.Tx.resetPagination(); App.Tx.loadData();" class="w-28 border-slate-600 bg-slate-800 text-slate-200">
+                            <option value="DESC">최신순</option><option value="ASC">과거순</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex-1 overflow-auto border border-slate-700/80 rounded-xl bg-slate-900/60 mb-14">
+                    <table class="w-full text-[12px] text-left min-w-max">
+                        <thead id="dbThead" class="bg-slate-800 sticky top-0 text-[10px] text-slate-300 font-black shadow-md z-10 uppercase"></thead>
+                        <tbody id="dbTbody" class="divide-y divide-slate-800/60"></tbody>
+                    </table>
+                </div>
+                <div class="absolute bottom-5 left-5 right-5 flex justify-between items-center bg-slate-800/90 backdrop-blur-md p-2.5 rounded-xl border border-slate-600 z-20">
+                    <button onclick="App.Tx.changePage(-1)" id="btnPrevPage" class="px-5 py-2 bg-slate-700 text-slate-200 rounded-lg text-xs font-black disabled:opacity-40">이전</button>
+                    <div class="text-xs text-slate-400 font-mono font-bold">Page <span id="currentPageDisplay" class="text-rose-400 text-sm mx-1">1</span> / <span id="totalPagesDisplay" class="mx-1">1</span></div>
+                    <button onclick="App.Tx.changePage(1)" id="btnNextPage" class="px-5 py-2 bg-slate-700 text-slate-200 rounded-lg text-xs font-black disabled:opacity-40">다음</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-stock" class="hidden-tab h-auto lg:h-full glass p-5 flex flex-col gap-4 lg:overflow-hidden">
+            <div class="flex justify-between items-center border-b border-slate-700/80 pb-4">
+                <h2 class="text-lg font-black text-rose-400 tracking-wide"><i class="fa-solid fa-square-poll-vertical mr-2"></i>품목별 실시간 품질 통계망</h2>
+                <div class="flex items-center gap-2">
+                    <div class="text-[11px] text-slate-400 font-bold bg-slate-900/50 px-3 py-1.5 rounded border border-slate-700/50"><i class="fa-solid fa-brain mr-1.5 text-rose-400 animate-pulse"></i>불량 한도 지표 가동 중</div>
+                    <select id="stockSortCol" onchange="App.Stock.renderBoard()" class="text-[11px] font-bold text-slate-200 bg-slate-800">
+                        <option value="NetValue">총 불량수량 기준</option><option value="NetQty">종합 불량률 기준</option><option value="Label">품목명 기준</option>
+                    </select>
+                </div>
+            </div>
+            <div id="stockWarningBanner" class="hidden shrink-0 p-3.5 bg-rose-900/30 border border-rose-500/50 rounded-xl text-rose-400 text-xs font-bold flex items-center">
+                <i class="fa-solid fa-triangle-exclamation text-xl mr-3 animate-pulse"></i>
+                <span>[품질 비상] 허용 불량률(경고선)을 초과한 고위험 관리 대상 품목이 발견되었습니다. 상단 경보망을 검토하십시오.</span>
+            </div>
+            <div class="flex-1 overflow-auto border border-slate-700/80 rounded-xl bg-slate-900/40 min-h-[400px] lg:min-h-0">
+                <table class="w-full text-[13px] text-left min-w-max">
+                    <thead class="bg-slate-800 sticky top-0 text-[10px] text-slate-400 font-black shadow-md uppercase">
+                        <tr>
+                            <th class="p-4">품목 / 부품명</th>
+                            <th class="p-4 text-right text-blue-400">총 검사수량</th>
+                            <th class="p-4 text-right text-rose-400">총 불량수량</th>
+                            <th class="p-4 text-right text-emerald-400">종합 양품수량</th>
+                            <th class="p-4 text-right text-indigo-300">공정 불량률(%)</th>
+                            <th class="p-4 text-center text-purple-400">품질 상태 판정</th>
+                            <th class="p-4 text-right">추정 실패비용</th>
+                            <th class="p-4 text-center text-amber-400">현장 실사</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stockTableBody" class="divide-y divide-slate-800/60"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="tab-dash" class="hidden-tab h-auto lg:h-full flex flex-col overflow-y-auto gap-4 pb-6">
+            <div class="glass p-4 flex flex-col xl:flex-row justify-between xl:items-center sticky top-0 z-20 shrink-0 gap-4 border-b border-slate-700/50 shadow-sm">
+                <h2 class="text-base lg:text-lg font-black text-rose-400 tracking-wide"><i class="fa-solid fa-chart-pie mr-2"></i>비즈니스 품질 인텔리전스 (Pareto 분석)</h2>
+                <div class="flex flex-wrap items-center gap-2 justify-end">
+                    <div class="flex items-center gap-1.5 bg-slate-900/80 px-2.5 py-1.5 rounded border border-slate-600">
+                        <i class="fa-regular fa-calendar-days text-rose-500 text-[11px]"></i>
+                        <input type="date" id="dashStartDate" onchange="App.Dash.renderAll()" class="h-6 text-[11px] bg-transparent border-none text-center text-rose-400 font-mono">
+                        <span class="text-slate-600">~</span>
+                        <input type="date" id="dashEndDate" onchange="App.Dash.renderAll()" class="h-6 text-[11px] bg-transparent border-none text-center text-rose-400 font-mono">
+                    </div>
+                    <button onclick="App.Dash.clearFilters()" class="bg-slate-700 text-white h-9 px-3.5 rounded border border-slate-500 text-[11px] font-bold"><i class="fa-solid fa-rotate-right"></i></button>
+                </div>
+            </div>
+            <div class="flex flex-col lg:flex-row gap-4 shrink-0 min-h-[400px] lg:h-[420px]">
+                <div class="w-full lg:w-3/5 glass p-5 flex flex-col h-[380px] lg:h-full relative overflow-hidden">
+                    <div class="flex justify-between items-center mb-5 border-b border-slate-700/50 pb-3">
+                        <h3 class="text-sm font-black text-slate-200">품질 트렌드 차트</h3>
+                        <div class="flex gap-2 text-[11px]">
+                            <select id="chartMetric" onchange="App.Dash.renderVisuals()" class="h-8 bg-slate-900 border-slate-600 text-rose-300 font-bold rounded">
+                                <option value="value">❌ 총 불량수량</option><option value="qty">🔍 총 검사수량</option><option value="turnover">⚠️ 불량률 변동 추이</option>
+                            </select>
+                            <select id="chartCol" onchange="App.Dash.renderVisuals()" class="h-8 bg-slate-900 border-slate-600 rounded text-slate-200"></select>
+                            <select id="chartType" onchange="App.Dash.renderVisuals()" class="w-24 h-8 bg-slate-900 border-slate-600 rounded text-slate-200">
+                                <option value="bar">📊 막대 차트</option><option value="line">📈 추세선</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex-1 bg-slate-900/50 rounded-xl p-3 border border-slate-800/80 flex items-center justify-center min-h-0 relative"><canvas id="mainChart"></canvas></div>
+                </div>
+                <div class="w-full lg:w-2/5 glass p-5 flex flex-col h-[320px] lg:h-full">
+                    <h3 class="text-sm font-black text-slate-200 mb-4 tracking-wide border-b border-slate-700/50 pb-3">품질 불량 등급 분석 (ABC 파레토)</h3>
+                    <div class="flex-1 overflow-auto border border-slate-800/80 rounded-xl bg-slate-900/40 shadow-inner">
+                        <table class="w-full text-[12px]">
+                            <thead class="bg-slate-800 text-[10px] text-slate-400 sticky top-0 font-black uppercase">
+                                <tr><th class="p-3.5 text-left">분류 항목명</th><th class="p-3.5 text-right">총 불량수량</th><th class="p-3.5 text-right">추정 손실가치</th><th class="p-3.5 text-center">집중 등급</th></tr>
+                            </thead>
+                            <tbody id="summaryTableBody" class="divide-y divide-slate-800/60"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="glass p-5 flex flex-col min-h-[420px]">
+                <div class="flex justify-between items-center mb-5 border-b border-slate-700/50 pb-3">
+                    <h3 class="text-sm font-black text-slate-200">공정/불량유형별 세부 현황판</h3>
+                    <select id="groupSelect" onchange="App.Dash.renderGroupCards()" class="w-36 h-8 bg-slate-900 border-slate-600 rounded text-slate-200"></select>
+                </div>
+                <div id="cardGrid" class="flex-1 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3.5 pb-2 content-start"></div>
+            </div>
+        </section>
+
+        <section id="tab-master" class="hidden-tab h-auto lg:h-full flex flex-col lg:flex-row gap-5 lg:overflow-hidden">
+            <div class="w-full lg:w-1/3 flex flex-col gap-4 shrink-0 lg:overflow-y-auto">
+                <div class="glass p-5 flex flex-col shrink-0">
+                    <h2 class="text-base font-black text-amber-400 mb-2.5"><i class="fa-solid fa-key mr-2"></i>검사 대상 규격 마스터 업로드</h2>
+                    <p class="text-[11px] text-slate-400 mb-5 leading-relaxed border-l-2 border-amber-500/80 pl-3 bg-amber-900/10 py-2 rounded-r-lg">
+                        품목별 정식 규격 명칭 및 불량 시 발생하는 부품 표준 실패비용 단가를 정의합니다.<br>
+                        <span class="text-slate-500 block mt-1">(필수 헤더: <span class="text-white bg-slate-800 px-1 rounded">품목코드</span>, <span class="text-white bg-slate-800 px-1 rounded">품목명</span>, <span class="text-white bg-slate-800 px-1 rounded">단가</span>)</span>
+                    </p>
+                    <div id="masterDropzone" class="dropzone rounded-xl flex flex-col items-center justify-center p-6 text-center cursor-pointer bg-slate-900/60">
+                        <i class="fa-solid fa-file-excel text-4xl text-amber-600/60 mb-3"></i>
+                        <p class="text-sm font-bold text-amber-200">품질 규격 마스터 드롭</p>
+                    </div>
+                    <div class="mt-5 flex gap-2.5">
+                        <button onclick="App.Master.clearData()" class="flex-1 py-2.5 bg-rose-900/60 text-rose-200 rounded-xl font-black text-xs border border-rose-700/60">전체 포맷</button>
+                        <button onclick="App.Master.openInsertModal()" class="flex-1 py-2.5 bg-amber-600/80 text-white rounded-xl font-black text-xs border border-amber-500 shadow-lg">단건 등록</button>
+                    </div>
+                </div>
+                <div class="glass p-5 flex flex-col shrink-0 border border-rose-500/40">
+                    <h2 class="text-sm font-black text-rose-400 mb-2.5"><i class="fa-solid fa-sliders mr-2"></i>품질 관리 상한선(허용 불량률) 제어</h2>
+                    <div class="flex items-center justify-between bg-slate-900/60 p-2.5 rounded border border-slate-700/60">
+                        <span class="text-xs font-bold text-rose-300">최대 한도 임계치</span>
+                        <div class="flex items-center gap-2">
+                            <input type="number" id="configLeadTime" class="w-16 h-8 text-right text-emerald-400 font-bold bg-slate-800" onchange="App.Config.saveRop()">
+                            <span class="text-[10px] text-slate-500 font-bold">% 미만 통제</span>
+                        </div>
+                    </div>
+                    <input type="hidden" id="configSafetyDays" value="0"><input type="hidden" id="configAbcA" value="70"><input type="hidden" id="configAbcB" value="90">
+                </div>
+            </div>
+            <div class="w-full lg:flex-1 glass p-5 flex flex-col lg:overflow-hidden min-h-[400px] lg:min-h-0">
+                <h2 class="text-base font-black text-slate-200 border-b border-slate-700/50 pb-4 mb-4">규격 레지스트리 목록</h2>
+                <div class="flex-1 overflow-auto border border-slate-700/80 rounded-xl bg-slate-900/60 shadow-inner">
+                    <table class="w-full text-[12px] text-left min-w-max">
+                        <thead class="bg-slate-800 text-[10px] text-amber-500 font-black tracking-wider shadow-md">
+                            <tr><th class="p-3.5">품목코드</th><th class="p-3.5">품목명 (규격명)</th><th class="p-3.5 text-right">표준 대치 비용</th><th class="p-3.5 text-center">관리</th></tr>
+                        </thead>
+                        <tbody id="masterTbody" class="divide-y divide-slate-800/60"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <button id="aiChatFab" onclick="App.AI.toggle()" class="fixed bottom-6 right-28 w-14 h-14 bg-gradient-to-tr from-rose-500 to-red-600 rounded-full flex items-center justify-center text-white text-2xl z-[500] border border-rose-400/30">
+        <i class="fa-solid fa-robot"></i>
+    </button>
+    <div id="aiChatWidget" class="fixed bottom-24 right-6 md:right-32 w-[90%] sm:w-[420px] h-[550px] max-h-[75vh] glass hidden flex-col rounded-2xl z-[500] border border-rose-500/40 overflow-hidden">
+        <div class="bg-slate-900/90 p-4 border-b border-rose-800/60 flex justify-between items-center text-rose-400 shrink-0">
+            <h3 class="text-sm font-black"><i class="fa-solid fa-robot mr-2"></i>NEXUS 품질 AI 관제비서</h3>
+            <button onclick="App.AI.toggle()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+        </div>
+        <div class="p-3 bg-slate-800/70 flex items-center border-b border-slate-700/60">
+            <input type="password" id="geminiApiKey" placeholder="Gemini API Key 입력" class="h-8 text-[11px] flex-1 bg-slate-900 border border-slate-600 rounded px-3 text-slate-200">
+        </div>
+        <div id="agentTerminal" class="flex-1 overflow-y-auto p-4 text-[12px] flex flex-col gap-3 bg-slate-900/50 shadow-inner">
+            <div class="text-slate-400 italic p-3 text-[10px] text-center bg-slate-800/50 rounded-lg">[System] 품질 비서 모듈이 상시 대기 중입니다.</div>
+        </div>
+        <div class="p-3 bg-slate-900/90 border-t border-slate-700/60 flex gap-2.5">
+            <input type="text" id="agentInput" class="w-full h-11 text-[12px] px-4 bg-slate-800 border border-slate-600 rounded-xl text-white" placeholder="ex) 최근 불량률이 최고인 부품은?" onkeypress="if(event.key==='Enter') App.AI.execute()">
+            <button onclick="App.AI.execute()" class="w-14 bg-rose-600 hover:bg-rose-500 text-white rounded-xl flex items-center justify-center"><i class="fa-solid fa-paper-plane text-lg"></i></button>
+        </div>
+    </div>
+
+    <div id="modalBackdrop" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[100] hidden flex items-center justify-center p-2 lg:p-4">
+        <div id="stagingModal" class="glass p-4 lg:p-8 w-full max-w-6xl hidden flex flex-col max-h-[95vh] overflow-hidden border-rose-900/50">
+            <div class="flex justify-between items-center mb-5 border-b border-slate-700/80 pb-4">
+                <h2 class="text-lg lg:text-xl font-black text-rose-400"><i class="fa-solid fa-clipboard-check mr-2"></i>데이터 검역소 (Quality Staging Area)</h2>
+                <button onclick="App.UI.closeModals()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-2xl"></i></button>
+            </div>
+            <div class="mb-4 text-xs text-slate-300 bg-slate-900/70 p-4 rounded-xl border border-rose-900/60">
+                <i class="fa-solid fa-circle-info text-blue-400 mr-1.5"></i>총 <span id="stagingTotalCount" class="font-bold text-emerald-400">0</span>건 중 마스터 미등록 항목이 <span id="stagingErrorCount" class="font-black text-rose-400 underline">0</span>건 발견되었습니다.
+            </div>
+            <div class="flex-1 overflow-auto border border-slate-700/80 rounded-xl bg-slate-900/50">
+                <table class="w-full text-[11px] text-left min-w-max">
+                    <thead id="stagingThead" class="bg-slate-800 sticky top-0 text-slate-400 font-black uppercase"></thead>
+                    <tbody id="stagingTbody" class="divide-y divide-slate-800/60 text-slate-300"></tbody>
+                </table>
+            </div>
+            <div class="mt-5 pt-4 border-t border-slate-700/80 flex justify-between items-center gap-3">
+                <div id="stagingPagingControls" class="flex items-center gap-2 bg-slate-900/50 p-1.5 rounded border border-slate-700/50 shadow-inner"></div>
+                <div class="flex gap-3">
+                    <button onclick="App.UI.closeModals()" class="px-6 py-2.5 rounded-xl bg-slate-700 text-white font-bold">파기</button>
+                    <button onclick="App.Staging.commit()" id="btnCommitStaging" class="px-8 py-2.5 rounded-xl bg-emerald-600 text-white font-black"><i class="fa-solid fa-upload mr-1.5"></i>DB 일괄 적재</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="schemaModal" class="glass p-4 lg:p-8 w-full max-w-5xl max-h-[95vh] flex flex-col hidden overflow-hidden">
+            <div class="flex justify-between items-center mb-5 border-b border-slate-700/80 pb-4 shrink-0">
+                <h2 class="text-lg font-black text-white"><i class="fa-solid fa-cogs mr-2 text-rose-400"></i>품질 양식 정제 알고리즘 스키마 설계</h2>
+                <div class="flex gap-2 items-center">
+                    <button onclick="App.Config.downloadSchemaTemplate()" class="bg-blue-600/20 text-blue-400 border border-blue-500/40 px-4 py-2 rounded-xl text-xs font-bold">표준양식 다운로드</button>
+                    <button onclick="App.UI.closeModals()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-2xl"></i></button>
+                </div>
+            </div>
+            <div id="schemaBuilderContainer" class="flex-1 overflow-y-auto space-y-4"></div>
+            <div class="mt-5 pt-5 border-t border-slate-700/80 flex justify-between items-center shrink-0">
+                <button onclick="App.Config.addSchemaRow()" class="px-5 py-2.5 rounded-xl border-2 border-dashed border-slate-600 text-slate-400 text-sm font-bold">항목 추가</button>
+                <div class="flex gap-3">
+                    <button onclick="App.UI.closeModals()" class="px-6 py-2.5 rounded-xl bg-slate-700 text-white">취소</button>
+                    <button onclick="App.Config.applySchema()" class="px-8 py-2.5 rounded-xl bg-emerald-600 text-white font-black">DB 반영</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="insertModal" class="glass p-5 lg:p-8 w-full max-w-md hidden flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center mb-5 border-b border-slate-700/80 pb-3 shrink-0">
+                <h3 id="modalTitle" class="text-lg font-black text-rose-400">데이터 입력</h3>
+                <button onclick="App.UI.closeModals()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <input type="hidden" id="editId">
+            <div id="insertForm" class="space-y-4 overflow-y-auto flex-1"></div>
+            <div class="flex justify-end gap-3 mt-5 pt-5 border-t border-slate-700/80">
+                <button onclick="App.UI.closeModals()" class="px-5 py-2.5 rounded-xl bg-slate-700 text-white">취소</button>
+                <button onclick="App.Tx.submitManualData()" class="px-8 py-2.5 rounded-xl bg-rose-600 text-white font-black">DB 저장</button>
+            </div>
+        </div>
+
+        <div id="masterInsertModal" class="glass p-5 lg:p-8 w-full max-w-md hidden flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center mb-5 border-b border-slate-700/80 pb-3">
+                <h3 class="text-lg font-black text-amber-400">마스터 단건 등록</h3>
+                <button onclick="App.UI.closeModals()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="space-y-5 overflow-y-auto flex-1">
+                <div><label class="text-[11px] text-slate-400 font-bold mb-1.5 block">품목코드</label><input type="text" id="mi_code" class="w-full bg-slate-900 rounded-xl p-3" placeholder="ex) Q-PART-01"></div>
+                <div><label class="text-[11px] text-slate-400 font-bold mb-1.5 block">품목명 (규격명)</label><input type="text" id="mi_name" class="w-full bg-slate-900 rounded-xl p-3" placeholder="ex) 하우징 커버-A"></div>
+                <div><label class="text-[11px] text-slate-400 font-bold mb-1.5 block">표준 실패비용</label><input type="number" id="mi_price" class="w-full bg-slate-900 rounded-xl p-3" placeholder="ex) 45000"></div>
+            </div>
+            <div class="flex justify-end gap-3 mt-5 pt-5 border-t border-slate-700/80">
+                <button onclick="App.UI.closeModals()" class="px-5 py-2.5 rounded-xl bg-slate-700 text-white">취소</button>
+                <button onclick="App.Master.submitManualData()" class="px-8 py-2.5 rounded-xl bg-amber-600 text-white font-black">DB 저장</button>
+            </div>
+        </div>
+
+        <div id="receiptModal" class="bg-white p-6 lg:p-10 w-full max-w-3xl hidden flex flex-col max-h-[95vh] overflow-y-auto text-black rounded-xl">
+            <div class="no-print flex justify-between items-center mb-6 border-b border-gray-300 pb-4">
+                <div class="text-sm font-bold text-gray-500"><i class="fa-solid fa-print text-rose-500 mr-2"></i> 품질 부적합품 통지서 출력 서식입니다.</div>
+                <div class="flex gap-2">
+                    <button onclick="App.Tx.printReceipt()" class="px-5 py-2.5 bg-rose-600 text-white rounded-lg text-sm font-black">인쇄하기</button>
+                    <button onclick="App.UI.closeModals()" class="px-4 py-2.5 bg-gray-200 text-gray-700 rounded-lg">닫기</button>
+                </div>
+            </div>
+            <div class="flex flex-col border-2 border-black p-6 lg:p-8 min-h-[400px] bg-white text-black" id="receiptPrintArea">
+                <h1 class="text-3xl font-black text-center mb-8 tracking-[0.5em] border-b-4 border-double border-black pb-4 text-black">품질 부적합 보고서</h1>
+                <div class="flex justify-between mb-6 text-sm font-bold text-black">
+                    <div>발행일자: <span id="receiptDate" class="border-b border-black px-2"></span></div>
+                    <div>관리번호: <span id="receiptNo" class="border-b border-black px-2 font-mono"></span></div>
+                </div>
+                <table class="w-full border-collapse border-2 border-black text-sm text-center mb-8 font-bold text-black">
+                    <thead><tr class="bg-gray-100"><th class="border border-black p-2">No.</th><th class="border border-black p-2">품명/검사 규격</th><th class="border border-black p-2">공정 판정</th><th class="border border-black p-2">검사수량</th><th class="border border-black p-2">불량수량</th></tr></thead>
+                    <tbody id="receiptTableBody"></tbody>
+                </table>
+                <div class="flex justify-end text-xl font-black mt-auto pt-4 border-t-2 border-black text-black">실패손실 합계: <span id="receiptTotal" class="ml-6 font-mono">₩ 0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    window.App = (function () {
+        'use strict';
+        function debounce(fn, ms) { let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); }; }
+        function toast(msg, type = 'info') { const c = document.getElementById('toastContainer'); const el = document.createElement('div'); el.className = `toast toast-${type}`; el.innerHTML = msg; c.appendChild(el); setTimeout(() => el.remove(), 3100); }
+
+        const State = {
+            db: null, SQL: null, chartInstance: null,
+            STORE_KEY: 'NEXUS_QLTY_DB_V30', SCHEMA_KEY: 'NEXUS_QLTY_SCHEMA_V30',
+            abcConfig: {a:70, b:90}, ropConfig: {leadTime:5, safetyDays:0}, //품질 한도 임계치 % (leadTime 자리에 저장)
+            agentHistory: [], currentTab: 'data', currentPage: 1, PAGE_SIZE: 100, totalRecords: 0,
+            schemaDef: JSON.parse(localStorage.getItem('NEXUS_QLTY_SCHEMA_V30')) || [
+                { name: "검사일자", type: "text", options: [], aliases: ["날짜","date","일시"] },
+                { name: "품목명", type: "text", options: [], aliases: ["품명","부품명","item","name"] },
+                { name: "공정구분", type: "select", options: ["합격","재작업","폐기"], aliases: ["판정","구분","상태"] },
+                { name: "검사수량", type: "number", options: [], aliases: ["총수량","inspect","수량"] },
+                { name: "불량수량", type: "number", options: [], aliases: ["defect","불량","에러"] }
+            ],
+            tempSchemaDef: [], dataCache: [], cachedMasterMap: {}, stagingData: [], isDbDirty: false,
+            stagingCurrentPage: 1, STAGING_PAGE_SIZE: 100
+        };
+
+        const Utils = {
+            cleanStr: s => String(s || '').toLowerCase().replace(/[^a-z가-힣0-9]/g, ''),
+            getLevenshtein(a, b) {
+                if (!a.length) return b.length; if (!b.length) return a.length;
+                const m = []; for (let i = 0; i <= b.length; i++) m[i] = [i]; for (let j = 0; j <= a.length; j++) m[0][j] = j;
+                for (let i = 1; i <= b.length; i++) for (let j = 1; j <= a.length; j++) m[i][j] = b[i-1] === a[j-1] ? m[i-1][j-1] : Math.min(m[i-1][j-1]+1, m[i][j-1]+1, m[i-1][j]+1);
+                return m[b.length][a.length];
+            },
+            isFuzzyMatch(raw, target) {
+                if (!raw || !target) return false; if (raw === target) return true;
+                if (raw.includes(target) || target.includes(raw)) return true;
+                if (raw.length >= 3 && target.length >= 3 && this.getLevenshtein(raw, target) <= 1) return true; return false;
+            },
+            parseRobustDate(val) {
+                if (val === '' || val == null) return ''; if (typeof val === 'number') { if (val > 10000000 && val < 99999999) { const s = String(val); return `${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6,8)}`; } const d = new Date(Math.round((val - 25569) * 86400 * 1000)); if (!isNaN(d.getTime())) return d.toISOString().split('T')[0]; }
+                const str = String(val).trim(); const nums = str.match(/\d+/g); if (!nums) return str;
+                if (nums.length >= 3) { let [y, m, d] = nums; if (y.length === 2) y = '20' + y; return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`; }
+                if (nums.length === 1 && nums[0].length === 8) { const s = nums[0]; return `${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6,8)}`; }
+                return '2026-06-15';
+            },
+            getF() {
+                const s = State.schemaDef;
+                return {
+                    name: (s.find(x => /품목|품명|부품|item|name/i.test(x.name)) || s[1])?.name,
+                    type: (s.find(x => /공정|구분|판정|상태/i.test(x.name)))?.name || '',
+                    qty: (s.find(x => /검사수량|총수량|수량/i.test(x.name)))?.name || '1',
+                    price: (s.find(x => /불량수량|불량/i.test(x.name)))?.name || '0', // 구조 호환을 위해 수량2를 price자리에 매핑
+                    date: (s.find(x => /일자|날짜|date/i.test(x.name)))?.name || ''
+                };
+            },
+            getBaseWhere(sI, eI) {
+                const kw = document.getElementById('globalSearch').value.trim(); let w = ' WHERE 1=1 ';
+                if (kw) { const safeKw = kw.replace(/'/g, "''"); const conds = State.schemaDef.map(s => `CAST("${s.name}" AS TEXT) LIKE '%${safeKw}%'`).join(' OR '); w += ` AND (${conds}) `; }
+                const f = this.getF();
+                if (sI && eI && f.date) { const sv = document.getElementById(sI)?.value; const ev = document.getElementById(eI)?.value; if (sv) w += ` AND "${f.date}" >= '${sv}' `; if (ev) w += ` AND "${f.date}" <= '${ev}' `; }
+                return w;
+            },
+            parseFile(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = evt => { try { const data = new Uint8Array(evt.target.result); const wb = XLSX.read(data, { type: 'array' }); const ws = wb.Sheets[wb.SheetNames[0]]; resolve(XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' })); } catch (e) { reject(e); } }; reader.readAsArrayBuffer(file); }); }
+        };
+
+        const DB = {
+            init: async function () {
+                State.SQL = await initSqlJs({ locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${f}` });
+                let saved = await localforage.getItem(State.STORE_KEY); State.db = saved ? new State.SQL.Database(saved) : new State.SQL.Database();
+                try {
+                    State.db.run('PRAGMA foreign_keys = ON;'); const cols = State.schemaDef.map(s => `"${s.name}"`).join(','); State.db.exec(`SELECT ${cols} FROM data LIMIT 1`);
+                    State.db.run(`CREATE TABLE IF NOT EXISTS item_master (id INTEGER PRIMARY KEY AUTOINCREMENT, item_code TEXT, item_name TEXT UNIQUE, unit_price REAL)`);
+                    State.db.run(`CREATE TABLE IF NOT EXISTS history_log (id INTEGER PRIMARY KEY AUTOINCREMENT, action_type TEXT, record_id INTEGER, details TEXT, created_at TEXT)`);
+                } catch (e) { this.createTable(); }
+                if (!saved) { this.createTable(); this.injectMockData(); }
+            },
+            createTable() {
+                const f = Utils.getF(); State.db.run('PRAGMA foreign_keys = OFF;'); State.db.run('DROP TABLE IF EXISTS data;'); State.db.run('DROP TABLE IF EXISTS history_log;');
+                State.db.run(`CREATE TABLE IF NOT EXISTS item_master (id INTEGER PRIMARY KEY AUTOINCREMENT, item_code TEXT, item_name TEXT UNIQUE, unit_price REAL)`);
+                const cols = State.schemaDef.map(s => `"${s.name}" ${s.type === 'number' ? 'REAL' : 'TEXT'}`).join(',');
+                State.db.run(`CREATE TABLE data (id INTEGER PRIMARY KEY AUTOINCREMENT, ${cols}, FOREIGN KEY("${f.name}") REFERENCES item_master(item_name) ON UPDATE CASCADE ON DELETE RESTRICT);`);
+                State.db.run('CREATE TABLE history_log (id INTEGER PRIMARY KEY AUTOINCREMENT, action_type TEXT, record_id INTEGER, details TEXT, created_at TEXT);');
+                State.db.run('PRAGMA foreign_keys = ON;'); this.save();
+            },
+            async save() { State.isDbDirty = true; UI.updateBackupIndicator(); await localforage.setItem(State.STORE_KEY, State.db.export()); localStorage.setItem(State.SCHEMA_KEY, JSON.stringify(State.schemaDef)); },
+            logHistory(a, r, p) { const kst = new Date(new Date().getTime() + 9*60*60*1000).toISOString().replace('T',' ').slice(0,19); const stmt = State.db.prepare('INSERT INTO history_log (action_type,record_id,details,created_at) VALUES (?,?,?,?)'); stmt.run([a, r, JSON.stringify(p), kst]); stmt.free(); },
+            resetSystem() { if (confirm('품질 트랜잭션 데이터를 초기화하시겠습니까?')) { State.db.run('DELETE FROM data'); State.db.run('DELETE FROM history_log'); this.save().then(() => location.reload()); } },
+            download() { const blob = new Blob([State.db.export()], { type: 'application/octet-stream' }); const url = URL.createObjectURL(blob); const a = Object.assign(document.createElement('a'), { href: url, download: `nexus_quality_backup.sqlite` }); document.body.appendChild(a); a.click(); toast('✅ 품질 DB 백업 완료', 'success'); State.isDbDirty = false; UI.updateBackupIndicator(); },
+            import(e) { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = async () => { State.db = new State.SQL.Database(new Uint8Array(reader.result)); await DB.save(); location.reload(); }; reader.readAsArrayBuffer(file); },
+            injectMockData() {
+                State.db.exec('BEGIN;');
+                State.db.run(`INSERT INTO item_master (item_code,item_name,unit_price) VALUES ('Q-HAUSING','하우징 커버-A',45000)`);
+                State.db.run(`INSERT INTO item_master (item_code,item_name,unit_price) VALUES ('Q-GEAR','구동 기어-B',12000)`);
+                const f = Utils.getF(); const today = new Date().toISOString().split('T')[0];
+                State.db.run(`INSERT INTO data ("${f.date}","${f.name}","${f.type}","${f.qty}","${f.price}") VALUES (?,?,?,?,?)`, [today, '하우징 커버-A', '재작업', 500, 32]);
+                State.db.run(`INSERT INTO data ("${f.date}","${f.name}","${f.type}","${f.qty}","${f.price}") VALUES (?,?,?,?,?)`, [today, '구동 기어-B', '합격', 1200, 4]);
+                State.db.exec('COMMIT;'); this.save();
+            }
+        };
+
+        const Config = {
+            init() { document.getElementById('configLeadTime').value = State.ropConfig.leadTime; },
+            saveRop() { State.ropConfig.leadTime = Number(document.getElementById('configLeadTime').value); localStorage.setItem(State.STORE_KEY+'_ROP', JSON.stringify(State.ropConfig)); App.handleGlobalSearch(); toast('✅ 품질 허용 경고선 변경 완료', 'success'); },
+            openSchemaModal() { State.tempSchemaDef = JSON.parse(JSON.stringify(State.schemaDef)); this.renderSchemaBuilder(); UI.showModal('schemaModal'); },
+            addSchemaRow() { State.tempSchemaDef.push({ name:'신규검사항목', type:'text', options:[], aliases:[] }); this.renderSchemaBuilder(); },
+            removeSchemaRow(idx) { State.tempSchemaDef.splice(idx,1); this.renderSchemaBuilder(); },
+            applySchema() { if (confirm('품질 스키마 변경 시 테이블 구조가 리셋됩니다.')) { State.schemaDef = JSON.parse(JSON.stringify(State.tempSchemaDef)); DB.createTable(); location.reload(); } },
+            renderSchemaBuilder() {
+                document.getElementById('schemaBuilderContainer').innerHTML = State.tempSchemaDef.map((col, idx) => `
+                    <div class="flex flex-col bg-slate-900/50 p-4 rounded-xl border border-slate-700 gap-2 relative">
+                        <div class="flex gap-4">
+                            <input type="text" value="${col.name}" onchange="App.Config.updateSchemaTemp(${idx},'name',this.value)" class="bg-slate-800 p-2 rounded text-white text-sm font-bold">
+                            <select onchange="App.Config.updateSchemaTemp(${idx},'type',this.value); App.Config.renderSchemaBuilder();" class="bg-slate-800 p-2 rounded text-emerald-400">
+                                <option value="text" ${col.type==='text'?'selected':''}>텍스트</option><option value="number" ${col.type==='number'?'selected':''}>숫자</option><option value="select" ${col.type==='select'?'selected':''}>목록형</option>
+                            </select>
+                        </div>
+                        <button onclick="App.Config.removeSchemaRow(${idx})" class="absolute top-4 right-4 text-rose-500"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `).join('');
+            },
+            updateSchemaTemp(idx, key, val) { State.tempSchemaDef[idx][key] = val; }
+        };
+
+        const UI = {
+            init() { const opts = State.schemaDef.map(s => `<option value="${s.name}">${s.name}</option>`).join(''); document.getElementById('sortCol').innerHTML = document.getElementById('chartCol').innerHTML = document.getElementById('groupSelect').innerHTML = opts; },
+            setupDropzone() {
+                const zone = document.getElementById('dropzone'); const input = document.getElementById('fileInput');
+                zone.addEventListener('click', () => input.click());
+                input.addEventListener('change', e => { if (e.target.files[0]) FileHandler.processTxFile(e.target.files[0]); });
+            },
+            switchTab(btn, id) { State.currentTab = id; document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden-tab')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById('tab-' + id).classList.remove('hidden-tab'); btn.classList.add('active'); this._renderCurrentTab(); },
+            _renderCurrentTab() { if (State.currentTab === 'data') Tx.loadData(); if (State.currentTab === 'stock') Stock.renderBoard(); if (State.currentTab === 'dash') Dash.renderAll(); if (State.currentTab === 'master') Master.loadData(); },
+            showModal(id) { document.getElementById('modalBackdrop').classList.remove('hidden'); document.getElementById(id).classList.remove('hidden'); },
+            closeModals() { document.getElementById('modalBackdrop').classList.add('hidden'); document.querySelectorAll('#modalBackdrop > div').forEach(d => d.classList.add('hidden')); },
+            updateBackupIndicator() { document.getElementById('backupWarningBadge')?.classList.toggle('hidden', !State.isDbDirty); },
+            exportToExcel() { const res = State.db.exec('SELECT * FROM data'); if(res.length) { const ws = XLSX.utils.json_to_sheet(res[0].values); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'QualityData'); XLSX.writeFile(wb, 'NEXUS_Quality_Export.xlsx'); toast('✅ 엑셀 저장 완료', 'success'); } },
+            exportToPDF() { window.print(); },
+            toggleNotification() { document.getElementById('notificationDropdown').classList.toggle('hidden'); }
+        };
+
+        const FileHandler = {
+            async processTxFile(file) {
+                try {
+                    const rows = await Utils.parseFile(file); if (rows.length < 2) return;
+                    const f = Utils.getF(); const nameIdx = State.schemaDef.findIndex(s => s.name === f.name);
+                    State.stagingData = rows.slice(1).map(r => {
+                        const data = State.schemaDef.map((s, si) => r[si] || '');
+                        const isValid = State.cachedMasterMap.hasOwnProperty(data[nameIdx]);
+                        return { data, isValid, parsedItemName: data[nameIdx] };
+                    });
+                    Staging.renderArea(); UI.showModal('stagingModal');
+                } catch (e) { toast('파일 로드 실패', 'error'); }
+            }
+        };
+
+        const Master = {
+            loadData() {
+                const res = State.db.exec('SELECT id,item_code,item_name,unit_price FROM item_master');
+                const tbody = document.getElementById('masterTbody');
+                State.cachedMasterMap = {};
+                if (!res.length) { tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4">데이터 없음</td></tr>'; return; }
+                res[0].values.forEach(r => State.cachedMasterMap[r[2]] = { id: r[0], price: r[3] });
+                tbody.innerHTML = res[0].values.map(r => `<tr><td class="p-3">${r[1]||'-'}</td><td class="p-3 font-bold text-rose-400">${r[2]}</td><td class="p-3 text-right">₩${r[3].toLocaleString()}</td><td class="p-3 text-center"><button onclick="App.Master.deleteRow(${r[0]})" class="text-red-500"><i class="fa-solid fa-trash"></i></button></td></tr>`).join('');
+                document.getElementById('masterTotalCount').innerText = res[0].values.length;
+            },
+            openInsertModal() { document.getElementById('mi_code').value=document.getElementById('mi_name').value=document.getElementById('mi_price').value=''; UI.showModal('masterInsertModal'); },
+            submitManualData() {
+                const c = document.getElementById('mi_code').value; const n = document.getElementById('mi_name').value; const p = Number(document.getElementById('mi_price').value);
+                State.db.run('INSERT OR IGNORE INTO item_master (item_code,item_name,unit_price) VALUES (?,?,?)', [c, n, p]);
+                DB.save().then(() => { this.loadData(); UI.closeModals(); toast('마스터 등록 완료', 'success'); });
+            },
+            deleteRow(id) { if (confirm('삭제하시겠습니까?')) { try { State.db.run('DELETE FROM item_master WHERE id=?', [id]); DB.save().then(() => this.loadData()); } catch(e) { toast('❌ 공정 기록이 존재하여 삭제 불가', 'error'); } } }
+        };
+
+        const Tx = {
+            changePage(d) { State.currentPage += d; this.loadData(); },
+            resetPagination() { State.currentPage = 1; },
+            loadData() {
+                const sort = document.getElementById('sortCol').value || 'id'; const dir = document.getElementById('sortDir').value || 'DESC';
+                const where = Utils.getBaseWhere(); const f = Utils.getF();
+                const countRes = State.db.exec(`SELECT COUNT(*) FROM data ${where}`); State.totalRecords = countRes.length ? countRes[0].values[0][0] : 0;
+                const totalPages = Math.ceil(State.totalRecords / State.PAGE_SIZE) || 1;
+                const offset = (State.currentPage - 1) * State.PAGE_SIZE;
+                const res = State.db.exec(`SELECT * FROM data ${where} ORDER BY "${sort}" ${dir} LIMIT ${State.PAGE_SIZE} OFFSET ${offset}`);
+                State.dataCache = res.length ? res[0].values : [];
+                document.getElementById('totalRecordCount').innerText = `Total: ${State.totalRecords}건`;
+                document.getElementById('currentPageDisplay').innerText = State.currentPage; document.getElementById('totalPagesDisplay').innerText = totalPages;
+                
+                const tbody = document.getElementById('dbTbody');
+                if (!State.dataCache.length) { tbody.innerHTML = '<tr><td class="text-center p-4" colspan="6">데이터 없음</td></tr>'; return; }
+                tbody.innerHTML = State.dataCache.map(row => `<tr>${State.schemaDef.map((s,i) => `<td class="p-3">${row[i+1]}</td>`).join('')}<td class="p-3 text-center"><button onclick="App.Tx.openReceiptModal(${row[0]})" class="text-rose-400 mr-2"><i class="fa-solid fa-file-invoice"></i></button><button onclick="App.Tx.deleteRow(${row[0]})" class="text-red-500"><i class="fa-solid fa-trash"></i></button></td></tr>`).join('');
+            },
+            openInsertModal() { Tx.renderInsertForm(); UI.showModal('insertModal'); },
+            renderInsertForm(vals=[]) {
+                document.getElementById('insertForm').innerHTML = State.schemaDef.map((s,i) => `<div><label class="text-xs text-slate-400 block mb-1">${s.name}</label><input type="text" id="insert_field_${i}" value="${vals[i]||''}" class="w-full bg-slate-900 p-2.5 rounded insert-val"></div>`).join('');
+            },
+            submitManualData() {
+                const vals = Array.from(document.querySelectorAll('.insert-val')).map(el => el.value);
+                State.db.run(`INSERT INTO data (${State.schemaDef.map(s=>`"${s.name}"`).join(',')}) VALUES (${State.schemaDef.map(()=>'?').join(',')})`, vals);
+                DB.save().then(() => { UI.closeModals(); App.handleGlobalSearch(); toast('정상 저장 완료', 'success'); });
+            },
+            deleteRow(id) { if(confirm('삭제하시겠습니까?')) { State.db.run('DELETE FROM data WHERE id=?', [id]); DB.save().then(() => this.loadData()); } },
+            openReceiptModal(id) {
+                const row = State.db.exec(`SELECT * FROM data WHERE id=${id}`)[0]?.values[0]; if(!row) return;
+                document.getElementById('receiptDate').innerText = new Date().toISOString().split('T')[0]; document.getElementById('receiptNo').innerText = `NCR-2026-${id}`;
+                const f = Utils.getF(); const nameIdx = State.schemaDef.findIndex(s=>s.name===f.name); const defIdx = State.schemaDef.findIndex(s=>s.name===f.price);
+                const price = State.cachedMasterMap[row[nameIdx+1]]?.price || 0;
+                document.getElementById('receiptTableBody').innerHTML = `<tr><td class="p-2 border border-black">1</td><td class="p-2 border border-black">${row[nameIdx+1]}</td><td class="p-2 border border-black">${row[3]}</td><td class="p-2 border border-black">${row[4]}</td><td class="p-2 border border-black text-red-600">${row[5]}</td></tr>`;
+                document.getElementById('receiptTotal').innerText = '₩ ' + (Number(row[defIdx+1])*price).toLocaleString(); UI.showModal('receiptModal');
+            },
+            printReceipt() { window.print(); }
+        };
+
+        const Stock = {
+            renderBoard() {
+                const f = Utils.getF(); const where = Utils.getBaseWhere();
+                const q = `SELECT "${f.name}", SUM(CAST("${f.qty}" AS REAL)), SUM(CAST("${f.price}" AS REAL)) FROM data ${where} GROUP BY 1`;
+                const res = State.db.exec(q); const tbody = document.getElementById('stockTableBody');
+                if(!res.length) { tbody.innerHTML='<tr><td class="text-center p-4" colspan="8">통계 데이터 없음</td></tr>'; return; }
+                
+                let alerts = [];
+                tbody.innerHTML = res[0].values.map(v => {
+                    const failRate = ((v[2]/v[1])*100).toFixed(1);
+                    const limit = State.ropConfig.leadTime; //허용 임계 불량률
+                    const isDanger = failRate >= limit;
+                    const price = State.cachedMasterMap[v[0]]?.price || 0;
+                    if(isDanger) alerts.push(v[0]);
+                    return `<tr class="${isDanger?'bg-rose-950/20 text-rose-400':''}">
+                        <td class="p-4 font-bold">${v[0]}</td><td class="p-4 text-right">${v[1].toLocaleString()}</td><td class="p-4 text-right text-red-400">${v[2].toLocaleString()}</td><td class="p-4 text-right text-emerald-400">${(v[1]-v[2]).toLocaleString()}</td>
+                        <td class="p-4 text-right font-bold">${failRate}%</td><td

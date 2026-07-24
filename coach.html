@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>코치전용관 | 중소기업 AI훈련 확산센터</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta name="description" content="AI훈련코치 전용관 - 컨설팅 표준 3단계 프로세스와 필수 행정 서식을 일괄 제공합니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="코치전용관 | 중소기업 AI훈련 확산센터">
+  <meta property="og:description" content="컨설팅 표준 3단계 프로세스와 필수 행정 서식을 일괄 제공합니다.">
+  <meta property="og:image" content="favicon.svg">
+  <meta name="twitter:card" content="summary">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+
+  <!-- Custom Modern Design System -->
+  <link rel="stylesheet" href="css/custom-theme.css">
+
+  <style>
+    :root { --primary: #003366; --accent: #20c997; --bg-light: #f8f9fa; --light-blue: #eef7ff; }
+    body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-light); color: #333; }
+    
+    #main-content { display: none; }
+    #admin-log-section { display: none; }
+
+    .login-wrapper { min-height: 80vh; display: flex; align-items: center; justify-content: center; }
+    .login-container { max-width: 420px; width: 100%; padding: 40px; background: white; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.08); }
+    .nav-breadcrumb { background: white; padding: 15px 0; border-bottom: 1px solid #eee; }
+    .section-title { border-left: 5px solid var(--accent); padding-left: 15px; margin-bottom: 30px; font-weight: 700; }
+    .card-custom { border: none; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); background: white; }
+    .nav-tabs-global .nav-link { color: #666; font-size: 1.1rem; font-weight: 700; padding: 15px 30px; border: none; border-bottom: 3px solid transparent; }
+    .nav-tabs-global .nav-link.active { color: var(--primary); border-bottom: 3px solid var(--primary); background: transparent; }
+    .nav-pills-custom .nav-link { color: #666; font-weight: 600; padding: 10px 20px; border-radius: 50px; border: 1px solid #dee2e6; margin: 0 5px; background: white; }
+    .nav-pills-custom .nav-link.active { background-color: var(--primary); color: white; border-color: var(--primary); }
+    .process-timeline { position: relative; padding-left: 10px; }
+    .process-timeline::before { content: ''; position: absolute; left: 30px; top: 20px; bottom: 20px; width: 2px; background: #e9ecef; z-index: 1; }
+    .process-step-item { position: relative; display: flex; align-items: center; margin-bottom: 20px; z-index: 2; }
+    .process-step-number { width: 40px; height: 40px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 8px rgba(32, 201, 151, 0.3); flex-shrink: 0; margin-right: 20px; }
+    .process-step-box { flex-grow: 1; background: #ffffff; border: 1px solid #eef0f2; border-radius: 12px; padding: 15px 20px; transition: 0.3s ease; }
+    .process-step-item:hover .process-step-box { border-color: var(--accent); transform: translateX(5px); background: #fafffd; }
+    .highlight-box-equal { background: #f8faff; border-radius: 12px; padding: 20px; border-left: 5px solid var(--primary); height: 100%; }
+    .highlight-box-equal.red { border-left-color: #dc3545; }
+    .salary-blind-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; color: #FFFFFF; cursor: pointer; z-index: 10; transition: 0.3s; border-radius: 12px; border: 2px dashed rgba(0, 229, 255, 0.5); }
+    .salary-blind-overlay:hover { background: rgba(0, 51, 102, 0.95); border-color: #00E5FF; transform: scale(1.01); }
+    .all-download-bar { background-color: #f1f3f5; padding: 12px 15px; border-radius: 10px; margin-bottom: 15px; display: flex; justify-content: flex-end; align-items: center; gap: 12px; border: 1px dashed #ced4da; }
+    .badge-step { font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; font-weight: 600; margin-right: 8px; vertical-align: middle; }
+    .bg-apply { background-color: #e7f5ff; color: #007bff; border: 1px solid #b3d7ff; }
+    .bg-process { background-color: #f3f0ff; color: #7048e8; border: 1px solid #d0bfff; }
+    .bg-payment { background-color: #fff4e6; color: #fd7e14; border: 1px solid #ffd8a8; }
+    .download-item { border-bottom: 1px solid #f1f3f5; padding: 12px 5px; }
+    .download-item:last-child { border-bottom: none; }
+    
+    .hero-spec { 
+      background: #FFFFFF;
+      background-image: 
+        radial-gradient(at 10% 10%, rgba(224, 242, 254, 0.75) 0px, transparent 50%),
+        radial-gradient(at 90% 90%, rgba(238, 242, 255, 0.75) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(240, 249, 255, 0.5) 0px, transparent 60%);
+      color: #0F172A;
+      padding: 50px 0;
+      border-bottom: 1px solid #E2E8F0;
+      border-radius: 0 0 40px 40px;
+    }
+    .process-box { border-left: 4px solid var(--accent); background: var(--light-blue); padding: 20px; border-radius: 0 15px 15px 0; height: 100%; }
+    .step-badge { background: var(--primary); color: white; padding: 4px 12px; border-radius: 50px; font-size: 0.8rem; margin-bottom: 10px; display: inline-block; }
+
+    /* 모바일에서는 서식/매뉴얼 목록이 좁은 스크롤 박스에 갇히지 않도록 여유롭게 */
+    @media (max-width: 991.98px) {
+      .custom-scrollbar { max-height: 60vh !important; }
+    }
+    /* 데스크톱에서는 서식/매뉴얼 목록을 좁은 스크롤 박스에 가두지 않고 전체 표시 */
+    @media (min-width: 992px) {
+      .custom-scrollbar { max-height: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="login-section" class="container login-wrapper">
+  <div class="login-container text-center">
+    <div class="mb-4"><i class="bi bi-shield-lock-fill text-primary" style="font-size: 3rem;"></i></div>
+    <h4 class="fw-bold text-primary mb-2">코치 전용 로그인</h4>
+    <p class="small text-muted mb-4">HRD4U ID와 생년월일을 입력하세요.</p>
+    <div class="mb-3 text-start">
+      <label class="form-label small fw-bold text-secondary" for="userName">아이디</label>
+      <input type="text" id="userName" class="form-control form-control-lg border-2 shadow-sm" placeholder="HRD4U ID를 입력하세요">
+    </div>
+    <div class="mb-4 text-start">
+      <label class="form-label small fw-bold text-secondary" for="userPw">생년월일</label>
+      <input type="password" id="userPw" class="form-control form-control-lg border-2 shadow-sm" placeholder="생년월일 입력">
+    </div>
+    <button id="loginBtn" onclick="checkSecureLogin()" class="btn btn-primary w-100 py-3 fw-bold rounded-pill shadow">인증 및 접속하기</button>
+  </div>
+</div>
+
+<div id="main-content">
+  <div class="nav-breadcrumb">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <div class="d-flex align-items-center gap-3">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="index.html" class="text-decoration-none text-muted">홈</a></li>
+            <li class="breadcrumb-item active fw-bold text-primary" id="dynamic-nav-title">코치 전용 가이드관</li>
+          </ol>
+        </nav>
+        
+
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-light text-dark border fw-bold p-2" id="userGreeting"></span>
+        <button onclick="handleLogOut()" class="btn btn-sm btn-outline-danger rounded-pill px-3">로그아웃</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white border-bottom sticky-top" style="z-index: 1020; top: 0;">
+    <div class="container">
+      <ul class="nav nav-tabs nav-tabs-global border-0" id="globalMenuTab" role="tablist">
+        <li class="nav-item"><button class="nav-link active" id="menu-notice-tab" data-bs-toggle="tab" data-bs-target="#menu-notice" type="button" role="tab"><i class="bi bi-megaphone-fill me-2"></i>0. 공지사항 및 Q&A</button></li>
+        <li class="nav-item"><button class="nav-link" id="menu-guide-tab" data-bs-toggle="tab" data-bs-target="#menu-guide" type="button" role="tab"><i class="bi bi-briefcase-fill me-2"></i>1. 컨설팅 업무 가이드관</button></li>
+        <li class="nav-item"><button class="nav-link" id="menu-spec-tab" data-bs-toggle="tab" data-bs-target="#menu-spec" type="button" role="tab"><i class="bi bi-cpu-fill me-2"></i>2. AI 훈련 표준모델 안내관</button></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container py-5">
+    <div class="tab-content" id="globalMenuTabContent">
+      
+      <div class="tab-pane fade show active" id="menu-notice" role="tabpanel">
+        <div class="text-center mb-5">
+          <h2 class="fw-bold text-danger mb-2">공지사항 및 자주 묻는 질문</h2>
+          <p class="text-muted">주요 변경사항을 확인하고 코칭 관련 궁금증을 해결하세요.</p>
+        </div>
+        
+        <div class="accordion accordion-flush" id="noticeFaqQnaAccordion">
+          
+          <!-- 1. 공지사항 -->
+          <div class="accordion-item shadow-sm mb-4 border rounded-4 overflow-hidden">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed py-4" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNoticeSec" aria-expanded="false">
+                <h4 class="fw-bold mb-0 text-dark"><i class="bi bi-megaphone-fill text-danger me-2"></i>공지사항</h4>
+              </button>
+            </h2>
+            <div id="collapseNoticeSec" class="accordion-collapse collapse" data-bs-parent="#noticeFaqQnaAccordion">
+              <div class="accordion-body bg-white p-4 custom-scrollbar" style="max-height: 500px; overflow-y: auto;">
+                <div class="accordion accordion-flush" id="noticeAccordion">
+                  <div class="text-center text-muted py-5">공지사항 데이터를 불러오는 중입니다...</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. 자주 묻는 질문 -->
+          <div class="accordion-item shadow-sm mb-4 border rounded-4 overflow-hidden">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed py-4" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFaqSec" aria-expanded="false">
+                <h4 class="fw-bold mb-0 text-dark"><i class="bi bi-info-circle-fill text-primary me-2"></i>자주 묻는 질문</h4>
+              </button>
+            </h2>
+            <div id="collapseFaqSec" class="accordion-collapse collapse" data-bs-parent="#noticeFaqQnaAccordion">
+              <div class="accordion-body bg-white p-4 custom-scrollbar" style="max-height: 500px; overflow-y: auto;">
+                <div class="accordion accordion-flush" id="faqAccordion">
+                  <div class="text-center text-muted py-5">FAQ 데이터를 불러오는 중입니다...</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. 개별 Q&A -->
+          <div class="accordion-item shadow-sm mb-4 border rounded-4 overflow-hidden">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed py-4" type="button" data-bs-toggle="collapse" data-bs-target="#collapseQnaSec" aria-expanded="false">
+                <div class="d-flex w-100 justify-content-between align-items-center pe-3">
+                  <h4 class="fw-bold mb-0 text-dark"><i class="bi bi-question-circle-fill text-info me-2"></i>개별 Q&A</h4>
+                  <div data-bs-toggle="modal" data-bs-target="#qnaModal" class="btn btn-sm btn-info text-white fw-bold shadow-sm rounded-pill px-3" onclick="event.stopPropagation();"><i class="bi bi-pencil-square me-1"></i>질문 남기기</div>
+                </div>
+              </button>
+            </h2>
+            <div id="collapseQnaSec" class="accordion-collapse collapse" data-bs-parent="#noticeFaqQnaAccordion">
+              <div class="accordion-body bg-white p-0 custom-scrollbar" style="max-height: 500px; overflow-y: auto;">
+                <div class="table-responsive" id="qnaBoardContainer">
+                  <div class="text-center text-muted py-5">Q&A 데이터를 불러오는 중입니다...</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+
+            <!-- QnA Modal -->
+            <div class="modal fade" id="qnaModal" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow" style="border-radius:15px;">
+                  <div class="modal-header border-0 pb-0">
+                    <h5 class="fw-bold text-dark"><i class="bi bi-pencil-square text-info me-2"></i>질문 작성하기</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body pt-3">
+                    <p class="text-muted small mb-3">궁금한 점을 남겨주시면, 확인 후 신속하게 답변을 등록해 드립니다.</p>
+                    <textarea id="qnaQuestionText" class="form-control mb-3" rows="4" placeholder="질문 내용을 입력해주세요." style="border-radius:10px;"></textarea>
+                    <button id="qnaSubmitBtn" onclick="submitQna()" class="btn btn-info w-100 text-white fw-bold rounded-pill shadow-sm">질문 등록하기</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+      </div>
+
+
+      <div class="tab-pane fade" id="menu-guide" role="tabpanel">
+        <div class="text-center mb-5">
+          <h2 class="fw-bold text-primary mb-2">코치 전용 업무 절차 및 자료실</h2>
+          <p class="text-muted">컨설팅 표준 3단계 프로세스 및 필수 행정 서식을 일괄 제공합니다.</p>
+        </div>
+        <div class="d-flex flex-column gap-4">
+          <div id="procedure-section">
+            <h4 class="section-title mb-4"><i class="bi bi-diagram-3-fill text-primary me-2"></i>코칭 3단계 프로세스 통합 안내</h4>
+            <div class="accordion accordion-flush" id="threeStepAccordion">
+              
+              <!-- 1단계 -->
+              <div class="accordion-item shadow-sm mb-4 border rounded-4 overflow-hidden">
+                <h2 class="accordion-header">
+                  <button class="accordion-button py-4" type="button" data-bs-toggle="collapse" data-bs-target="#step1Collapse" aria-expanded="true">
+                    <div class="d-flex align-items-center">
+                      <span class="badge bg-primary p-3 me-3 fs-5 rounded-circle" style="width:50px; height:50px; display:flex; align-items:center; justify-content:center;">1</span>
+                      <div>
+                        <h4 class="fw-bold mb-0 text-dark">AI훈련로드맵 컨설팅</h4>
+                        <p class="text-muted small mb-0 mt-1">기업 진단 및 훈련 로드맵 수립 단계</p>
+                      </div>
+                    </div>
+                  </button>
+                </h2>
+                <div id="step1Collapse" class="accordion-collapse collapse show">
+                  <div class="accordion-body bg-white p-4">
+                    <div class="row g-4">
+                      <!-- 매뉴얼 -->
+                      <div class="col-lg-6 d-flex flex-column">
+                        <div class="d-flex align-items-center mb-3" style="min-height: 31px;">
+                          <h5 class="fw-bold text-primary mb-0"><i class="bi bi-book-half me-2"></i>전산 업무 매뉴얼</h5>
+                        </div>
+                        <div class="card border border-primary p-3 shadow-sm flex-grow-1 custom-scrollbar" style="border-radius:15px; border-width: 2px !important; max-height: 250px; overflow-y: auto;">
+                          <div class="d-flex flex-column gap-2">
+                            <a href="5.전산업무매뉴얼/1. AI훈련로드맵/① HRD4U 회원가입-기업(HRD4U).pdf" download class="btn btn-light border text-start fw-bold shadow-sm" style="font-size: 0.85rem;"><i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>① HRD4U 회원가입-기업(HRD4U)</a>
+                            <a href="5.전산업무매뉴얼/1. AI훈련로드맵/② 기초진단&이음컨설팅-기업(HRD4U).pdf" download class="btn btn-light border text-start fw-bold shadow-sm" style="font-size: 0.85rem;"><i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>② 기초진단&이음컨설팅-기업(HRD4U)</a>
+                            <a href="5.전산업무매뉴얼/1. AI훈련로드맵/③ 컨설팅 보고서 제출·확인-PM(HRD4U).pdf" download class="btn btn-light border text-start fw-bold shadow-sm" style="font-size: 0.85rem;"><i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>③ 컨설팅 보고서 제출·확인-PM(HRD4U)</a>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- 서식 -->
+                      <div class="col-lg-6 d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-center mb-3" style="min-height: 31px;">
+                          <h5 class="fw-bold text-primary mb-0"><i class="bi bi-folder-fill me-2"></i>관련 서식 다운로드</h5>
+                          <div id="zip-btn-stage-1"></div>
+                        </div>
+                        <div id="file-stage-1" class="file-stage-container flex-grow-1 d-flex flex-column">
+                          <div class="card bg-light border-0 shadow-sm p-4 h-100 text-center text-muted small d-flex justify-content-center align-items-center" style="border-radius:15px; max-height: 250px;">서식을 불러오는 중입니다...</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 2단계 -->
+              <div class="accordion-item shadow-sm mb-4 border rounded-4 overflow-hidden">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed py-4" type="button" data-bs-toggle="collapse" data-bs-target="#step2Collapse">
+                    <div class="d-flex align-items-center">
+                      <span class="badge bg-success p-3 me-3 fs-5 rounded-circle" style="width:50px; height:50px; display:flex; align-items:center; justify-content:center;">2</span>
+                      <div>
+                        <h4 class="fw-bold mb-0 text-dark">PBL AI+직무 훈련 과정개발 컨설팅</h4>
+                        <p class="text-muted small mb-0 mt-1">맞춤형 과정 설계 및 개발 단계</p>
+                      </div>
+                    </div>
+                  </button>
+                </h2>
+                <div id="step2Collapse" class="accordion-collapse collapse">
+                  <div class="accordion-body bg-white p-4">
+                    <div class="row g-4">
+                      <!-- 매뉴얼 -->
+                      <div class="col-lg-6 d-flex flex-column">
+                        <div class="d-flex align-items-center mb-3" style="min-height: 31px;">
+                          <h5 class="fw-bold text-success mb-0"><i class="bi bi-book-half me-2"></i>전산 업무 매뉴얼</h5>
+                        </div>
+                        <div class="card border border-success p-3 shadow-sm flex-grow-1 custom-scrollbar" style="border-radius:15px; border-width: 2px !important; max-height: 250px; overflow-y: auto;">
+                          <div class="d-flex flex-column gap-2">
+                            <a href="5.전산업무매뉴얼/2. 문제해결형(PBL) AI+직무 훈련 과정개발 (컨설팅)/① PBL AI+직무 훈련 참여 신청-기업(HRD4U).pdf" download class="btn btn-light border text-start fw-bold shadow-sm" style="font-size: 0.85rem;"><i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>① PBL AI+직무 훈련 참여 신청-기업(HRD4U)</a>
+                            <a href="5.전산업무매뉴얼/2. 문제해결형(PBL) AI+직무 훈련 과정개발 (컨설팅)/② 과정개발컨설팅 신청-기업(HRD4U).pdf" download class="btn btn-light border text-start fw-bold shadow-sm" style="font-size: 0.85rem;"><i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>② 과정개발컨설팅 신청-기업(HRD4U)</a>
+                            <a href="5.전산업무매뉴얼/2. 문제해결형(PBL) AI+직무 훈련 과정개발 (컨설팅)/③ 과정개발컨설팅 진행-PM(HRD4U).pdf" download class="btn btn-light border text-start fw-bold shadow-sm" style="font-size: 0.85rem;"><i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>③ 과정개발컨설팅 진행-PM(HRD4U)</a>
+                            <a href="5.전산업무매뉴얼/2. 문제해결형(PBL) AI+직무 훈련 과정개발 (컨설팅)/④ 과정개발컨설팅보고서 작성-PM(HRD4U).pdf" download class="btn btn-light border text-start fw-bold shadow-sm" style="font-size: 0.85rem;"><i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>④ 과정개발컨설팅보고서 작성-PM(HRD4U)</a>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- 서식 -->
+                      <div class="col-lg-6 d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-center mb-3" style="min-height: 31px;">
+                          <h5 class="fw-bold text-success mb-0"><i class="bi bi-folder-fill me-2"></i>관련 서식 다운로드</h5>
+                          <div id="zip-btn-stage-2"></div>
+                        </div>
+                        <div id="file-stage-2" class="file-stage-container flex-grow-1 d-flex flex-column">
+                          <div class="card bg-light border-0 shadow-sm p-4 h-100 text-center text-muted small d-flex justify-content-center align-items-center" style="border-radius:15px; max-height: 250px;">서식을 불러오는 중입니다...</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3단계 -->
+              <div class="accordion-item shadow-sm mb-4 border rounded-4 overflow-hidden">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed py-4" type="button" data-bs-toggle="collapse" data-bs-target="#step3Collapse">
+                    <div class="d-flex align-items-center">
+                      <span class="badge bg-info text-dark p-3 me-3 fs-5 rounded-circle" style="width:50px; height:50px; display:flex; align-items:center; justify-content:center;">3</span>
+                      <div>
+                        <h4 class="fw-bold mb-0 text-dark">PBL AI+직무 훈련 실시</h4>
+                        <p class="text-muted small mb-0 mt-1">실제 훈련 운영 및 수료 관리 단계</p>
+                      </div>
+                    </div>
+                  </button>
+                </h2>
+                <div id="step3Collapse" class="accordion-collapse collapse">
+                  <div class="accordion-body bg-white p-4">
+                    <div class="row g-4">
+                      <!-- 매뉴얼 -->
+                      <div class="col-lg-6 d-flex flex-column">
+                        <div class="d-flex align-items-center mb-3" style="min-height: 31px;">
+                          <h5 class="fw-bold text-info mb-0"><i class="bi bi-book-half me-2"></i>전산 업무 매뉴얼</h5>
+                        </div>
+                        <div class="card border border-info p-3 shadow-sm flex-grow-1 custom-scrollbar" style="border-radius:15px; border-width: 2px !important; max-height: 250px; overflow-y: auto;">
+                          <div class="d-flex flex-column gap-2">
+                            <a href="5.전산업무매뉴얼/3. 문제해결형(PBL) AI+직무 훈련/0. HRD-NET 설치 방법.pdf" download class="btn btn-light border text-start fw-bold shadow-sm" style="font-size: 0.85rem;"><i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>0. HRD-NET 설치 방법</a>
+                            <a href="5.전산업무매뉴얼/3. 문제해결형(PBL) AI+직무 훈련/0. HRD-NET 인증서 등록 .pdf" download class="btn btn-light border text-start fw-bold shadow-sm" style="font-size: 0.85rem;"><i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>0. HRD-NET 인증서 등록</a>
+                            <a href="5.전산업무매뉴얼/3. 문제해결형(PBL) AI+직무 훈련/① 과정인정신청-기업(HRD-NET).pdf" download class="btn btn-light border text-start fw-bold shadow-sm" style="font-size: 0.85rem;"><i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>① 과정인정신청-기업(HRD-NET)</a>
+                            <a href="5.전산업무매뉴얼/3. 문제해결형(PBL) AI+직무 훈련/② 훈련실시신고-기업(HRD-NET).pdf" download class="btn btn-light border text-start fw-bold shadow-sm" style="font-size: 0.85rem;"><i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>② 훈련실시신고-기업(HRD-NET)</a>
+                            <a href="5.전산업무매뉴얼/3. 문제해결형(PBL) AI+직무 훈련/③ 확정자신고-기업(HRD-NET).pdf" download class="btn btn-light border text-start fw-bold shadow-sm" style="font-size: 0.85rem;"><i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>③ 확정자신고-기업(HRD-NET)</a>
+                            <a href="5.전산업무매뉴얼/3. 문제해결형(PBL) AI+직무 훈련/④ 훈련관리-기업(고용24).pdf" download class="btn btn-light border text-start fw-bold shadow-sm" style="font-size: 0.85rem;"><i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>④ 훈련관리-기업(고용24)</a>
+                            <a href="5.전산업무매뉴얼/3. 문제해결형(PBL) AI+직무 훈련/⑤ 출결관리-기업(HRD-NET).pdf" download class="btn btn-light border text-start fw-bold shadow-sm" style="font-size: 0.85rem;"><i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>⑤ 출결관리-기업(HRD-NET)</a>
+                            <a href="5.전산업무매뉴얼/3. 문제해결형(PBL) AI+직무 훈련/⑥ 훈련결과보고-기업(HRD4U).pdf" download class="btn btn-light border text-start fw-bold shadow-sm" style="font-size: 0.85rem;"><i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>⑥ 훈련결과보고-기업(HRD4U)</a>
+                            <a href="5.전산업무매뉴얼/3. 문제해결형(PBL) AI+직무 훈련/⑦ 수료보고-기업(HRD-NET).pdf" download class="btn btn-light border text-start fw-bold shadow-sm" style="font-size: 0.85rem;"><i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>⑦ 수료보고-기업(HRD-NET)</a>
+                            <a href="5.전산업무매뉴얼/3. 문제해결형(PBL) AI+직무 훈련/⑧ 지원금신청-기업(HRD-NET).pdf" download class="btn btn-light border text-start fw-bold shadow-sm" style="font-size: 0.85rem;"><i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>⑧ 지원금신청-기업(HRD-NET)</a>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- 서식 -->
+                      <div class="col-lg-6 d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-center mb-3" style="min-height: 31px;">
+                          <h5 class="fw-bold text-info mb-0"><i class="bi bi-folder-fill me-2"></i>관련 서식 다운로드</h5>
+                          <div id="zip-btn-stage-3"></div>
+                        </div>
+                        <div id="file-stage-3" class="file-stage-container flex-grow-1 d-flex flex-column">
+                          <div class="card bg-light border-0 shadow-sm p-4 h-100 text-center text-muted small d-flex justify-content-center align-items-center" style="border-radius:15px; max-height: 250px;">등록된 서식이 없습니다.</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="menu-spec" role="tabpanel">
+        <header class="hero-spec text-center">
+          <div class="container">
+            <span class="badge bg-primary-subtle text-primary mb-3 fw-bold rounded-pill px-3 py-1.5 border border-primary-subtle fs-6">2026 표준모델 지침(안)</span>
+            <h1 class="fw-bold mb-3 text-dark" style="color: #0F172A !important;">생성형 AI 기반 업무관리 웹보드 개발 및 <br>리포트 자동화 훈련</h1>
+            <p class="lead text-secondary fw-semibold mb-4" style="color: #475569 !important;">"별도 시스템 구축 비용 없이, 엑셀 데이터를 실시간 AI 웹 대시보드로 전환"</p>
+            <div class="mt-4 text-secondary fw-bold mb-4">
+              <span class="me-4"><i class="bi bi-clock-history me-1 text-primary"></i> 업무시간 3시간 → 5분 단축</span>
+              <span><i class="bi bi-cpu me-1 text-primary"></i> 데이터 기반 의사결정 혁신</span>
+            </div>
+
+            <!-- 코치 전용 자재 바로가기 버튼 -->
+            <div class="d-flex justify-content-center flex-wrap gap-3 mt-4 pt-2">
+              <a href="prompt-guide.html" class="btn btn-ai-primary btn-lg px-4 py-2.5 rounded-pill shadow-sm fw-bold">
+                <i class="bi bi-terminal-box me-2"></i>공통 프롬프트 가이드
+              </a>
+              <a href="webboard-gallery.html" class="btn btn-outline-primary btn-lg px-4 py-2.5 rounded-pill shadow-sm fw-bold">
+                <i class="bi bi-layout-text-window-reverse me-2"></i>웹보드 샘플 갤러리
+              </a>
+            </div>
+          </div>
+        </header>
+
+        <div class="container py-5 px-0">
+          <ul class="nav nav-pills nav-pills-custom justify-content-center mb-5" id="modelTab" role="tablist">
+            <li class="nav-item"><button class="nav-link active" id="pills-overview-tab" data-bs-toggle="pill" data-bs-target="#overview" type="button" role="tab">표준모델이란?</button></li>
+            <li class="nav-item"><button class="nav-link" id="pills-curriculum-tab" data-bs-toggle="pill" data-bs-target="#curriculum" type="button" role="tab">훈련 프로세스</button></li>
+            <li class="nav-item"><button class="nav-link" id="pills-demo-tab" data-bs-toggle="pill" data-bs-target="#demo" type="button" role="tab">시연 및 활용사례</button></li>
+          </ul>
+
+          <div class="tab-content" id="pills-tabContent">
+            <div class="tab-pane fade show active" id="overview" role="tabpanel">
+              <div class="row g-4">
+                <div class="col-lg-7">
+                  <h4 class="fw-bold mb-4">AI 훈련 표준모델 개요</h4>
+                  <p class="lh-lg text-muted">
+                    본 모델은 이론 중심 교육에서 탈피하여, 기업의 <strong>직무 담당자가 직접 설계하는 업무 관리 웹보드</strong> 제작 모델입니다. 전문 인력이나 고가의 IT 인프라가 부족한 중소기업도 생성형 AI와 노코드(No-Code) 기술을 통해 즉각적인 디지털 전환이 가능한 직무 맞춤형 AI활용 모델입니다.
+                  </p>
+                  <div class="card card-custom p-4 bg-white mt-4 border">
+                    <h6 class="fw-bold"><i class="bi bi-person-check me-2 text-primary"></i>훈련 대상</h6>
+                    <p class="small text-muted mb-0"><strong>데이터 관리 및 보고서 작성 효율화</strong>가 필요한 모든 제조·사무직 재직자</p>
+                  </div>
+                </div>
+                <div class="col-lg-5">
+                  <div class="card card-custom p-4 h-100 bg-white border">
+                    <h5 class="fw-bold mb-4 text-primary">기대 효과 (Expected Effects)</h5>
+                    <div class="mb-4">
+                      <div class="small text-muted mb-2">정량적 성과</div>
+                      <div class="fw-bold text-primary mb-2"><i class="bi bi-check-circle-fill me-2"></i>오류 비용 발생 빈도 5~20% 감소</div>
+                      <div class="fw-bold text-primary"><i class="bi bi-check-circle-fill me-2"></i>데이터 정리 보고서 작성 시간 단축</div>
+                    </div>
+                    <hr class="my-4 opacity-10">
+                    <div>
+                      <div class="small text-muted mb-2">정성적 성과</div>
+                      <div class="fw-bold">단순 반복 업무의 AI 대체로 핵심 과업 집중</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tab-pane fade" id="curriculum" role="tabpanel">
+              <div class="text-center mb-5">
+                <h4 class="fw-bold">단계별 상세 프로세스</h4>
+                <p class="text-muted small">필수 5시간 + 심화 2시간 구성</p>
+              </div>
+              <div class="row g-4">
+                <div class="col-md-3"><div class="process-box"><span class="step-badge">1단계</span><h6 class="fw-bold">직무 이해 & 기획</h6><p class="small text-muted mb-0">본인 업무 핵심 흐름 정의 및 AI 직무 특성 학습</p></div></div>
+                <div class="col-md-3"><div class="process-box"><span class="step-badge">2단계</span><h6 class="fw-bold">프로그램 생성</h6><p class="small text-muted mb-0">업무 절차 코드 변환 및 웹보드 기초 뼈대 완성</p></div></div>
+                <div class="col-md-3"><div class="process-box"><span class="step-badge">3단계</span><h6 class="fw-bold">데이터 연동</h6><p class="small text-muted mb-0">실제 엑셀 데이터 연동 및 AI 자가 오류 수정</p></div></div>
+                <div class="col-md-3"><div class="process-box"><span class="step-badge">4단계</span><h6 class="fw-bold">리포트 고도화</h6><p class="small text-muted mb-0">UI 최적화 및 원클릭 PDF 보고서 생성 구현</p></div></div>
+              </div>
+            </div>
+
+            <div class="tab-pane fade" id="demo" role="tabpanel">
+              <div class="text-center mb-5">
+                <h4 class="fw-bold">표준모델 실제 구동 시연</h4>
+                <p class="text-muted small">제조기업의 '스마트 재고관리 웹보드' 실제 도입 시연입니다.</p>
+              </div>
+              <div class="row g-5 justify-content-center">
+                <div class="col-lg-10">
+<div class="ratio ratio-16x9 shadow-lg rounded-4 overflow-hidden border bg-dark">
+  <iframe 
+    src="https://www.youtube.com/embed/xgPUvi9WR9s"
+    title="중소기업AI훈련표준모델_경남경영자총협회" 
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen>
+  </iframe>
+</div>                   
+                  <div class="row mt-5 g-4">
+                    <div class="col-md-6"><div class="p-4 border rounded-4 h-100 bg-white"><h6 class="fw-bold text-danger mb-3"><i class="bi bi-x-circle me-2"></i>기존 업무 (Before)</h6><ul class="small text-muted ps-3 mb-0 lh-lg"><li>매일 2시간 이상 수동 엑셀 데이터 입력</li><li>담당자 부재 시 현장 현황 파악 지연</li><li>수기 데이터 오기입으로 인한 재고 불일치</li></ul></div></div>
+                    <div class="col-md-6"><div class="p-4 border rounded-4 h-100 bg-white" style="border-left: 5px solid var(--accent) !important;"><h6 class="fw-bold text-success mb-3"><i class="bi bi-check-circle-fill me-2"></i>도입 후 (After)</h6><ul class="small text-muted ps-3 mb-0 lh-lg"><li><strong>실시간 자동 집계:</strong> 데이터 업로드 즉시 대시보드 반영</li><li><strong>모바일 현장 대응:</strong> 어디서든 실시간 재고 조회 및 지시</li><li><strong>리포트 자동화:</strong> 주간 보고서 원클릭 PDF 출력</li></ul></div></div>
+                  </div>
+                  <div class="text-center mt-5">
+                    <p class="fw-bold mb-3">우리 기업에도 이 모델을 도입하여 업무를 혁신해 보세요.</p>
+                    <a href="company.html" class="btn btn-primary btn-lg px-5 rounded-pill shadow"><i class="bi bi-chat-dots-fill me-2"></i>컨설팅 신청 및 도입 문의</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          
+        </div>
+      </div>
+    </div>
+    
+    <div id="admin-log-section" class="mt-5 pt-5 border-top">
+      <div class="card card-custom p-4 border">
+        <h5 class="fw-bold mb-3"><i class="bi bi-clock-history me-2 text-secondary"></i>코치 접속 이력</h5>
+        <p class="small text-muted mb-3">코치별 로그인 기록입니다. (관리자만 열람 가능)</p>
+        <div class="table-responsive">
+          <table class="table table-hover bg-white align-middle small shadow-sm rounded-3 overflow-hidden">
+            <thead class="table-dark">
+              <tr>
+                <th scope="col" style="width: 10%">순번</th>
+                <th scope="col" style="width: 30%">코치 성명 / ID</th>
+                <th scope="col" style="width: 40%">접속 일시</th>
+                <th scope="col" style="width: 20%">상태</th>
+              </tr>
+            </thead>
+            <tbody id="logTableBody">
+            </tbody>
+          </table>
+        </div>
+        <div class="text-end mt-2">
+          <button onclick="clearSystemLogs()" class="btn btn-sm btn-outline-secondary rounded-pill"><i class="bi bi-trash3 me-1"></i>기록 전체 초기화</button>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+</div>
+
+<script>
+  // 1. 구글 시트 웹 앱 URL (배포 후 받은 주소)
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzvApaSAT127s9G-vJ0tC92-gklDLzXdKBwCF2sV5Zt1XFEJqUy4UYyFFMq3E9rSZBH/exec";
+
+  // ============================================================
+  // ★★★  서식 패키지 데이터 (여기에 추가하면 자동 반영됩니다)  ★★★
+  // ============================================================
+  //
+  //  [추가 방법]
+  //  1) 새 패키지(아코디언 묶음)를 추가하려면 → FORM_PACKAGES 배열에 새 객체를 추가
+  //  2) 기존 패키지에 서식 파일을 추가하려면 → 해당 패키지의 files 배열에 한 줄 추가
+  //
+  //  badge(뱃지) 종류:  신청 | 진행 | 수당 | 신규 | 설계 | 완료  (자유롭게 추가 가능)
+  //
+  // 기본 로컬 서식 패키지 데이터 (구글 시트 로딩 전 0초 즉시 렌더링용)
+  let DEFAULT_FORM_PACKAGES = {
+    1: {
+      zipFile: '3.AI훈련코치/AI훈련로드맵 서식/AI훈련로드맵 서식.zip',
+      files: [
+        { badge: '신청', label: '1-1. AI훈련로드맵 사업 참여 신청서', path: '3.AI훈련코치/AI훈련로드맵 서식/(신청) 1-1. AI훈련로드맵 사업 참여 신청서(기업 작성).hwp' },
+        { badge: '신청', label: '1-2. AI훈련로드맵 컨설팅 신청서', path: '3.AI훈련코치/AI훈련로드맵 서식/(신청) 1-2. AI훈련로드맵 컨설팅 신청서(코치매칭 후 작성).hwp' },
+        { badge: '신청', label: '2-1. AI훈련로드맵 표준 협약서(기업 작성)', path: '3.AI훈련코치/AI훈련로드맵 서식/(신청) 2-1. AI훈련로드맵 표준 협약서(기업 작성).hwp' },
+        { badge: '신청', label: '2-2. AI훈련코치 컨설팅 팀 참여 약정서', path: '3.AI훈련코치/AI훈련로드맵 서식/(신청) 2-2. AI훈련코치 컨설팅 팀 참여 약정서(코치 작성).hwp' },
+        { badge: '신청', label: '2-3. AI훈련코치 위촉 관련 정보공유 동의서', path: '3.AI훈련코치/AI훈련로드맵 서식/(신청) 2-3. AI훈련코치 위촉 관련 정보공유 동의서(코치 작성).hwp' },
+        { badge: '신청', label: '2-4. AI훈련코치 개인정보 수집·이용 동의서', path: '3.AI훈련코치/AI훈련로드맵 서식/(신청) 2-4. AI훈련코치 개인정보 수집·이용 동의서(코치 작성).hwp' },
+        { badge: '신청', label: '2-5. AI훈련코치 참여 서약서', path: '3.AI훈련코치/AI훈련로드맵 서식/(신청) 2-5. AI훈련코치 참여 서약서(코치 작성).hwp' },
+        { badge: '진행', label: '3-1. AI훈련로드맵 보고서', path: '3.AI훈련코치/AI훈련로드맵 서식/(진행) 3-1. AI훈련로드맵 보고서(코치 작성).hwp' },
+        { badge: '진행', label: '3-2. AI훈련로드맵 컨설팅 수행일지', path: '3.AI훈련코치/AI훈련로드맵 서식/(진행) 3-2. AI훈련로드맵 수행일지(코치 작성).hwp' },
+        { badge: '수당', label: '4. AI훈련로드맵 수당지급 명세서', path: '3.AI훈련코치/AI훈련로드맵 서식/(수당) 4. AI훈련로드맵 수당지급 명세서.hwp' }
+      ]
+    },
+    2: {
+      zipFile: '3.AI훈련코치/PBL 과정 개발 서식/PBL 과정 개발 서식.zip',
+      files: [
+        { badge: '신청', label: '1-1. PBL 과정개발 컨설팅 신청서(기업 작성)', path: '3.AI훈련코치/PBL 과정 개발 서식/(신청) 1-1.PBL+AI 컨설팅 신청서(기업 작성).hwp' },
+        { badge: '신청', label: '1-2. PBL 과정개발 컨설팅 팀 참여 약정서(역할별 작성)', path: '3.AI훈련코치/PBL 과정 개발 서식/(신청) 1-2 PBL+AI 컨설팅 팀 참여 약정서(역할별 작성).hwp' },
+        { badge: '신청', label: '1-3. PBL 과정개발사업 개인정보 수집·이용 동의서(역할별 작성)', path: '3.AI훈련코치/PBL 과정 개발 서식/(신청) 1-3. PBL+AI 사업 참여자 개인정보 수집·이용 동의서(역할별 작성).hwp' },
+        { badge: '별첨', label: '도메인 전문가 증빙자료(HRD4U증빙(필수),학력/경력증명서, 자격증 등)', path: '#' },
+        { badge: '별첨', label: '내부 전문가 증빙자료(재직 증명서 등)', path: '#' },
+        { badge: '별첨', label: '기업HRD이음컨설팅 보고서', path: '#' },
+        { badge: '진행', label: '2-1. PBL 과정개발 외부강사 서약서', path: '3.AI훈련코치/PBL 과정 개발 서식/(진행) 2-1. 문제해결형(PBL) AI+직무 훈련 외부강사 서약서.hwp' },
+        { badge: '진행', label: '2-2. PBL 과정개발 컨설팅 수행일지', path: '3.AI훈련코치/PBL 과정 개발 서식/(진행) 2-2. 컨설팅 수행일지.hwp' },
+        { badge: '진행', label: '2-3. PBL 과정개발 훈련과정 개발 보고서', path: '3.AI훈련코치/PBL 과정 개발 서식/(진행) 2-3. 문제해결형(PBL) AI+직무 훈련과정 개발보고서.hwp' },
+        { badge: '진행', label: '2-4. PBL 과정개발 훈련 시간표', path: '3.AI훈련코치/PBL 과정 개발 서식/(진행) 2-4 문제해결형(PBL) AI+직무 훈련 시간표.hwp' }
+      ]
+    },
+    3: {
+      zipFile: '3.AI훈련코치/PBL 훈련 서식/PBL 서식.zip',
+      files: [
+        { badge: '진행', label: '(진행) 1-1. PBL 훈련 실시 일지', path: '3.AI훈련코치/PBL 훈련 서식/(진행) 1-1. PBL 훈련 실시 일지.hwp' },
+        { badge: '진행', label: '(진행) 1-2. PBL 훈련 출석부 및 수료보고서', path: '3.AI훈련코치/PBL 훈련 서식/(진행) 1-2. PBL 훈련 출석부 및 수료보고서.hwp' }
+      ]
+    }
+  };
+
+  let FORM_PACKAGES = DEFAULT_FORM_PACKAGES;
+  let NOTICES = [];
+  let FAQ_LIST = [];
+  let QNA_LIST = [];
+
+  // 구글 시트(공개)에서 QnA 리스트 불러오기
+  function loadQnaFromSheet() {
+    const SHEET_ID = '1FPC06ZjhCXKIzgX51Zkpfi8VNdz_SAGs302vHUWYEs4';
+    const cb = new Date().getTime();
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=responseHandler:processQnaData&sheet=QnA&t=${cb}`;
+    const script = document.createElement('script');
+    script.src = url;
+    document.body.appendChild(script);
+  }
+
+  // QnA JSONP 콜백
+  window.processQnaData = function(data) {
+    try {
+      const rows = data.table.rows;
+      QNA_LIST = [];
+      rows.forEach((row, idx) => {
+        if(idx === 0) return; // 무조건 첫 번째 줄(헤더) 무시
+        if(!row || !row.c || !row.c[0] || !row.c[0].v) return;
+        const question = row.c[0].v;
+        const answer = row.c[1] && row.c[1].v ? row.c[1].v : '';
+        const author = '익명';
+        // 날짜 열: 작성자 열이 삭제되어 3번째(index 2)로 이동함
+        let dateStr = '';
+        if (row.c[2] && row.c[2].f) {
+           dateStr = row.c[2].f;
+        } else if (row.c[2] && row.c[2].v) {
+           dateStr = String(row.c[2].v);
+           if(dateStr.startsWith('Date(')) {
+               const parts = dateStr.match(/Date\((\d+),(\d+),(\d+)\)/);
+               if(parts) {
+                   const y = parts[1];
+                   const m = String(parseInt(parts[2]) + 1).padStart(2, '0');
+                   const d = String(parts[3]).padStart(2, '0');
+                   dateStr = `${y}.${m}.${d}`;
+               }
+           }
+        }
+        if (!dateStr || dateStr.trim() === '') dateStr = '-';
+        
+        // 시간 부분 제거하고 날짜만 남기기 (오전/오후 분기 처리)
+        if (dateStr.includes('오전')) dateStr = dateStr.split('오전')[0].trim();
+        else if (dateStr.includes('오후')) dateStr = dateStr.split('오후')[0].trim();
+        else if (dateStr.match(/\d{2}:\d{2}/)) dateStr = dateStr.split(' ')[0];
+
+        QNA_LIST.push({ question, answer, author, date: dateStr });
+      });
+      renderQna();
+    } catch(e) {
+      console.error("QnA 연동 실패:", e);
+      document.getElementById('qnaAccordion').innerHTML = '<div class="alert alert-danger">QnA를 불러오지 못했습니다. 구글 시트 권한을 확인해 주세요.</div>';
+    }
+  };
+
+  // QnA 아코디언(게시판) 렌더링
+  function renderQna() {
+    const container = document.getElementById('qnaBoardContainer');
+    if (!container) return;
+    
+    if (QNA_LIST.length === 0) {
+      container.innerHTML = '<div class="text-center text-muted py-5">등록된 Q&A가 없습니다.</div>';
+      return;
+    }
+    
+    // 테이블 헤더
+    let tableHTML = `
+      <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
+        <thead class="table-light">
+          <tr>
+            <th class="text-center" style="width: 25%;">상태</th>
+            <th style="width: 75%;">질문 및 작성자</th>
+          </tr>
+        </thead>
+        <tbody id="qnaTableBody">
+    `;
+
+    // 최신 질문이 위로 오도록 역순으로 렌더링 (또는 시트 순서 유지)
+    // 시트에서 위에서부터 아래로 쌓이므로 배열을 뒤집습니다.
+    const reversedQna = [...QNA_LIST].reverse();
+
+    reversedQna.forEach((qna, idx) => {
+      const isAnswered = qna.answer && qna.answer.trim().length > 0;
+      const statusBadge = isAnswered 
+        ? `<span class="badge bg-primary w-100 rounded-pill">답변 완료</span>` 
+        : `<span class="badge bg-secondary w-100 rounded-pill">답변 대기</span>`;
+      
+      const rowId = `qnaCollapse${idx}`;
+
+      tableHTML += `
+        <tr style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#${rowId}" aria-expanded="false" aria-controls="${rowId}">
+          <td class="text-center align-middle">${statusBadge}</td>
+          <td>
+            <div class="fw-bold text-dark text-truncate" style="max-width: 170px;">${qna.question}</div>
+            <div class="text-muted mt-1" style="font-size: 0.75rem;">${qna.author} | ${qna.date}</div>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2" class="p-0 border-0">
+            <div class="collapse" id="${rowId}" data-bs-parent="#qnaTableBody">
+              <div class="p-3 bg-light text-dark" style="border-bottom: 1px solid #dee2e6; white-space: pre-line; line-height: 1.5; font-size: 0.85rem;">
+                <div class="mb-2">
+                  <span class="badge bg-info text-dark me-2">Q</span> <span class="fw-bold">${qna.question}</span>
+                </div>
+                <div>
+                  <span class="badge bg-secondary me-2">A</span> 
+                  ${isAnswered ? qna.answer : '<span class="text-muted">아직 답변이 등록되지 않았습니다.</span>'}
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      `;
+    });
+
+    tableHTML += `
+        </tbody>
+      </table>
+    `;
+    
+    container.innerHTML = tableHTML;
+  }
+
+  // 구글 시트(공개)에서 공지사항 리스트 불러오기
+  function loadNoticesFromSheet() {
+    const SHEET_ID = '1FPC06ZjhCXKIzgX51Zkpfi8VNdz_SAGs302vHUWYEs4';
+    const cb = new Date().getTime();
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=responseHandler:processNoticeData&sheet=공지사항&t=${cb}`;
+    const script = document.createElement('script');
+    script.src = url;
+    document.body.appendChild(script);
+  }
+
+  // 공지사항 JSONP 콜백
+  window.processNoticeData = function(data) {
+    try {
+      const rows = data.table.rows;
+      NOTICES = [];
+      rows.forEach((row, idx) => {
+        if(idx === 0) return; // 무조건 첫 번째 줄(헤더) 무시
+        if(!row || !row.c || !row.c[0] || !row.c[0].v) return;
+        
+        const title = String(row.c[0].v).trim();
+        let content = row.c[1] && row.c[1].v ? String(row.c[1].v) : '';
+        // 개행문자를 <br>로 치환하여 보존
+        content = content.replace(/\n/g, '<br>');
+        
+        NOTICES.push({ date: '', title: title, content: content });
+      });
+      renderNotices();
+    } catch(e) {
+      console.error("공지사항 연동 실패:", e);
+      document.getElementById('noticeAccordion').innerHTML = '<div class="alert alert-danger">공지사항을 불러오지 못했습니다.</div>';
+    }
+  };
+
+  // 구글 시트(공개)에서 FAQ 리스트 불러오기
+  function loadFaqFromSheet() {
+    const SHEET_ID = '1FPC06ZjhCXKIzgX51Zkpfi8VNdz_SAGs302vHUWYEs4';
+    const cb = new Date().getTime();
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=responseHandler:processFaqData&sheet=FAQ&t=${cb}`;
+    const script = document.createElement('script');
+    script.src = url;
+    document.body.appendChild(script);
+  }
+
+  // FAQ JSONP 콜백 (구글 시트 FAQ 탭 1:1 동적 연동)
+  window.processFaqData = function(data) {
+    try {
+      const rows = data.table.rows;
+      FAQ_LIST = [];
+      rows.forEach((row, idx) => {
+        if(idx === 0) return; // 첫 번째 줄(헤더) 무시
+        if(!row || !row.c || !row.c[0] || !row.c[0].v) return;
+        const q = String(row.c[0].v).trim();
+        const a = row.c[1] && row.c[1].v ? String(row.c[1].v).trim() : '';
+        FAQ_LIST.push({ q, a });
+      });
+
+      if (FAQ_LIST.length === 0) {
+        FAQ_LIST = [
+          { q: "AI훈련로드맵 컨설팅 보고서 제출 기한은 언제인가요?", a: "1차 컨설팅 진행 기준 4주(28일) 이내로 제출하셔야 합니다." },
+          { q: "PBL 과정개발 컨설팅 보고서 제출 기한은 언제인가요?", a: "1차 컨설팅 진행 기준 1달 이내로 제출하셔야 합니다." }
+        ];
+      }
+      renderFaq();
+    } catch(e) {
+      console.error("FAQ 연동 실패:", e);
+      FAQ_LIST = [
+        { q: "AI훈련로드맵 컨설팅 보고서 제출 기한은 언제인가요?", a: "1차 컨설팅 진행 기준 4주(28일) 이내로 제출하셔야 합니다." },
+        { q: "PBL 과정개발 컨설팅 보고서 제출 기한은 언제인가요?", a: "1차 컨설팅 진행 기준 1달 이내로 제출하셔야 합니다." }
+      ];
+      renderFaq();
+    }
+  };
+
+  function renderFaq() {
+    const container = document.getElementById('faqAccordion');
+    if (!container) return;
+    if (FAQ_LIST.length === 0) {
+      container.innerHTML = '<div class="text-center text-muted py-4">등록된 자주 묻는 질문이 없습니다.</div>';
+      return;
+    }
+    
+    container.innerHTML = '';
+    FAQ_LIST.forEach((item, idx) => {
+      const accordionId = `faqItem${idx}`;
+      const itemHTML = `
+        <div class="accordion-item shadow-sm mb-2" style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed py-3" type="button" data-bs-toggle="collapse" data-bs-target="#${accordionId}">
+              <div class="d-flex w-100 justify-content-between align-items-center pe-3">
+                <div class="text-truncate pe-2">
+                  <span class="badge bg-primary me-2">Q</span>
+                  <span class="fw-bold text-dark" style="font-size: 0.95rem;">${item.q}</span>
+                </div>
+              </div>
+            </button>
+          </h2>
+          <div id="${accordionId}" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body bg-light" style="white-space: pre-line; line-height: 1.6; font-size: 0.9rem; border-top: 1px dashed #ced4da;">
+              <span class="badge bg-secondary me-2">A</span>${item.a}
+            </div>
+          </div>
+        </div>`;
+      container.innerHTML += itemHTML;
+    });
+  }
+
+  // 공지사항 아코디언 렌더링
+  function renderNotices() {
+    const container = document.getElementById('noticeAccordion');
+    if (!container) return;
+    
+    if (NOTICES.length === 0) {
+      container.innerHTML = '<div class="text-center text-muted py-4">등록된 공지사항이 없습니다.</div>';
+      return;
+    }
+    
+    container.innerHTML = '';
+    NOTICES.forEach((notice, idx) => {
+      const accordionId = `noticeItem${idx}`;
+      const isImportant = notice.title.includes('[중요]');
+      const badgeHTML = isImportant ? `<span class="badge bg-danger me-2">중요</span>` : '';
+      
+      const itemHTML = `
+        <div class="accordion-item shadow-sm mb-2" style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed py-3" type="button" data-bs-toggle="collapse" data-bs-target="#${accordionId}">
+              <div class="d-flex w-100 justify-content-between align-items-center pe-3">
+                <div class="pe-2" style="word-break: keep-all;">
+                  ${badgeHTML}<span class="fw-bold text-dark" style="font-size: 0.85rem; line-height: 1.4;">${notice.title}</span>
+                </div>
+                ${notice.date ? `
+                <div class="text-muted small flex-shrink-0" style="white-space: nowrap;">
+                  <i class="bi bi-calendar-event me-1"></i>${notice.date}
+                </div>
+                ` : ''}
+              </div>
+            </button>
+          </h2>
+          <div id="${accordionId}" class="accordion-collapse collapse" data-bs-parent="#noticeAccordion">
+            <div class="accordion-body bg-light" style="white-space: pre-line; line-height: 1.6; font-size: 0.95rem; border-top: 1px dashed #ced4da;">
+              ${notice.content}
+            </div>
+          </div>
+        </div>`;
+      container.innerHTML += itemHTML;
+    });
+  }
+
+  // 구글 시트(공개)에서 서식 리스트 불러오기 (JSONP 방식 - CORS 우회)
+  function loadFormPackagesFromSheet() {
+    // 회원님이 새로 주신 진짜 구글 시트 ID
+    const SHEET_ID = '1FPC06ZjhCXKIzgX51Zkpfi8VNdz_SAGs302vHUWYEs4';
+    const cb = new Date().getTime();
+    // 구글 시트 고유의 JSONP 콜백 파라미터 (tqx=responseHandler:콜백함수명) 및 sheet=file (3번째 탭)
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=responseHandler:processSheetData&sheet=file&t=${cb}`;
+    
+    const script = document.createElement('script');
+    script.src = url;
+    document.body.appendChild(script);
+  }
+
+  // JSONP 콜백 함수 (전역)
+  window.processSheetData = function(data) {
+    try {
+      const rows = data.table.rows;
+      let packageMap = {
+        1: { zipFile: '3.AI훈련코치/AI훈련로드맵 서식/AI훈련로드맵 서식.zip', files: [] },
+        2: { zipFile: '3.AI훈련코치/PBL 과정 개발 서식/PBL 과정 개발 서식.zip', files: [] },
+        3: { zipFile: '3.AI훈련코치/PBL 훈련 서식/PBL 서식.zip', files: [] }
+      };
+      
+      rows.forEach(row => {
+        if(!row || !row.c || !row.c[0] || !row.c[0].v) return;
+        const pkgTitle = row.c[0].v;
+        if(pkgTitle === "파일 이름" || pkgTitle === "패키지명") return; 
+        
+        const badge = row.c[1] && row.c[1].v ? row.c[1].v : '신청';
+        const label = row.c[2] && row.c[2].v ? row.c[2].v : '-';
+        const path = row.c[3] && row.c[3].v ? row.c[3].v : '#';
+        
+        // 시트 패키지명 앞의 번호(예: "1. ...", "2. ...", "3. ...")를 그대로 단계로 사용.
+        // (기존엔 '로드맵/과정/PBL' 단어로 추측해 3단계가 항상 2단계로 잘못 분류됐음)
+        let stage;
+        const numMatch = String(pkgTitle).match(/^\s*([123])\s*[.\-]/);
+        if (numMatch) {
+          stage = parseInt(numMatch[1], 10);
+        } else if (pkgTitle.includes('로드맵')) {
+          stage = 1;
+        } else if (pkgTitle.includes('실시') || pkgTitle.includes('운영') || pkgTitle.includes('훈련 서식')) {
+          stage = 3;
+        } else if (pkgTitle.includes('과정') || pkgTitle.includes('PBL')) {
+          stage = 2;
+        } else {
+          stage = 3;
+        }
+        if (!packageMap[stage]) return; // 1~3 외 값 방어
+
+        packageMap[stage].files.push({ badge, label, path });
+      });
+      
+      FORM_PACKAGES = packageMap;
+      renderFormPackages();
+      
+    } catch(e) {
+      console.error("구글 시트 연동 실패:", e);
+      [1, 2, 3].forEach(i => {
+        let el = document.getElementById(`file-stage-${i}`);
+        if(el) el.innerHTML = '<div class="alert alert-danger shadow-sm border-0"><i class="bi bi-exclamation-triangle-fill me-2"></i>구글 시트 연동 실패</div>';
+      });
+    }
+  };
+
+  const BADGE_STYLES = {
+    '신청': 'bg-apply',
+    '진행': 'bg-process',
+    '수당': 'bg-payment',
+    '신규': 'bg-apply',
+    '설계': 'bg-process',
+    '완료': 'bg-payment',
+  };
+
+  function renderFormPackages() {
+    [1, 2, 3].forEach(stage => {
+      const container = document.getElementById(`file-stage-${stage}`);
+      if (!container) return;
+      
+      const pkg = FORM_PACKAGES[stage];
+      if (!pkg || pkg.files.length === 0) {
+        container.innerHTML = '<div class="card bg-light border-0 shadow-sm p-4 h-100 text-center text-muted small d-flex justify-content-center align-items-center" style="border-radius:15px;">등록된 서식이 없습니다.</div>';
+        return;
+      }
+
+      // 단계별 그룹화
+      const groups = {
+        '필수': [],
+        '별첨': [],
+        '신청': [],
+        '진행': [],
+        '수당': []
+      };
+      
+      // 기타(예상치 못한 뱃지)를 담을 배열
+      const others = [];
+
+      pkg.files.forEach(f => {
+        let matched = false;
+        for (const key of Object.keys(groups)) {
+          if (f.badge.includes(key)) {
+            groups[key].push(f);
+            matched = true;
+            break;
+          }
+        }
+        if (!matched) others.push(f);
+      });
+
+      let filesHTML = '';
+      
+      // 렌더링 함수
+      const renderGroup = (title, items) => {
+        if (items.length === 0) return '';
+
+        // [필수] 또는 [별첨] 은 서식 다운로드 버튼 리스트가 아닌 완전히 독립된 '제출 증빙 서류 안내 상자'로 렌더링
+        if (title === '필수' || title === '별첨') {
+          let boxTitle = title === '필수' ? '[필수] 제출 증빙 서류' : '[별첨] 제출 증빙 서류 목록';
+          let borderClass = title === '필수' ? 'border-danger' : 'border-primary';
+          let iconClass = title === '필수' ? 'bi-exclamation-circle-fill text-danger' : 'bi-paperclip text-primary';
+
+          let html = `<div class="card p-3 mb-3 bg-white border-start border-4 ${borderClass} shadow-sm" style="border-radius: 12px;">
+                        <div class="fw-bold text-dark small mb-2 d-flex align-items-center">
+                          <i class="bi ${iconClass} fs-6 me-1.5"></i>${boxTitle}
+                        </div>
+                        <div class="d-flex flex-column gap-2">`;
+          
+          html += items.map(f => {
+            let displayLabel = f.label;
+            return `<div class="p-2.5 bg-light rounded-3 border d-flex align-items-center justify-content-between gap-2 mb-1" style="font-size: 0.85rem;">
+                      <span class="fw-bold text-dark text-truncate" style="font-size: 0.85rem;"><i class="bi bi-file-earmark-text text-secondary me-2"></i>${displayLabel}</span>
+                      <span class="badge bg-white text-secondary border px-2 py-1 flex-shrink-0" style="font-size: 0.75rem;">제출 요망</span>
+                    </div>`;
+          }).join('');
+
+          html += `</div></div>`;
+          return html;
+        }
+
+        // 실제 다운로드용 서식 그룹 (신청, 진행, 수당 등)
+        let html = `<div class="mb-3">
+                      <div class="fw-bold text-muted small mb-2"><i class="bi bi-bookmark-check-fill me-1"></i>[${title}] 관련 서식</div>`;
+        html += items.map(f => {
+          let displayLabel = f.label;
+          const badgeClass = BADGE_STYLES[f.badge] || 'bg-apply';
+          return `<a href="${f.path}" download class="btn btn-light border text-start fw-bold shadow-sm d-flex justify-content-between align-items-center mb-2" style="font-size: 0.85rem;">
+                    <span><span class="badge-step ${badgeClass} me-2">${f.badge}</span>${displayLabel}</span>
+                    <i class="bi bi-download text-muted"></i>
+                  </a>`;
+        }).join('');
+        html += `</div>`;
+        return html;
+      };
+
+      // 순서대로 렌더링
+      filesHTML += renderGroup('필수', groups['필수']);
+      filesHTML += renderGroup('별첨', groups['별첨']);
+      filesHTML += renderGroup('신청', groups['신청']);
+      filesHTML += renderGroup('진행', groups['진행']);
+      filesHTML += renderGroup('수당', groups['수당']);
+      if (others.length > 0) filesHTML += renderGroup('기타', others);
+
+      let colorClass = stage === 1 ? 'primary' : stage === 2 ? 'success' : 'info';
+      
+      const zipContainer = document.getElementById(`zip-btn-stage-${stage}`);
+      if (zipContainer) {
+        zipContainer.innerHTML = pkg.zipFile 
+          ? `<a href="${pkg.zipFile}" download class="btn btn-outline-${colorClass} btn-sm rounded-pill fw-bold bg-white shadow-sm px-3 py-1" style="font-size: 0.8rem;"><i class="bi bi-archive me-1"></i>압축 다운로드</a>` 
+          : '';
+      }
+
+      container.innerHTML = `
+        <div class="card border border-${colorClass} p-3 h-100 shadow-sm d-flex flex-column custom-scrollbar" style="border-radius:15px; border-width: 2px !important; max-height:250px; overflow-y:auto;">
+          <div class="d-flex flex-column">
+            ${filesHTML}
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  // Q&A 등록 로직
+  async function submitQna() {
+    const text = document.getElementById('qnaQuestionText').value.trim();
+    if(!text) { alert('질문 내용을 입력해주세요.'); return; }
+    const username = localStorage.getItem('coach_logged_in_user') || '익명 코치';
+    
+    const btn = document.getElementById('qnaSubmitBtn');
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>등록 중...';
+    btn.disabled = true;
+
+    try {
+      await fetch(WEB_APP_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'addQna', user: username, question: text, time: new Date().toLocaleString('ko-KR') })
+      });
+      alert('질문을 남겼습니다.');
+      
+      const todayStr = new Date().toLocaleDateString('ko-KR').replace(/\s/g, '');
+      QNA_LIST.push({ question: text, answer: '', author: '익명', date: todayStr });
+      renderQna();
+      
+      document.getElementById('qnaQuestionText').value = '';
+      bootstrap.Modal.getInstance(document.getElementById('qnaModal')).hide();
+    } catch(e) {
+      alert('등록 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+    } finally {
+      btn.innerHTML = '질문 등록하기';
+      btn.disabled = false;
+    }
+  }
+
+  // 2. 로그인 처리 (SHA-256 대신 구글 시트 통신)
+async function checkSecureLogin() {
+    const id = document.getElementById('userName').value.trim();
+    const pw = document.getElementById('userPw').value.trim();
+    const loginBtn = document.getElementById('loginBtn');
+    
+    if (!id || !pw) { alert("아이디와 비밀번호를 입력해주세요."); return; }
+
+    if ((id === 'admin' || id === '관리자') && pw === 'admin') {
+      localStorage.setItem('coach_logged_in_user', id);
+      localStorage.setItem('login_time', new Date().getTime()); 
+      saveAccessLog(id);
+      renderAuthorizedScreen(id);
+      return;
+    }
+
+    loginBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>인증 중...`;
+    loginBtn.disabled = true;
+
+    // 코치명단 시트에서 직접 ID/PW 확인 (CORS 우회 JSONP 방식)
+    const SHEET_ID = '1FPC06ZjhCXKIzgX51Zkpfi8VNdz_SAGs302vHUWYEs4';
+    const cb = 'loginCb_' + new Date().getTime();
+    // 코치 계정(id/password/name)은 'db' 탭에 저장됨. (기존엔 없는 '코치명단'을 부르다 우연히 첫 탭으로 대체돼 동작했음)
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=responseHandler:${cb}&sheet=db`;
+
+    window[cb] = function(data) {
+      try {
+        let isAuthenticated = false;
+        let coachName = id;
+        const rows = data.table.rows;
+        
+        for (let i = 1; i < rows.length; i++) {
+          const row = rows[i];
+          if (!row || !row.c || !row.c[0] || !row.c[1]) continue;
+          
+          const sheetId = String(row.c[0].v).trim();
+          const sheetPw = String(row.c[1].v).trim();
+          
+          if (sheetId === id && sheetPw === pw) {
+            isAuthenticated = true;
+            coachName = row.c[2] && row.c[2].v ? String(row.c[2].v).trim() : id;
+            break;
+          }
+        }
+
+        if (isAuthenticated) {
+          localStorage.setItem('coach_logged_in_user', coachName);
+          localStorage.setItem('login_time', new Date().getTime()); 
+          saveAccessLog(coachName);
+          renderAuthorizedScreen(coachName);
+        } else {
+          alert("아이디 또는 비밀번호가 일치하지 않습니다.");
+          loginBtn.innerHTML = "인증 및 접속하기";
+          loginBtn.disabled = false;
+        }
+      } catch (e) {
+        alert("로그인 처리 중 오류가 발생했습니다.");
+        loginBtn.innerHTML = "인증 및 접속하기";
+        loginBtn.disabled = false;
+      }
+      delete window[cb];
+    };
+
+    const script = document.createElement('script');
+    script.src = url;
+    script.onerror = function() {
+      alert("서버 연결 실패. 인터넷 연결을 확인해주세요.");
+      loginBtn.innerHTML = "인증 및 접속하기";
+      loginBtn.disabled = false;
+      delete window[cb];
+    };
+    document.body.appendChild(script);
+  }
+
+  // --- 기존의 기능들은 그대로 유지됩니다 ---
+  
+  function renderAuthorizedScreen(username) {
+    const loginSec = document.getElementById('login-section');
+    const mainSec = document.getElementById('main-content');
+    
+    // 고급스러운 페이드 아웃/인 트랜지션
+    loginSec.style.transition = 'opacity 0.3s ease-out';
+    loginSec.style.opacity = '0';
+    
+    setTimeout(() => {
+      loginSec.style.display = 'none';
+      
+      mainSec.style.display = 'block';
+      mainSec.style.opacity = '0';
+      mainSec.style.transition = 'opacity 0.4s ease-in';
+      
+      setTimeout(() => {
+        mainSec.style.opacity = '1';
+      }, 20);
+    }, 300);
+    
+    if (username === "관리자" || username === "admin") {
+      document.getElementById('userGreeting').innerHTML = `<i class="bi bi-shield-fill-check text-primary"></i> 관리자 접속 중`;
+      document.getElementById('admin-log-section').style.display = 'block';
+      loadAccessLogsToTable();
+    } else {
+      document.getElementById('userGreeting').innerHTML = `<i class="bi bi-person-fill text-primary"></i> ${username} 코치님`;
+      document.getElementById('admin-log-section').style.display = 'none';
+    }
+    window.scrollTo(0, 0);
+  }
+
+  function handleLogOut() { localStorage.removeItem('coach_logged_in_user'); location.reload(); }
+
+  // 구글 시트로 접속 기록을 전송하는 함수
+async function saveAccessLog(username) {
+  try {
+    // 우리가 연결한 WEB_APP_URL로 접속 정보를 보냅니다.
+    await fetch(WEB_APP_URL, {
+      method: 'POST',
+      mode: 'no-cors', // 구글 앱 스크립트 통신을 위한 설정
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user: username, time: new Date().toLocaleString('ko-KR') })
+    });
+  } catch (e) {
+    console.log("기록 전송 실패:", e);
+  }
+}
+
+async function loadAccessLogsToTable() {
+  const tBody = document.getElementById('logTableBody');
+  try {
+    // 구글 시트에서 데이터를 가져옵니다 (action=getLogs로 요청)
+    const response = await fetch(WEB_APP_URL + "?action=getLogs");
+    const data = await response.json();
+
+    tBody.innerHTML = "";
+    if (!Array.isArray(data) || data.length <= 1) {
+      tBody.innerHTML = `<tr><td colspan="4" class="text-center text-muted">기록이 없습니다.</td></tr>`;
+      return;
+    }
+
+    // 최신순으로 출력 (i=1부터 시작하므로 역순 정렬)
+    for(let i = data.length - 1; i > 0; i--) {
+      const row = document.createElement('tr');
+      row.innerHTML = `<th class="text-center">${i}</th><td>${data[i][0]}</td><td>${data[i][1]}</td><td><span class="badge bg-success">성공</span></td>`;
+      tBody.appendChild(row);
+    }
+  } catch (e) {
+    console.error("접속 기록 로드 실패:", e);
+    tBody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">기록을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.</td></tr>`;
+  }
+}
+
+  async function clearSystemLogs() {
+    if (!confirm("모든 로그인 기록을 삭제하시겠습니까?")) return;
+    try {
+      // 실제 기록은 구글 시트(Apps Script)에 저장되므로 서버에 삭제를 요청합니다.
+      // ※ Apps Script 쪽에 action:'clearLogs' 처리 핸들러가 있어야 실제로 비워집니다.
+      await fetch(WEB_APP_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'clearLogs' })
+      });
+      // no-cors는 응답을 읽을 수 없으므로, 잠시 후 표를 다시 불러와 실제 상태를 반영합니다.
+      setTimeout(loadAccessLogsToTable, 1200);
+      alert("삭제 요청을 보냈습니다. 표를 새로고침합니다.");
+    } catch (e) {
+      console.error("기록 삭제 실패:", e);
+      alert("기록 삭제 요청 중 오류가 발생했습니다.");
+    }
+  }
+
+  // 페이지 로드 시 기존 로그인 상태 확인
+  window.addEventListener('DOMContentLoaded', () => {
+    renderFormPackages();   // ★ 로컬 서식 패키지 0초 즉시 렌더링
+    loadNoticesFromSheet(); // ★ 공지사항 자동 불러오기
+    loadFaqFromSheet();     // ★ FAQ 자동 불러오기
+    loadQnaFromSheet();     // ★ QnA 자동 불러오기
+    loadFormPackagesFromSheet(); // ★ 서식 패키지 구글 시트에서 자동 불러오기
+    
+    const cachedUser = localStorage.getItem('coach_logged_in_user');
+    const loginTime = localStorage.getItem('login_time');
+    
+    // 보안 기능: 로그인 후 2시간(7200000ms) 경과 시 자동 로그아웃
+    if (cachedUser && loginTime) {
+      const now = new Date().getTime();
+      if (now - parseInt(loginTime) > 7200000) {
+        alert("보안을 위해 세션이 만료되어 자동 로그아웃 되었습니다. 다시 로그인해 주세요.");
+        localStorage.removeItem('coach_logged_in_user');
+        localStorage.removeItem('login_time');
+      } else {
+        renderAuthorizedScreen(cachedUser);
+      }
+    } else if (cachedUser) {
+      renderAuthorizedScreen(cachedUser);
+    }
+    
+    document.getElementById('userPw').addEventListener('keypress', (e) => { if (e.key === 'Enter') checkSecureLogin(); });
+    document.getElementById('userName').addEventListener('keypress', (e) => { if (e.key === 'Enter') checkSecureLogin(); });
+  });
+
+  function revealSalaryInfo() {
+    const gate = document.getElementById('salary-blind-gate');
+    const txtContainer = document.getElementById('salary-real-text');
+    gate.style.opacity = '0';
+    setTimeout(() => { gate.style.display = 'none'; txtContainer.innerHTML = `<p class="h4 fw-bold mb-1 text-primary">기업당 75만 원</p><p class="small text-muted mb-0">보고서 최종 승인 완료 후 10일 이내 지급</p>`; }, 250);
+  }
+
+  function adjustSpecTitle() { document.getElementById('dynamic-nav-title').innerText = "AI 훈련 표준모델 안내관"; }
+  document.getElementById('menu-guide-tab').addEventListener('click', function() { document.getElementById('dynamic-nav-title').innerText = "코치 전용 가이드관"; });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

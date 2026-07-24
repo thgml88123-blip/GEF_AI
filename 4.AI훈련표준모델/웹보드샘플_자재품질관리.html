@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>통합 자재 및 품질관리 대시보드</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- html2pdf.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        #itemModal, #defectModal, #docStorageModal { display: none; }
+        #itemModal.show, #defectModal.show, #docStorageModal.show { display: flex !important; }
+        .risk-stock { background-color: rgba(244, 63, 94, 0.08); } /* 안전재고 미달 */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .tab-btn.active { border-bottom-color: #2563eb; color: #2563eb; font-weight: 800; }
+    </style>
+</head>
+<body class="bg-slate-50 p-8 text-slate-800 font-sans">
+
+<div class="max-w-[1500px] mx-auto">
+    <!-- 헤더 영역 -->
+    <header class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-600">📦 통합 자재 및 품질관리 시스템</h1>
+            <p class="text-slate-500 mt-1 font-medium text-sm">실시간 재고 수급 모니터럼 및 품질 공정 불량률 분석 보고서 플랫폼</p>
+        </div>
+        <div class="flex gap-2 items-center">
+            <button id="restoreBtn" onclick="restoreBackup()" class="hidden bg-rose-100 text-rose-700 px-4 py-3 rounded-2xl font-bold hover:bg-rose-200 transition-all text-xs">↩️ 업로드 취소</button>
+            <button id="loadPreviousBtn" onclick="loadPreviousData()" class="hidden bg-amber-100 text-amber-800 px-4 py-3 rounded-2xl font-bold hover:bg-amber-200 transition-all text-xs">🕒 이전 데이터 로드</button>
+            <button onclick="openDocStorage()" class="bg-indigo-100 text-indigo-700 px-4 py-3 rounded-2xl font-bold hover:bg-indigo-200 transition-all text-xs">📁 도면/검사서 스토리지</button>
+            <button onclick="downloadSample()" class="bg-slate-200 text-slate-700 px-4 py-3 rounded-2xl font-bold hover:bg-slate-300 transition-all text-xs">📄 양식 다운로드</button>
+            <label class="bg-emerald-600 text-white px-5 py-3 rounded-2xl font-bold hover:bg-emerald-700 shadow-md cursor-pointer transition-all text-sm text-center">
+                📂 CSV 업로드
+                <input type="file" id="csvFile" accept=".csv" class="hidden" onchange="uploadCSV(event)">
+            </label>
+            <button onclick="openForm(-1)" class="bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-blue-700 shadow-md transition-all active:scale-95 text-sm">+ 신규 자재 등록</button>
+        </div>
+    </header>
+
+    <!-- 탭 메뉴 스위치 바 -->
+    <div class="flex border-b border-slate-200 mb-6">
+        <button onclick="switchTab('main-tab')" id="btn-main-tab" class="tab-btn active px-6 py-3 border-b-4 border-transparent text-slate-500 font-bold text-sm transition-all">🏠 자재 수급 및 품질 관리</button>
+        <button onclick="switchTab('report-tab')" id="btn-report-tab" class="tab-btn px-6 py-3 border-b-4 border-transparent text-slate-500 font-bold text-sm transition-all">📋 품질 경영 보고서 빌더</button>
+    </div>
+
+    <!-- ========================================== TAB 1: 메인 관리 화면 ========================================== -->
+    <div id="main-tab" class="tab-content active">
+        <!-- 계량 통계 요약 보드 -->
+        <div id="statBoard" class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8"></div>
+
+        <!-- 필터 및 제어 바 -->
+        <div class="flex items-center justify-between mb-6 p-2 bg-white rounded-2xl border border-slate-200 shadow-sm">
+            <div class="flex items-center gap-2 overflow-x-auto">
+                <span class="text-xs font-bold text-slate-400 px-4 whitespace-nowrap">자재 분류 :</span>
+                <div id="filterArea" class="flex gap-2"></div>
+            </div>
+            <div class="flex items-center gap-2 px-4 border-l border-slate-100">
+                <input type="checkbox" id="hideSafeStock" onchange="render()" class="w-4 h-4 cursor-pointer accent-blue-600">
+                <label for="hideSafeStock" class="text-xs font-bold text-slate-500 cursor-pointer">안전재고 미달만 보기</label>
+            </div>
+        </div>
+
+        <!-- 자재 마스터 명부 테이블 -->
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+            <table class="w-full text-left">
+                <thead class="bg-slate-900 text-white text-xs font-bold text-center">
+                    <tr>
+                        <th class="p-5 text-left">자재명 (품번 / 자재명 클릭 시 불량등록)</th>
+                        <th class="p-5">분류 / 단위</th>
+                        <th class="p-5">현재고량</th>
+                        <th class="p-5 text-indigo-300">안전재고량</th>
+                        <th class="p-5 text-red-400">총 검사수 / 불량수</th>
+                        <th class="p-5 text-yellow-300">공정 불량률</th>
+                        <th class="p-5">행정 관리</th>
+                    </tr>
+                </thead>
+                <tbody id="itemList" class="divide-y divide-slate-100 text-sm font-medium text-slate-700"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ========================================== TAB 2: 품질 경영 보고서 빌더 탭 ========================================== -->
+    <div id="report-tab" class="tab-content">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+            <!-- 왼쪽 제어 체크박스 패널 -->
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+                <h3 class="text-base font-black text-slate-900 mb-2">⚙️ 보고서 구성 옵션</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">체크박스를 선택하는 대로 우측의 보고서 서식에 실시간 피드백됩니다.</p>
+                
+                <div class="space-y-3 pt-2">
+                    <label class="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
+                        <input type="checkbox" id="repSummary" checked onchange="buildLiveReport()" class="w-4 h-4 accent-blue-600"> 1. 품질 요약 지표 (가동률/불량률)
+                    </label>
+                    <label class="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
+                        <input type="checkbox" id="repCharts" checked onchange="buildLiveReport()" class="w-4 h-4 accent-blue-600"> 2. 자재 및 품질 시각화 그래프
+                    </label>
+                    <label class="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
+                        <input type="checkbox" id="repRisk" checked onchange="buildLiveReport()" class="w-4 h-4 accent-blue-600"> 3. 안전재고 미달 자재 경보 현황
+                    </label>
+                    <label class="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
+                        <input type="checkbox" id="repTable" checked onchange="buildLiveReport()" class="w-4 h-4 accent-blue-600"> 4. 전체 자재별 품질 종합 대장
+                    </label>
+                </div>
+                
+                <div class="pt-4 border-t border-slate-100">
+                    <button onclick="exportLiveReportToPDF()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3.5 rounded-xl font-black text-sm shadow-md hover:from-blue-700 hover:to-indigo-700 transition active:scale-95">
+                        📥 품질 분석 보고서 (PDF) 다운로드
+                    </button>
+                </div>
+            </div>
+
+            <!-- 오른쪽: 실시간 렌더링 리포트 뷰 -->
+            <div class="lg:col-span-3 bg-white p-10 rounded-3xl border border-slate-300 shadow-xl overflow-x-auto">
+                <div id="live-report-print-zone" class="bg-white text-slate-900 font-sans p-2 mx-auto" style="min-width: 900px;">
+                    <!-- 스크립트로 실시간 동적 빌드 생성 주입 -->
+                </div>
+                <!-- 오프스크린 숨김 캔버스 (차트 스냅샷용) -->
+                <div class="absolute top-[-9999px] left-[-9999px]" style="width: 300px; height: 200px;">
+                    <canvas id="hiddenCategoryChart"></canvas>
+                    <canvas id="hiddenDefectChart"></canvas>
+                    <canvas id="hiddenStockChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 모달 1: 도면 및 검사성적서 스토리지 -->
+<div id="docStorageModal" class="fixed inset-0 bg-slate-900/60 z-[9999] backdrop-blur-sm items-center justify-center p-4">
+    <div class="bg-white w-full max-w-lg rounded-3xl p-8 shadow-2xl">
+        <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold text-slate-900">📁 자재 도면 및 품질 검사서 스토리지</h3><button onclick="closeDocStorage()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button></div>
+        <div class="mb-4"><label class="block text-xs font-bold text-slate-400 mb-2">공유할 기술 도면 / 검사성적서 파일 업로드</label><input type="file" id="docStorageInput" class="w-full text-xs border border-slate-200 rounded-xl px-3 py-2 bg-slate-50" onchange="uploadStorageFile()"></div>
+        <h4 class="text-xs font-bold text-slate-400 mb-2 uppercase">파일 리스트</h4>
+        <div class="border border-slate-100 rounded-2xl p-2 bg-slate-50 max-h-[200px] overflow-y-auto"><ul id="sharedFileList" class="space-y-1 text-xs"></ul></div>
+    </div>
+</div>
+
+<!-- 모달 2: 자재 등록/수정 -->
+<div id="itemModal" class="fixed inset-0 bg-slate-900/60 z-[9999] backdrop-blur-sm items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-3xl p-8 shadow-2xl">
+        <h3 id="formTitle" class="text-2xl font-bold mb-6 text-slate-900">자재 정보 입력</h3><input type="hidden" id="targetIdx">
+        <div class="space-y-4">
+            <div><label class="block text-sm font-semibold mb-1">자재명 (품명)</label><input type="text" id="fName" class="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none shadow-sm"></div>
+            <div class="grid grid-cols-2 gap-4">
+                <div><label class="block text-sm font-semibold mb-1 text-xs text-slate-400">자재 코드 (품번)</label><input type="text" id="fCode" class="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none shadow-sm"></div>
+                <div><label class="block text-sm font-semibold mb-1 text-xs text-slate-400">자재 분류</label><select id="fCategory" class="w-full border border-slate-200 rounded-xl px-4 py-3 bg-white shadow-sm"><option>원자재</option><option>부자재</option><option>반제품</option><option>완제품</option></select></div>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+                <div><label class="block text-[11px] font-semibold text-slate-400 mb-1">단위 (EA/kg 등)</label><input type="text" id="fUnit" class="w-full border border-slate-200 rounded-xl px-2 py-3 shadow-sm"></div>
+                <div><label class="block text-[11px] font-semibold text-blue-600 font-bold mb-1">현재고량</label><input type="number" id="fStock" class="w-full border border-blue-200 rounded-xl px-2 py-3 outline-none shadow-sm"></div>
+                <div><label class="block text-[11px] font-semibold text-indigo-600 font-bold mb-1">안전재고량</label><input type="number" id="fSafeStock" class="w-full border border-indigo-200 rounded-xl px-2 py-3 outline-none shadow-sm"></div>
+            </div>
+        </div>
+        <div class="flex gap-3 mt-8"><button onclick="closeForm()" class="flex-1 py-3 font-bold text-slate-500 hover:bg-slate-100 rounded-xl">취소</button><button onclick="saveData()" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700">저장하기</button></div>
+    </div>
+</div>
+
+<!-- 모달 3: 공정 품질 불량 등록/실적 이력 -->
+<div id="defectModal" class="fixed inset-0 bg-slate-900/60 z-[9999] backdrop-blur-sm items-center justify-center p-4">
+    <div class="bg-white w-full max-w-2xl rounded-3xl p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-start mb-6 border-b border-slate-100 pb-4">
+            <div><h3 id="defectModalTitle" class="text-2xl font-black text-slate-900">공정 품질 불량 및 실적 등록</h3><p id="defectModalSubtitle" class="text-xs text-slate-400 font-bold mt-1"></p></div>
+            <button onclick="closeDefectModal()" class="text-slate-400 hover:text-slate-600 text-2xl font-bold">&times;</button>
+        </div>
+        <input type="hidden" id="defectTargetIdx">
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6">
+            <h4 class="text-xs font-bold text-slate-700 mb-2">✏️ 실시간 검사 결과 및 불량 기록 추가</h4>
+            <div class="grid grid-cols-3 gap-3 mb-3">
+                <div><label class="block text-[10px] text-slate-400 font-bold mb-1">검사 일자</label><input type="date" id="qDate" class="w-full text-xs border border-slate-200 rounded-lg p-2 bg-white"></div>
+                <div><label class="block text-[10px] text-slate-400 font-bold mb-1">총 검사수</label><input type="number" id="qTotal" value="100" class="w-full text-xs border border-slate-200 rounded-lg p-2 bg-white"></div>
+                <div><label class="block text-[10px] text-red-500 font-bold mb-1">발견 불량수</label><input type="number" id="qDefect" value="0" class="w-full text-xs border border-slate-200 rounded-lg p-2 bg-white"></div>
+            </div>
+            <div class="mb-3"><label class="block text-[10px] text-slate-400 font-bold mb-1">불량 원인 및 유형 코드 (NCR)</label><input type="text" id="qReason" placeholder="예: 치수 불량, 표면 스크래치, 혼입 등" class="w-full text-xs border border-slate-200 rounded-lg p-2 bg-white"></div>
+            <button onclick="addDefectRow()" class="w-full bg-blue-600 text-white text-xs font-bold py-2 rounded-lg hover:bg-blue-700">검사 실적 반영 및 대시보드 갱신</button>
+        </div>
+        <h4 class="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">📋 자재별 품질 검사 이력 히스토리</h4>
+        <div class="border border-slate-200 rounded-xl overflow-hidden bg-white max-h-[200px] overflow-y-auto"><table class="w-full text-xs text-center"><thead class="bg-slate-100 text-slate-600 font-bold"><tr><th class="p-2">검사일자</th><th class="p-2">총 검사수</th><th class="p-2 text-red-500">불량수</th><th class="p-2 text-left">불량 사유 유형</th><th class="p-2">관리</th></tr></thead><tbody id="defectHistoryList" class="divide-y divide-slate-100 text-slate-600"></tbody></table></div>
+    </div>
+</div>
+
+<script>
+    let materials = [];
+    let currentFilter = '전체';
+    let globalFiles = JSON.parse(localStorage.getItem('qm_shared_files')) || [];
+    let hiddenCharts = { category: null, defect: null, stock: null };
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        document.getElementById('btn-' + tabId).classList.add('active');
+        if (tabId === 'report-tab') buildLiveReport();
+    }
+
+    function downloadSample() {
+        const header = "자재코드,자재명,자재분류,단위,현재고,안전재고,총검사수,총불량수\n";
+        const sample = "M-001,알루미늄 프로파일,원자재,EA,150,200,1000,12\nM-002,스틸 프레임,원자재,EA,450,300,500,2\nM-003,컨트롤러 보드,반제품,EA,80,100,250,8";
+        const blob = new Blob(["\uFEFF" + header + sample], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.setAttribute("download", "품질자재관리_표준양식.csv"); link.click();
+    }
+
+    // 메인 화면 가동 자재 수급 대시보드 렌더링
+    function render() {
+        const list = document.getElementById('itemList'); const board = document.getElementById('statBoard'); const filterArea = document.getElementById('filterArea');
+        const hideSafeStock = document.getElementById('hideSafeStock').checked; const restoreBtn = document.getElementById('restoreBtn'); const loadPreviousBtn = document.getElementById('loadPreviousBtn');
+        list.innerHTML = '';
+        
+        let stats = { totalItems: 0, totalStock: 0, underSafeStock: 0, sumTotalInspected: 0, sumTotalDefects: 0 };
+        let catMap = {};
+
+        materials.forEach(mat => {
+            const isCatMatch = currentFilter === '전체' || mat.category === currentFilter;
+            const isUnderStock = mat.stock < mat.safeStock;
+
+            if (isCatMatch) {
+                if (!hideSafeStock || isUnderStock) {
+                    stats.totalItems++; stats.totalStock += mat.stock;
+                    stats.sumTotalInspected += (mat.totalInspected || 0);
+                    stats.sumTotalDefects += (mat.totalDefects || 0);
+                    if (isUnderStock) stats.underSafeStock++;
+                }
+            }
+            if(mat.category) catMap[mat.category] = true;
+        });
+
+        const finalCats = ['전체', ...Object.keys(catMap).sort((a,b)=>a.localeCompare(b,'ko'))];
+        filterArea.innerHTML = '';
+        finalCats.forEach(c => {
+            filterArea.innerHTML += `<button onclick="setFilter('${c}')" class="filter-btn ${currentFilter === c ? 'active' : ''} text-xs font-bold px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 transition-all">${c}</button>`;
+        });
+
+        if (materials.length === 0) {
+            list.innerHTML = `<tr><td colspan="7" class="p-12 text-slate-400 text-sm font-medium text-center">등록된 품질 자재 마스터가 없습니다.</td></tr>`;
+        } else {
+            const targets = materials.filter(mat => (currentFilter === '전체' || mat.category === currentFilter) && (!hideSafeStock || mat.stock < mat.safeStock));
+            targets.forEach(mat => {
+                const isUnder = mat.stock < mat.safeStock; const realIdx = materials.findIndex(m => m === mat);
+                const defectRate = mat.totalInspected ? ((mat.totalDefects / mat.totalInspected) * 100).toFixed(2) : '0.00';
+
+                list.innerHTML += `
+                    <tr class="${isUnder ? 'risk-stock' : 'bg-white'} hover:bg-slate-50 transition text-center">
+                        <td class="p-5 font-bold text-slate-900 text-left leading-tight">
+                            <span onclick="openDefectModal(${realIdx})" class="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer font-black text-base">${mat.name}</span>
+                            <br><span class="text-[10px] text-slate-400 font-medium">${mat.code}</span>
+                        </td>
+                        <td class="p-5 text-xs text-slate-500">${mat.category}<br><span class="text-[10px] bg-slate-100 text-slate-600 rounded-md px-1 py-0.5 font-bold">${mat.unit}</span></td>
+                        <td class="p-5 font-black text-slate-900">${mat.stock.toLocaleString()}</td>
+                        <td class="p-5 font-bold text-indigo-600">${mat.safeStock.toLocaleString()}</td>
+                        <td class="p-5 text-xs text-slate-500">${(mat.totalInspected || 0).toLocaleString()} / <span class="text-red-500 font-bold">${(mat.totalDefects || 0).toLocaleString()}</span></td>
+                        <td class="p-5 font-black ${Number(defectRate) >= 1.5 ? 'text-red-500' : 'text-slate-600'} bg-slate-50/50">${defectRate}%</td>
+                        <td class="p-5 flex gap-2 justify-center items-center pt-6 h-full">
+                            <button onclick="openForm(${realIdx})" class="text-blue-600 hover:bg-blue-50 px-2.5 py-1.5 rounded-lg text-xs font-bold">수정</button>
+                            <button onclick="del(${realIdx})" class="text-red-400 hover:bg-red-50 px-2.5 py-1.5 rounded-lg text-xs font-bold">삭제</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        const totalDefectRate = stats.sumTotalInspected ? ((stats.sumTotalDefects / stats.sumTotalInspected) * 100).toFixed(2) : '0.00';
+        board.innerHTML = `
+            <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm text-center"><p class="text-[10px] font-bold text-slate-400 uppercase">자재 품목수</p><p class="text-2xl font-black">${stats.totalItems}종</p></div>
+            <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm text-center"><p class="text-[10px] font-bold text-slate-400 uppercase">총 재고수량</p><p class="text-2xl font-black text-indigo-600">${stats.totalStock.toLocaleString()}</p></div>
+            <div class="bg-white p-5 rounded-3xl border border-red-100 bg-rose-50/10 shadow-sm text-center"><p class="text-[10px] font-bold text-red-500 uppercase">안전재고 미달</p><p class="text-2xl font-black text-red-600">${stats.underSafeStock}품목</p></div>
+            <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm text-center"><p class="text-[10px] font-bold text-slate-400 uppercase">총 품질검사수</p><p class="text-2xl font-black text-emerald-600">${stats.sumTotalInspected.toLocaleString()}</p></div>
+            <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm text-center"><p class="text-[10px] font-bold text-slate-400 uppercase">종합 공정불량률</p><p class="text-2xl font-black ${Number(totalDefectRate) >= 1.5 ? 'text-red-600' : 'text-slate-800'}">${totalDefectRate}%</p></div>`;
+
+        if(localStorage.getItem('qm_backup')) restoreBtn.classList.remove('hidden'); else restoreBtn.classList.add('hidden');
+        if (localStorage.getItem('qm_v14_data') && materials.length === 0) loadPreviousBtn.classList.remove('hidden'); else loadPreviousBtn.classList.add('hidden');
+        if (materials.length > 0) localStorage.setItem('qm_v14_data', JSON.stringify(materials));
+    }
+
+    // ========================================== 실시간 품질 보고서 빌더 엔진 ==========================================
+    function buildLiveReport() {
+        const reportZone = document.getElementById('live-report-print-zone');
+        reportZone.innerHTML = '';
+
+        const optSummary = document.getElementById('repSummary').checked;
+        const optCharts = document.getElementById('repCharts').checked;
+        const optRisk = document.getElementById('repRisk').checked;
+        const optTable = document.getElementById('repTable').checked;
+
+        const today = new Date().toISOString().split('T')[0];
+
+        let totalItems = 0, totalStock = 0, totalUnder = 0, inspectedSum = 0, defectSum = 0;
+        let catCountMap = {}; let catDefectMap = {};
+
+        materials.forEach(m => {
+            totalItems++; totalStock += m.stock;
+            inspectedSum += (m.totalInspected || 0);
+            defectSum += (m.totalDefects || 0);
+            if(m.stock < m.safeStock) totalUnder++;
+
+            if(m.category) {
+                catCountMap[m.category] = (catCountMap[m.category] || 0) + m.stock;
+                catDefectMap[m.category] = (catDefectMap[m.category] || 0) + (m.totalDefects || 0);
+            }
+        });
+
+        const totalDefectRate = inspectedSum ? ((defectSum / inspectedSum) * 100).toFixed(2) : '0.00';
+
+        let htmlBuilder = `
+            <div class="p-6 text-slate-800 border border-slate-100 shadow-inner rounded-2xl bg-white">
+                <div class="flex justify-between items-start border-b-2 border-slate-800 pb-4 mb-6">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-slate-900">[정기] 품질 공정 마스터 및 자재 수급 분석 보고서</h2>
+                        <p class="text-[11px] text-slate-400 mt-1 font-bold">출력 기준일: ${today} | 보안 성격: 사내 대외비 문서</p>
+                    </div>
+                    <!-- 결재인 방안 상자 -->
+                    <table class="border-collapse border border-slate-400 text-[11px] text-center">
+                        <tr>
+                            <th class="border border-slate-400 p-1 bg-slate-50 font-bold" rowspan="2">결<br>재</th>
+                            <td class="border border-slate-400 p-1 w-16 bg-slate-50 text-slate-500">품질담당</td>
+                            <td class="border border-slate-400 p-1 w-16 bg-slate-50 text-slate-500">공장장</td>
+                            <td class="border border-slate-400 p-1 w-16 bg-slate-50 text-slate-500">대표이사</td>
+                        </tr>
+                        <tr style="height: 35px;"><td class="border border-slate-400 text-[9px] text-slate-300 align-bottom">인</td><td class="border border-slate-400 text-[9px] text-slate-300 align-bottom">인</td><td class="border border-slate-400 text-[9px] text-slate-300 align-bottom">인</td></tr>
+                    </table>
+                </div>
+        `;
+
+        if (optSummary) {
+            htmlBuilder += `
+                <div class="mb-6">
+                    <h4 class="text-sm font-black text-slate-900 border-l-4 border-blue-600 pl-2 mb-3">1. 자재 및 생산품질 정량 요약 지표</h4>
+                    <div class="grid grid-cols-4 gap-2 text-center text-xs">
+                        <div class="border border-slate-200 p-3 rounded-lg bg-slate-50"><p class="text-[10px] text-slate-400 font-bold">운영 자재 품목</p><p class="text-sm font-black text-slate-800 mt-1">${totalItems} 종</p></div>
+                        <div class="border border-slate-200 p-3 rounded-lg bg-slate-50"><p class="text-[10px] text-slate-400 font-bold">종합 품질 불량률</p><p class="text-sm font-black text-red-500 mt-1">${totalDefectRate} %</p></div>
+                        <div class="border border-slate-200 p-3 rounded-lg bg-slate-50"><p class="text-[10px] text-slate-400 font-bold">총 자재 보유고</p><p class="text-sm font-black text-slate-800 mt-1">${totalStock.toLocaleString()} EA</p></div>
+                        <div class="border border-slate-200 p-3 rounded-lg bg-rose-50 border-rose-200"><p class="text-[10px] text-red-500 font-bold">수급 위험 경보 (재고부족)</p><p class="text-sm font-black text-red-600 mt-1">${totalUnder} 품목</p></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        if (optCharts) {
+            htmlBuilder += `
+                <div class="mb-6">
+                    <h4 class="text-sm font-black text-slate-900 border-l-4 border-blue-600 pl-2 mb-3">2. 자재 분포 및 불량 비중 차트 분석</h4>
+                    <div class="grid grid-cols-3 gap-3 text-center">
+                        <div class="border border-slate-200 p-2 rounded-xl bg-white"><p class="text-[10px] font-bold text-slate-500 mb-2">[분류별 재재 보유비중]</p><img id="imgQChart1" class="mx-auto h-32 object-contain"></div>
+                        <div class="border border-slate-200 p-2 rounded-xl bg-white"><p class="text-[10px] font-bold text-slate-500 mb-2">[분류별 불량 건수 비교]</p><img id="imgQChart2" class="mx-auto h-32 object-contain"></div>
+                        <div class="border border-slate-200 p-2 rounded-xl bg-white"><p class="text-[10px] font-bold text-slate-500 mb-2">[수급 안정성 지표]</p><img id="imgQChart3" class="mx-auto h-32 object-contain"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        if (optRisk) {
+            let trs = '';
+            materials.forEach(m => {
+                if(m.stock < m.safeStock) {
+                    trs += `<tr class="bg-rose-50/40 text-center text-[11px]"><td class="border border-slate-200 p-1.5 font-bold text-red-600">${m.code}</td><td class="border border-slate-200 p-1.5 font-bold">${m.name}</td><td class="border border-slate-200 p-1.5">${m.category}</td><td class="border border-slate-200 p-1.5 font-bold text-red-600">${m.stock} ${m.unit}</td><td class="border border-slate-200 p-1.5 text-indigo-600">${m.safeStock} ${m.unit}</td></tr>`;
+                }
+            });
+            if(!trs) trs = `<tr><td colspan="5" class="border border-slate-200 p-3 text-center text-xs text-slate-400">자재 조달 수급 상태 완벽 (위험 품목 없음)</td></tr>`;
+            htmlBuilder += `
+                <div class="mb-6">
+                    <h4 class="text-sm font-black text-slate-900 border-l-4 border-blue-600 pl-2 mb-3">3. 안전재고 미달 품목 및 긴급 조달 지시 현황</h4>
+                    <table class="w-full border-collapse border border-slate-300 text-[11px]"><thead class="bg-slate-50 font-bold text-center"><tr><th class="border border-slate-300 p-1.5">품번 (코드)</th><th class="border border-slate-300 p-1.5">품명 (자재명)</th><th class="border border-slate-300 p-1.5">자재분류</th><th class="border border-slate-300 p-1.5 text-red-500">현재고</th><th class="border border-slate-300 p-1.5">기준 안전재고</th></tr></thead><tbody>${trs}</tbody></table>
+                </div>
+            `;
+        }
+
+        if (optTable) {
+            let trsAll = '';
+            materials.forEach(m => {
+                const rate = m.totalInspected ? ((m.totalDefects / m.totalInspected) * 100).toFixed(2) : '0.00';
+                trsAll += `<tr class="text-center text-[11px]"><td class="border border-slate-200 p-1.5 font-bold">${m.code}</td><td class="border border-slate-200 p-1.5 font-black text-left">${m.name}</td><td class="border border-slate-200 p-1.5">${m.category}</td><td class="border border-slate-200 p-1.5 font-bold">${m.stock.toLocaleString()}</td><td class="border border-slate-200 p-1.5 text-indigo-600">${m.safeStock.toLocaleString()}</td><td class="border border-slate-200 p-1.5 text-slate-500">${m.totalInspected || 0} / <span class="text-red-500">${m.totalDefects || 0}</span></td><td class="border border-slate-200 p-1.5 font-black text-slate-800">${rate}%</td></tr>`;
+            });
+            htmlBuilder += `
+                <div>
+                    <h4 class="text-sm font-black text-slate-900 border-l-4 border-blue-600 pl-2 mb-3">4. 전사 자재 및 공정 품질 현황 대장 (전체 품목)</h4>
+                    <table class="w-full border-collapse border border-slate-300 text-[10px]"><thead class="bg-slate-900 text-white font-bold text-center"><tr><th class="border border-slate-300 p-1.5">자재코드</th><th class="border border-slate-300 p-1.5 text-left">자재명 (품명)</th><th class="border border-slate-300 p-1.5">분류</th><th class="border border-slate-300 p-1.5">현재고</th><th class="border border-slate-300 p-1.5">안전재고</th><th class="border border-slate-300 p-1.5">총검사 / 불량</th><th class="border border-slate-300 p-1.5">불량률</th></tr></thead><tbody>${trsAll}</tbody></table>
+                </div>
+            `;
+        }
+
+        htmlBuilder += `</div>`;
+        reportZone.innerHTML = htmlBuilder;
+
+        if (optCharts) buildHiddenCharts(catCountMap, catDefectMap, totalActive, totalUnder);
+    }
+
+    function buildHiddenCharts(catCount, catDefect, activeCount, underCount) {
+        const labels = Object.keys(catCount);
+        const options = { animation: false, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true } } };
+
+        if (hiddenCharts.category) hiddenCharts.category.destroy();
+        hiddenCharts.category = new Chart(document.getElementById('hiddenCategoryChart').getContext('2d'), {
+            type: 'doughnut', data: { labels: labels, datasets: [{ data: Object.values(catCount), backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#a855f7'] }] }, options
+        });
+
+        if (hiddenCharts.defect) hiddenCharts.defect.destroy();
+        hiddenCharts.defect = new Chart(document.getElementById('hiddenDefectChart').getContext('2d'), {
+            type: 'bar', data: { labels: labels, datasets: [{ label: '불량 건수', data: Object.values(catDefect), backgroundColor: 'rgba(239, 68, 68, 0.75)' }] }, options
+        });
+
+        if (hiddenCharts.stock) hiddenCharts.stock.destroy();
+        hiddenCharts.stock = new Chart(document.getElementById('hiddenStockChart').getContext('2d'), {
+            type: 'pie', data: { labels: ['정상보유', '재고부족위험'], datasets: [{ data: [materials.length - underCount, underCount], backgroundColor: ['#10b981', '#f43f5e'] }] }, options
+        });
+
+        setTimeout(() => {
+            const img1 = document.getElementById('imgQChart1'); const img2 = document.getElementById('imgQChart2'); const img3 = document.getElementById('imgQChart3');
+            if(img1) img1.src = document.getElementById('hiddenCategoryChart').toDataURL();
+            if(img2) img2.src = document.getElementById('hiddenDefectChart').toDataURL();
+            if(img3) img3.src = document.getElementById('hiddenStockChart').toDataURL();
+        }, 150);
+    }
+
+    function exportLiveReportToPDF() {
+        const element = document.getElementById('live-report-print-zone');
+        const today = new Date().toISOString().split('T')[0];
+        const opt = {
+            margin: 10, filename: `품질경영_통합분석보고서_${today}.pdf`, image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, backgroundColor: '#ffffff', useCORS: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+        };
+        html2pdf().from(element).set(opt).save();
+    }
+
+    // ========================================== 모달 및 부속 근태/검사이력 제어 로직 ==========================================
+    function openDefectModal(idx) {
+        const mat = materials[idx]; if(!mat.qualityHistory) mat.qualityHistory = [];
+        document.getElementById('defectModal').classList.add('show');
+        document.getElementById('defectTargetIdx').value = idx;
+        document.getElementById('defectModalTitle').innerText = `📊 ${mat.name} 품질 데이터 관리`;
+        document.getElementById('defectModalSubtitle').innerText = `품번: ${mat.code} | 자재분류: ${mat.category} (현재고: ${mat.stock} ${mat.unit})`;
+        document.getElementById('qDate').value = new Date().toISOString().split('T')[0];
+        document.getElementById('qTotal').value = 100; document.getElementById('qDefect').value = 0; document.getElementById('qReason').value = "";
+        renderDefectHistory(idx);
+    }
+    function closeDefectModal() { document.getElementById('defectModal').classList.remove('show'); }
+
+    function renderDefectHistory(idx) {
+        const mat = materials[idx]; const historyList = document.getElementById('defectHistoryList'); historyList.innerHTML = '';
+        if (!mat.qualityHistory || mat.qualityHistory.length === 0) { historyList.innerHTML = `<tr><td colspan="5" class="p-4 text-slate-400 text-center">등록된 공정 검사 이력이 없습니다.</td></tr>`; return; }
+        [...mat.qualityHistory].sort((a,b)=>new Date(b.date)-new Date(a.date)).forEach((item) => {
+            const orgIdx = mat.qualityHistory.findIndex(h => h === item);
+            historyList.innerHTML += `<tr class="hover:bg-slate-50 text-center"><td class="p-2 font-bold">${item.date}</td><td>${item.total.toLocaleString()}</td><td class="text-red-500 font-bold">${item.defect.toLocaleString()}</td><td class="text-left font-medium max-w-xs truncate">${item.reason || '-'}</td><td><button onclick="removeDefectRow(${idx}, ${orgIdx})" class="text-red-400 font-bold hover:text-red-600">삭제</button></td></tr>`;
+        });
+    }
+
+    function addDefectRow() {
+        const idx = document.getElementById('defectTargetIdx').value;
+        const date = document.getElementById('qDate').value;
+        const total = Number(document.getElementById('qTotal').value) || 0;
+        const defect = Number(document.getElementById('qDefect').value) || 0;
+        const reason = document.getElementById('qReason').value;
+        if(!date || total <= 0) return alert('정확한 검사수량을 입력하세요.');
+
+        materials[idx].qualityHistory.push({ date, total, defect, reason });
+        calculateQualitySummary(idx);
+        renderDefectHistory(idx); render();
+    }
+
+    function removeDefectRow(matIdx, historyIdx) {
+        if(confirm('품질 기록을 삭제합니까?')) { materials[matIdx].qualityHistory.splice(historyIdx, 1); calculateQualitySummary(matIdx); renderDefectHistory(matIdx); render(); }
+    }
+
+    function calculateQualitySummary(idx) {
+        let ins = 0, def = 0;
+        materials[idx].qualityHistory.forEach(h => { ins += h.total; def += h.defect; });
+        materials[idx].totalInspected = ins; materials[idx].totalDefects = def;
+    }
+
+    // 문서 스토리지 기믹
+    function openDocStorage() { document.getElementById('docStorageModal').classList.add('show'); renderStorageFiles(); }
+    function closeDocStorage() { document.getElementById('docStorageModal').classList.remove('show'); }
+    function uploadStorageFile() {
+        const input = document.getElementById('docStorageInput'); const file = input.files[0]; if(!file) return;
+        const reader = new FileReader(); reader.onload = function(e) {
+            globalFiles.push({ name: file.name, data: e.target.result }); localStorage.setItem('qm_shared_files', JSON.stringify(globalFiles)); renderStorageFiles(); input.value = '';
+        }; reader.readAsDataURL(file);
+    }
+    function renderStorageFiles() {
+        const listHTML = document.getElementById('sharedFileList'); listHTML.innerHTML = globalFiles.length === 0 ? '<li class="text-slate-400 text-center py-4">공유 파일 서식 없음</li>' : '';
+        globalFiles.forEach((f, idx) => {
+            listHTML.innerHTML += `<li class="flex justify-between items-center p-2 bg-white rounded-xl border border-slate-100 my-1"><a href="${f.data}" download="${f.name}" class="text-blue-600 hover:underline font-bold truncate max-w-[350px]">📄 ${f.name}</a><button onclick="deleteStorageFile(${idx})" class="text-red-500 font-bold px-1">❌</button></li>`;
+        });
+    }
+    function deleteStorageFile(idx) { if(confirm('삭제합니까?')) { globalFiles.splice(idx, 1); localStorage.setItem('qm_shared_files', JSON.stringify(globalFiles)); renderStorageFiles(); } }
+
+    // 자재 입출력/수정 기본 제어 묶음
+    function openForm(idx) {
+        document.getElementById('itemModal').classList.add('show'); document.getElementById('targetIdx').value = idx;
+        if(idx === -1) {
+            document.getElementById('formTitle').innerText = "신규 품질 자재 등록"; document.getElementById('fName').value = ""; document.getElementById('fCode').value = "M-" + (materials.length+1).toString().padStart(3,'0'); document.getElementById('fUnit').value = "EA"; document.getElementById('fStock').value = ""; document.getElementById('fSafeStock').value = "";
+        } else {
+            const m = materials[idx]; document.getElementById('formTitle').innerText = "자재 제원 규격 수정"; document.getElementById('fName').value = m.name; document.getElementById('fCode').value = m.code; document.getElementById('fCategory').value = m.category; document.getElementById('fUnit').value = m.unit; document.getElementById('fStock').value = m.stock; document.getElementById('fSafeStock').value = m.safeStock;
+        }
+    }
+    function closeForm() { document.getElementById('itemModal').classList.remove('show'); }
+    function saveData() {
+        const idx = document.getElementById('targetIdx').value; const name = document.getElementById('fName').value; const code = document.getElementById('fCode').value; if(!name || !code) return alert("필수 값 누락");
+        const isNew = idx == -1; const obj = isNew ? { totalInspected: 0, totalDefects: 0, qualityHistory: [] } : materials[idx];
+        const newObj = { ...obj, name, code, category: document.getElementById('fCategory').value, unit: document.getElementById('fUnit').value, stock: Number(document.getElementById('fStock').value)||0, safeStock: Number(document.getElementById('fSafeStock').value)||0 };
+        if(isNew) materials.push(newObj); else materials[idx] = newObj; closeForm(); render();
+    }
+    function del(i) { if(confirm('영구 삭제합니까?')) { materials.splice(i,1); render(); } }
+    function setFilter(cat) { currentFilter = cat; render(); }
+    function loadPreviousData() { const saved = localStorage.getItem('qm_v14_data'); if(saved) { materials = JSON.parse(saved); render(); alert('성공적으로 로드되었습니다.'); } }
+    function restoreBackup() { const b = localStorage.getItem('qm_backup'); if(b && confirm('되돌립니까?')) { materials = JSON.parse(b); localStorage.removeItem('qm_backup'); render(); } }
+
+    // 대량 인사 파일 수집 및 파싱 연동 CSV 모듈
+    function uploadCSV(event) {
+        const file = event.target.files[0]; if(!file) return; localStorage.setItem('qm_backup', JSON.stringify(materials));
+        const reader = new FileReader(); reader.onload = e => {
+            const bytes = new Uint8Array(e.target.result); let isUtf8 = true;
+            for (let i = 0; i < bytes.length; i++) { if (bytes[i] > 0x7F) { if ((bytes[i] & 0xE0) === 0xC0 && i + 1 < bytes.length && (bytes[i+1] & 0xC0) === 0x80) { i += 1; } else if ((bytes[i] & 0xF0) === 0xE0 && i + 2 < bytes.length && (bytes[i+1] & 0xC0) === 0x80 && (bytes[i+2] & 0xC0) === 0x80) { i += 2; } else { isUtf8 = false; break; } } }
+            const textReader = new FileReader(); textReader.onload = evt => {
+                evt.target.result.split(/\r?\n/).forEach((row, rIdx) => {
+                    if(rIdx === 0 || !row.trim()) return; const cols = row.split(',').map(c => c.trim()); if(cols.length < 4) return;
+                    let [code, name, cat, unit, stock, safe, ins, def] = cols; if(!code || !name) return;
+                    const idx = materials.findIndex(m => m.code === code);
+                    const obj = { code, name, category: cat, unit, stock: Number(stock)||0, safeStock: Number(safe)||0, totalInspected: Number(ins)||0, totalDefects: Number(def)||0, qualityHistory: (idx !== -1 && materials[idx].qualityHistory) ? materials[idx].qualityHistory : [] };
+                    if(idx !== -1) materials[idx] = obj; else materials.push(obj);
+                }); alert('자재 및 공정 품질 마스터 데이터 연동 성공!'); event.target.value = ''; render();
+            }; textReader.readAsText(file, isUtf8 ? 'UTF-8' : 'EUC-KR');
+        }; reader.readAsArrayBuffer(file);
+    }
+
+    // 기본 시연용 초기 제조 공정 데이터 마이그레이션 셋업
+    if (materials.length === 0) {
+        materials = [
+            { code: "M-001", name: "알루미늄 가공 프로파일 바", category: "원자재", unit: "EA", stock: 120, safeStock: 200, totalInspected: 1500, totalDefects: 28, qualityHistory: [{date:"2026-06-10", total: 500, defect: 18, reason: "NCR-02 표면 스크래치 다발"}] },
+            { code: "M-002", name: "PCB 제어 메인 보드 ASM", category: "반제품", unit: "EA", stock: 95, safeStock: 80, totalInspected: 450, totalDefects: 3, qualityHistory: [] },
+            { code: "M-003", name: "외장 고정용 SUS 스크류 볼트", category: "부자재", unit: "kg", stock: 12, safeStock: 30, totalInspected: 2000, totalDefects: 5, qualityHistory: [] }
+        ];
+    }
+    render();
+</script>
+</body>
+</html>

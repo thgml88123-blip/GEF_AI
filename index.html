@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>경남경영자총협회 중소기업AI훈련확산센터</title>
+
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta name="description" content="2026 고용노동부 지원 사업. 경남경영자총협회 중소기업AI훈련확산센터 - 우리 기업에 딱 맞는 AI 도입 4단계 원스톱 컨설팅.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="경남경영자총협회 중소기업AI훈련확산센터">
+  <meta property="og:description" content="2026 고용노동부 지원 사업. 우리 기업에 딱 맞는 AI 도입 4단계 원스톱 컨설팅을 경험하세요.">
+  <meta property="og:image" content="favicon.svg">
+  <meta name="twitter:card" content="summary">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+  
+  <!-- Custom Modern Design System -->
+  <link rel="stylesheet" href="css/custom-theme.css">
+
+  <style>
+    /* 최종 선택: Option 2 (맑고 깨끗한 퓨어 화이트 & 소프트 메쉬 오로라 100vh 핏) */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: #FFFFFF;
+      background-image: 
+        radial-gradient(at 10% 10%, rgba(224, 242, 254, 0.75) 0px, transparent 50%),
+        radial-gradient(at 90% 90%, rgba(238, 242, 255, 0.75) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(240, 249, 255, 0.5) 0px, transparent 60%);
+      font-family: 'Pretendard', sans-serif;
+      color: #0F172A;
+    }
+
+    .navbar-pure {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid #E2E8F0;
+      padding: 12px 0;
+      box-shadow: 0 4px 12px rgba(0, 102, 255, 0.03);
+    }
+
+    .one-screen-main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 0;
+    }
+
+    /* 소프트 메쉬 퓨어 화이트 카드 */
+    .portal-card-pure {
+      background: #FFFFFF;
+      border: 1px solid #CBD5E1;
+      border-radius: var(--ai-radius-xl);
+      padding: 36px 32px;
+      transition: var(--ai-transition);
+      color: #0F172A;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      box-shadow: 0 12px 30px rgba(0, 102, 255, 0.06);
+      position: relative;
+    }
+
+    .portal-card-pure:hover {
+      transform: translateY(-6px);
+      border-color: #0066FF;
+      box-shadow: 0 20px 45px rgba(0, 102, 255, 0.16);
+      color: #0F172A;
+    }
+
+    .portal-icon-box-pure {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: #EFF6FF;
+      color: #0066FF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      margin-bottom: 20px;
+    }
+
+    .portal-icon-box-coach {
+      background: #FEF3C7;
+      color: #D97706;
+    }
+
+    .stat-chip-pure {
+      background: #F8FAFC;
+      color: #1E293B;
+      border: 1px solid #CBD5E1;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 6px 16px;
+      border-radius: 50px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+    }
+
+    footer.one-screen-footer-pure {
+      background: #FFFFFF;
+      border-top: 1px solid #E2E8F0;
+      padding: 14px 0;
+      color: #64748B;
+      font-size: 0.85rem;
+    }
+
+    @media (min-width: 992px) and (min-height: 750px) {
+      body {
+        overflow-y: hidden;
+      }
+    }
+
+    @media (max-width: 991.98px) {
+      body {
+        overflow-y: auto;
+      }
+      .one-screen-main {
+        padding: 40px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Top Navigation Bar (Pure White) -->
+<nav class="navbar navbar-expand-lg navbar-pure">
+  <div class="container">
+    <a class="navbar-brand text-dark fw-extrabold d-flex align-items-center" href="index.html" style="font-size: 1.1rem; color: #0F172A !important;">
+      <div class="step-icon-wrapper me-2" style="width: 36px; height: 36px; font-size: 1rem; background: var(--ai-gradient-accent); color: #fff;">
+        <i class="bi bi-cpu-fill"></i>
+      </div>
+      경남경영자총협회 <span class="text-primary ms-1">중소기업AI훈련확산센터</span>
+    </a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="메뉴 열기">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-center mt-2 mt-lg-0" style="gap: 16px !important;">
+        <li class="nav-item">
+          <a class="btn rounded-pill px-3.5 py-2 fw-extrabold shadow-sm d-inline-flex align-items-center text-dark" href="landing.html" style="font-size: 0.95rem; background-color: #FBBF24; border: none;">
+            <i class="bi bi-lightning-charge-fill text-dark" style="margin-right: 8px !important;"></i>AI 실무 특강
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="btn btn-outline-primary rounded-pill px-3.5 py-2 fw-bold shadow-sm d-inline-flex align-items-center" href="about.html" style="font-size: 0.95rem;">
+            <i class="bi bi-info-circle-fill text-primary fs-6" style="margin-right: 8px !important;"></i>사업소개
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="btn btn-primary rounded-pill px-3.5 py-2 fw-bold shadow-sm d-inline-flex align-items-center text-white" href="process.html" style="font-size: 0.95rem;">
+            <i class="bi bi-diagram-3-fill fs-6" style="margin-right: 8px !important;"></i>지원절차
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Main 1-Screen Dashboard Content -->
+<main class="one-screen-main">
+  <div class="container" style="max-width: 960px;">
+    
+    <!-- Hero Title Header (Team Lead's Choice: Deep Blue Industrial AI Hero Overlay) -->
+    <div class="text-center py-5 px-4 px-md-5 rounded-4 shadow-lg text-white position-relative overflow-hidden" 
+         style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 58, 138, 0.88) 100%), url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1600&q=80') center/cover; border: 1px solid rgba(255,255,255,0.15); margin-bottom: 3.5rem !important;">
+      
+      <div class="d-inline-flex align-items-center gap-2 mb-3">
+        <span class="badge fw-extrabold rounded-pill px-3.5 py-2 fs-6 shadow-sm" style="background-color: #FBBF24; color: #0F172A;">
+          <i class="bi bi-sparkles me-1 text-dark"></i> 2026 고용노동부 지원 사업
+        </span>
+      </div>
+      
+      <h1 class="fw-black mb-3 text-white" style="font-size: 2.4rem; letter-spacing: -0.03em; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+        경남경영자총협회 <span class="text-info" style="color: #38BDF8 !important;">중소기업AI훈련확산센터</span>
+      </h1>
+      
+      <p class="mx-auto mb-4 fw-semibold" style="max-width: 680px; font-size: 1.05rem; line-height: 1.6; color: #E2E8F0 !important;">
+        복잡한 행정 절차는 덜어내고, 현장 실무자가 바로 체감하는<br>
+        <strong>우리 기업 맞춤형 AI 도입 4단계 원스톱 컨설팅</strong>을 지원합니다.
+      </p>
+
+      <!-- Stat Counter Chips (100% Equal Uniform Width & Height) -->
+      <div class="d-flex justify-content-center align-items-center flex-wrap mt-4 mb-2" style="gap: 14px !important;">
+        <span class="stat-chip-pure shadow-sm d-inline-flex align-items-center justify-content-center" style="background: #FFFFFF; color: #0F172A; border: 1px solid #CBD5E1; font-weight: 700; padding: 9px 16px; border-radius: 50px; font-size: 0.88rem; min-width: 195px; text-align: center;"><i class="bi bi-check-circle-fill me-2" style="color: #0066FF !important;"></i> 100% 전액 지원</span>
+        <span class="stat-chip-pure shadow-sm d-inline-flex align-items-center justify-content-center" style="background: #FFFFFF; color: #0F172A; border: 1px solid #CBD5E1; font-weight: 700; padding: 9px 16px; border-radius: 50px; font-size: 0.88rem; min-width: 195px; text-align: center;"><i class="bi bi-diagram-3-fill me-2" style="color: #0066FF !important;"></i> 4 Step 원스톱 컨설팅</span>
+        <span class="stat-chip-pure shadow-sm d-inline-flex align-items-center justify-content-center" style="background: #FFFFFF; color: #0F172A; border: 1px solid #CBD5E1; font-weight: 700; padding: 9px 16px; border-radius: 50px; font-size: 0.88rem; min-width: 195px; text-align: center;"><i class="bi bi-building-fill me-2" style="color: #0066FF !important;"></i> 20인+ 우선 지원</span>
+        <span class="stat-chip-pure shadow-sm d-inline-flex align-items-center justify-content-center" style="background: #FFFFFF; color: #0F172A; border: 1px solid #CBD5E1; font-weight: 700; padding: 9px 16px; border-radius: 50px; font-size: 0.88rem; min-width: 195px; text-align: center;"><i class="bi bi-tools me-2" style="color: #0066FF !important;"></i> PBL 현장문제 해결형</span>
+      </div>
+    </div>
+
+    <!-- 2 Main Portal Entry Cards (Soft Aurora Mesh Cards) -->
+    <div class="row g-4 justify-content-center">
+      
+      <!-- 참여기업 전용관 -->
+      <div class="col-md-6">
+        <a href="company.html" class="portal-card-pure">
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="portal-icon-box-pure">
+              <i class="bi bi-buildings-fill"></i>
+            </div>
+            <span class="badge bg-primary text-white fw-bold rounded-pill px-3 py-1.5 fs-6 shadow-sm">기업 전용</span>
+          </div>
+          <h3 class="fw-bold text-dark mb-2" style="font-size: 1.4rem; color: #0F172A !important;">참여기업 전용관</h3>
+          <p class="small text-secondary mb-4 lh-base" style="color: #475569 !important;">
+            지원 자격 실시간 자가진단, 참여신청서 즉시 다운로드 및 이메일 접수 절차를 안내합니다.
+          </p>
+          <div class="btn btn-ai-primary w-100 py-2.5 rounded-pill shadow-sm fw-bold mt-auto d-flex align-items-center justify-content-center gap-2">
+            <span>자가진단 및 서류 신청하기</span>
+            <i class="bi bi-arrow-right fs-5"></i>
+          </div>
+        </a>
+      </div>
+
+      <!-- AI훈련코치 전용관 -->
+      <div class="col-md-6">
+        <a href="coach.html" class="portal-card-pure">
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="portal-icon-box-pure portal-icon-box-coach">
+              <i class="bi bi-person-badge-fill"></i>
+            </div>
+            <span class="badge bg-warning-subtle text-warning-emphasis fw-bold rounded-pill px-3 py-1.5 fs-6 border border-warning-subtle">코치 전용</span>
+          </div>
+          <h3 class="fw-bold text-dark mb-2" style="font-size: 1.4rem; color: #0F172A !important;">AI훈련코치 전용관</h3>
+          <p class="small text-secondary mb-4 lh-base" style="color: #475569 !important;">
+            코치 선발 요건, 훈련 지침, 공통 프롬프트 가이드 및 웹보드 샘플 갤러리를 제공합니다.
+          </p>
+          <div class="btn btn-outline-primary w-100 py-2.5 rounded-pill fw-bold mt-auto d-flex align-items-center justify-content-center gap-2" style="border-width: 2px;">
+            <span>코치 전용관 바로가기</span>
+            <i class="bi bi-arrow-right fs-5"></i>
+          </div>
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+<!-- Pure White Footer -->
+<footer class="one-screen-footer-pure text-center">
+  <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+    <div>
+      <strong class="text-dark me-2">경남경영자총협회 중소기업AI훈련확산센터</strong>
+      <span>경상남도 창원시 성산구 중앙대로 228번길 6 씨티알빌딩 5층 | T. 055-266-1939</span>
+    </div>
+    <div>
+      © 2026 Gyeongnam Employers Federation. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<!-- Floating Mobile Action Contact Bar -->
+<div class="floating-mobile-bar">
+  <a href="tel:055-266-1939" class="btn btn-outline-light rounded-pill flex-grow-1 fw-bold py-2" style="font-size: 0.85rem;">
+    <i class="bi bi-telephone-fill me-1 text-info"></i> 전화 문의
+  </a>
+  <a href="company.html" class="btn btn-ai-primary rounded-pill flex-grow-1 fw-bold py-2" style="font-size: 0.85rem;">
+    <i class="bi bi-rocket-takeoff-fill me-1"></i> 참여 신청하기
+  </a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

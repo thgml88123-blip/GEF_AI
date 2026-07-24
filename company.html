@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>기업전용관 | 중소기업 AI훈련 확산센터</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta name="description" content="참여기업 전용관 - 사업 참여 신청 절차 안내와 자가진단 기능을 제공합니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="기업전용관 | 중소기업 AI훈련 확산센터">
+  <meta property="og:description" content="사업 참여 신청 절차 안내와 자가진단 기능을 제공합니다.">
+  <meta property="og:image" content="favicon.svg">
+  <meta name="twitter:card" content="summary">
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+
+  <!-- Custom Modern Design System -->
+  <link rel="stylesheet" href="css/custom-theme.css">
+
+  <style>
+    .nav-breadcrumb {
+      background: #FFFFFF;
+      padding: 14px 0;
+      border-bottom: 1px solid #E2E8F0;
+      box-shadow: var(--ai-shadow-sm);
+    }
+    .section-title {
+      border-left: 5px solid var(--ai-accent);
+      padding-left: 15px;
+      margin-bottom: 24px;
+      font-weight: 800;
+      color: var(--ai-primary);
+      display: flex;
+      align-items: center;
+    }
+    .card-custom {
+      border: 1px solid #E2E8F0;
+      border-radius: var(--ai-radius-lg);
+      box-shadow: var(--ai-shadow-sm);
+      background: #FFFFFF;
+    }
+    .check-item {
+      transition: var(--ai-transition);
+      cursor: pointer;
+      border: 1px solid #E2E8F0;
+      border-radius: var(--ai-radius-md) !important;
+      margin-bottom: 10px;
+    }
+    .check-item:hover {
+      border-color: var(--ai-accent);
+      background: #F0F7FF;
+      transform: translateX(4px);
+    }
+    .step-box {
+      position: relative;
+      padding-left: 52px;
+      margin-bottom: 28px;
+    }
+    .step-box::before { 
+      content: attr(data-step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 36px;
+      height: 36px;
+      background: var(--ai-gradient-accent);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      box-shadow: 0 4px 10px rgba(0, 102, 255, 0.25);
+    }
+    .nav-pills .nav-link {
+      color: #64748B;
+      font-weight: 700;
+      transition: var(--ai-transition);
+      border: 1px solid #CBD5E1;
+    }
+    .nav-pills .nav-link.active {
+      background-color: var(--ai-accent);
+      color: white;
+      border-color: var(--ai-accent);
+      box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+<div class="nav-breadcrumb">
+  <div class="container d-flex justify-content-between align-items-center">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="index.html" class="text-decoration-none text-secondary"><i class="bi bi-house-door-fill me-1"></i>홈</a></li>
+        <li class="breadcrumb-item active fw-bold text-primary">참여기업 전용관</li>
+      </ol>
+    </nav>
+    <a href="index.html" class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-bold">
+      <i class="bi bi-arrow-left me-1"></i> 메인으로 돌아가기
+    </a>
+  </div>
+</div>
+
+<div class="container py-5">
+  <div class="row g-4">
+    <div class="col-lg-8">
+      
+      <!-- 자가진단 섹션 -->
+      <section>
+        <h3 class="section-title"><i class="bi bi-ui-checks me-2 text-primary"></i>참여 자격 자가진단</h3>
+        <div class="card card-custom p-4">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="small fw-bold text-secondary">항목을 체크하면 실시간으로 지원 자격이 판정됩니다.</span>
+            <span id="diagnosis-badge-status" class="diagnosis-badge bg-warning-subtle text-warning-emphasis">
+              <i class="bi bi-hourglass-split"></i> 진단 진행 중 (1/4)
+            </span>
+          </div>
+
+          <!-- 게이지 바 -->
+          <div class="diagnosis-progress-container">
+            <div id="diagnosis-bar" class="diagnosis-progress-bar" style="width: 25%;"></div>
+          </div>
+
+          <div class="list-group">
+            <label class="list-group-item check-item p-3">
+              <input class="form-check-input me-3 diagnosis-check" type="checkbox" onchange="updateDiagnosisStatus()">
+              <span class="fw-semibold text-dark">경남·부산·울산 소재의 중소기업입니까?</span>
+            </label>
+            <label class="list-group-item check-item p-3">
+              <input class="form-check-input me-3 diagnosis-check" type="checkbox" onchange="updateDiagnosisStatus()">
+              <span class="fw-semibold text-dark">고용보험법상 '우선지원대상기업'에 해당하십니까?</span>
+            </label>
+            <label class="list-group-item check-item p-3">
+              <input class="form-check-input me-3 diagnosis-check" type="checkbox" onchange="updateDiagnosisStatus()">
+              <span class="fw-semibold text-dark">상시근로자 수가 20인 이상입니까? (20인 미만 시 사전 협의 필요)</span>
+            </label>
+            <label class="list-group-item check-item p-3">
+              <input class="form-check-input me-3 diagnosis-check" type="checkbox" checked onchange="updateDiagnosisStatus()">
+              <span class="fw-semibold text-dark">고용보험료 체납 및 임금체불 사실이 없습니까?</span>
+            </label>
+          </div>
+
+          <!-- 자가진단 판정 상자 (왼쪽 정렬 및 깔끔한 다운로드 레이아웃) -->
+          <div id="diagnosis-alert-box" class="alert alert-info border-0 mt-3 mb-0 rounded-3 p-3.5">
+            <div id="diagnosis-alert-text" class="d-flex align-items-center gap-3">
+              <i class="bi bi-info-circle-fill text-primary fs-4 flex-shrink-0"></i>
+              <span class="small fw-semibold text-dark">4개 항목을 모두 선택하면 지원 가능 대상으로 확정됩니다.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 기업 자주 묻는 질문 FAQ 섹션 -->
+      <section class="mt-4">
+        <h3 class="section-title"><i class="bi bi-question-circle-fill me-2 text-primary"></i>자주 묻는 질문 (FAQ)</h3>
+        <div class="card card-custom p-4">
+          <div class="accordion accordion-flush" id="companyFaqAccordion">
+            <div class="accordion-item border-bottom">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed fw-bold text-dark py-3" type="button" data-bs-toggle="collapse" data-bs-target="#companyFaq1">
+                  <i class="bi bi-patch-question-fill text-primary me-2 fs-5"></i> Q. 20인 미만 중소기업도 참여 신청이 가능한가요?
+                </button>
+              </h2>
+              <div id="companyFaq1" class="accordion-collapse collapse" data-bs-parent="#companyFaqAccordion">
+                <div class="accordion-body text-secondary small lh-lg">
+                  상시근로자 20인 이상 기업이 우선 지원 대상이나, 20인 미만 사업장의 경우에도 검토를 통해 지원 가능 여부를 신속히 안내해 드립니다.
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed fw-bold text-dark py-3" type="button" data-bs-toggle="collapse" data-bs-target="#companyFaq3">
+                  <i class="bi bi-patch-question-fill text-primary me-2 fs-5"></i> Q. 대면 컨설팅 회의는 몇 번이나 진행되나요?
+                </button>
+              </h2>
+              <div id="companyFaq3" class="accordion-collapse collapse" data-bs-parent="#companyFaqAccordion">
+                <div class="accordion-body text-secondary small lh-lg">
+                  AI훈련로드맵 수립 대면 2회, PBL과정개발 대면 2회로 기업의 일정을 최우선 고려하여 신속하고 부담 없이 완료되도록 지원합니다.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- 우측 사이드바 (도움이 필요하신가요 센터 안내) -->
+    <div class="col-lg-4">
+      <div class="card border-0 text-white p-4 rounded-4 shadow-lg sticky-top" style="background: var(--ai-gradient-hero); top: 90px; z-index: 10;">
+        <h5 class="fw-bold text-white mb-2"><i class="bi bi-headset me-2 text-info"></i>도움이 필요하신가요?</h5>
+        <p class="small opacity-75 mb-3">서류 작성이나 지원 요건 관련 문의사항은 확산센터로 언제든 연락해 주세요.</p>
+        <hr class="border-white opacity-25 my-3">
+        <div class="mb-3 fw-semibold fs-6"><i class="bi bi-telephone-fill me-2 text-info"></i> <a href="tel:055-266-1939" class="text-white text-decoration-none">055-266-1939</a></div>
+        <div class="fw-semibold d-flex align-items-center justify-content-between flex-wrap gap-2">
+          <span><i class="bi bi-envelope-fill me-2 text-info"></i> <a href="mailto:thgml8812@gef.or.kr" class="text-white text-decoration-none">thgml8812@gef.or.kr</a></span>
+          <button onclick="copyText('thgml8812@gef.or.kr', '이메일 주소가 복사되었습니다!')" class="btn btn-sm btn-outline-light rounded-pill px-2.5 py-1" style="font-size: 0.78rem;"><i class="bi bi-copy me-1"></i>복사</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Copy Toast Notification -->
+<div id="copyToast" class="copy-toast">
+  <i class="bi bi-check-circle-fill text-success fs-5"></i>
+  <span id="toastText">클립보드에 복사되었습니다!</span>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  function copyText(val, msg) {
+    navigator.clipboard.writeText(val).then(() => {
+      const toast = document.getElementById('copyToast');
+      const toastText = document.getElementById('toastText');
+      toastText.innerText = msg || '복사되었습니다!';
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    });
+  }
+
+  // 자가진단 상태 업데이트 함수
+  function updateDiagnosisStatus() {
+    const checkboxes = document.querySelectorAll('.diagnosis-check');
+    let checkedCount = 0;
+    checkboxes.forEach(cb => { if (cb.checked) checkedCount++; });
+
+    const percent = (checkedCount / checkboxes.length) * 100;
+    const bar = document.getElementById('diagnosis-bar');
+    const badge = document.getElementById('diagnosis-badge-status');
+    const alertBox = document.getElementById('diagnosis-alert-box');
+    const alertText = document.getElementById('diagnosis-alert-text');
+
+    bar.style.width = percent + '%';
+
+    if (checkedCount === checkboxes.length) {
+      badge.className = 'diagnosis-badge bg-success text-white shadow-sm';
+      badge.innerHTML = '<i class="bi bi-check-circle-fill"></i> 참여 지원 대상 (4/4 완료)';
+      alertBox.className = 'alert alert-success border-0 mt-3 mb-0 rounded-3 p-3.5 shadow-sm';
+      alertText.className = 'd-flex flex-column gap-3 w-100';
+      alertText.innerHTML = `
+        <!-- 상단 헤더: 체크 아이콘 및 타이틀/설명문 열맞춤 -->
+        <div class="d-flex align-items-center gap-3 w-100 mb-1">
+          <div class="step-icon-wrapper flex-shrink-0" style="width: 44px; height: 44px; background: #DCFCE7; color: #16A34A; font-size: 1.4rem;">
+            <i class="bi bi-check-circle-fill"></i>
+          </div>
+          <div class="flex-grow-1">
+            <h5 class="fw-bold text-dark mb-1" style="font-size: 1.08rem; line-height: 1.3;"><i class="bi bi-party-fill text-warning me-1.5"></i> 축하합니다! 지원 가능 자격을 모두 만족합니다.</h5>
+            <p class="small text-secondary mb-0" style="font-size: 0.88rem;">아래 절차에 따라 참여신청서를 다운로드받아 작성 후 접수해 주세요.</p>
+          </div>
+        </div>
+        
+        <!-- 3단계 절차 박스 (내부 22px 패딩으로 좌측 벽에 붙지 않도록 보완) -->
+        <div class="d-flex flex-column bg-white rounded-3 border mb-3 shadow-sm w-100" style="gap: 14px !important; padding: 18px 22px !important;">
+          <div class="d-flex align-items-center py-1">
+            <span class="badge bg-primary text-white px-3 py-1.5 fw-bold rounded-pill flex-shrink-0 me-3" style="min-width: 60px; text-align: center;">1단계</span>
+            <span class="fw-bold text-dark" style="font-size: 0.93rem;">HRD4U 회원가입</span>
+          </div>
+          <div class="d-flex align-items-center py-1">
+            <span class="badge bg-primary text-white px-3 py-1.5 fw-bold rounded-pill flex-shrink-0 me-3" style="min-width: 60px; text-align: center;">2단계</span>
+            <span class="fw-bold text-dark" style="font-size: 0.93rem;">기초진단 및 이음 컨설팅 진행</span>
+          </div>
+          <div class="d-flex align-items-center py-1">
+            <span class="badge bg-primary text-white px-3 py-1.5 fw-bold rounded-pill flex-shrink-0 me-3" style="min-width: 60px; text-align: center;">3단계</span>
+            <span class="fw-bold text-dark" style="font-size: 0.93rem;">참여신청서 작성 후 이메일(<span class="text-primary fw-bold">thgml8812@gef.or.kr</span>) 접수</span>
+          </div>
+        </div>
+
+        <!-- 하단 즉시 다운로드 버튼 -->
+        <a href="2.참여기업/참여기업 서류.zip" download class="btn btn-success btn-lg rounded-pill px-4 py-2.5 fw-bold w-100 d-flex align-items-center justify-content-center gap-2 shadow-sm">
+          <i class="bi bi-file-earmark-arrow-down-fill fs-5"></i>
+          <span>참여신청서 서류 즉시 다운로드 (.zip)</span>
+        </a>
+      `;
+    } else {
+      badge.className = 'diagnosis-badge bg-warning-subtle text-warning-emphasis';
+      badge.innerHTML = `<i class="bi bi-hourglass-split"></i> 진단 진행 중 (${checkedCount}/4)`;
+      alertBox.className = 'alert alert-info border-0 mt-3 mb-0 rounded-3 p-3.5';
+      alertText.className = 'd-flex align-items-center gap-3';
+      alertText.innerHTML = `
+        <i class="bi bi-info-circle-fill text-primary fs-4 flex-shrink-0"></i>
+        <span class="small fw-semibold text-dark">현재 ${checkedCount}개 항목 선택됨. 4개 항목을 모두 선택하면 지원 가능 대상입니다.</span>
+      `;
+    }
+  }
+
+  // 초기 진단 상태 실행
+  updateDiagnosisStatus();
+</script>
+</body>
+</html>
