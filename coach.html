@@ -539,9 +539,9 @@
         { badge: '신청', label: '1-1. PBL 과정개발 컨설팅 신청서(기업 작성)', path: '3.AI훈련코치/PBL 과정 개발 서식/(신청) 1-1.PBL+AI 컨설팅 신청서(기업 작성).hwp' },
         { badge: '신청', label: '1-2. PBL 과정개발 컨설팅 팀 참여 약정서(역할별 작성)', path: '3.AI훈련코치/PBL 과정 개발 서식/(신청) 1-2 PBL+AI 컨설팅 팀 참여 약정서(역할별 작성).hwp' },
         { badge: '신청', label: '1-3. PBL 과정개발사업 개인정보 수집·이용 동의서(역할별 작성)', path: '3.AI훈련코치/PBL 과정 개발 서식/(신청) 1-3. PBL+AI 사업 참여자 개인정보 수집·이용 동의서(역할별 작성).hwp' },
-        { badge: '별첨', label: '도메인 전문가 증빙자료(HRD4U증빙(필수),학력/경력증명서, 자격증 등)', path: '#' },
-        { badge: '별첨', label: '내부 전문가 증빙자료(재직 증명서 등)', path: '#' },
-        { badge: '별첨', label: '기업HRD이음컨설팅 보고서', path: '#' },
+        { badge: '별첨', label: '도메인 전문가 증빙자료 <b>(HRD4U증빙<span class="text-danger fw-bold">(필수)</span>, 학력/경력증명서, 자격증 등)</b>', path: '#' },
+        { badge: '별첨', label: '내부 전문가 증빙자료 <b>(재직 증명서 등)</b>', path: '#' },
+        { badge: '별첨', label: '<b>기업HRD이음컨설팅 보고서</b>', path: '#' },
         { badge: '진행', label: '2-1. PBL 과정개발 외부강사 서약서', path: '3.AI훈련코치/PBL 과정 개발 서식/(진행) 2-1. 문제해결형(PBL) AI+직무 훈련 외부강사 서약서.hwp' },
         { badge: '진행', label: '2-2. PBL 과정개발 컨설팅 수행일지', path: '3.AI훈련코치/PBL 과정 개발 서식/(진행) 2-2. 컨설팅 수행일지.hwp' },
         { badge: '진행', label: '2-3. PBL 과정개발 훈련과정 개발 보고서', path: '3.AI훈련코치/PBL 과정 개발 서식/(진행) 2-3. 문제해결형(PBL) AI+직무 훈련과정 개발보고서.hwp' },
@@ -741,20 +741,29 @@
 
       if (FAQ_LIST.length === 0) {
         FAQ_LIST = [
-          { q: "AI훈련로드맵 컨설팅 보고서 제출 기한은 언제인가요?", a: "1차 컨설팅 진행 기준 4주(28일) 이내로 제출하셔야 합니다." },
-          { q: "PBL 과정개발 컨설팅 보고서 제출 기한은 언제인가요?", a: "1차 컨설팅 진행 기준 1달 이내로 제출하셔야 합니다." }
+          { q: "AI훈련로드맵 컨설팅 보고서 제출 기한은 언제인가요?", a: "1차 컨설팅 진행 기준 <b><span class=\"text-danger fw-bold\">4주(28일) 이내</span></b>로 제출하셔야 합니다." },
+          { q: "PBL 과정개발 컨설팅 보고서 제출 기한은 언제인가요?", a: "1차 컨설팅 진행 기준 <b><span class=\"text-danger fw-bold\">1달 이내</span></b>로 제출하셔야 합니다." }
         ];
       }
       renderFaq();
     } catch(e) {
       console.error("FAQ 연동 실패:", e);
       FAQ_LIST = [
-        { q: "AI훈련로드맵 컨설팅 보고서 제출 기한은 언제인가요?", a: "1차 컨설팅 진행 기준 4주(28일) 이내로 제출하셔야 합니다." },
-        { q: "PBL 과정개발 컨설팅 보고서 제출 기한은 언제인가요?", a: "1차 컨설팅 진행 기준 1달 이내로 제출하셔야 합니다." }
+        { q: "AI훈련로드맵 컨설팅 보고서 제출 기한은 언제인가요?", a: "1차 컨설팅 진행 기준 <b><span class=\"text-danger fw-bold\">4주(28일) 이내</span></b>로 제출하셔야 합니다." },
+        { q: "PBL 과정개발 컨설팅 보고서 제출 기한은 언제인가요?", a: "1차 컨설팅 진행 기준 <b><span class=\"text-danger fw-bold\">1달 이내</span></b>로 제출하셔야 합니다." }
       ];
       renderFaq();
     }
   };
+
+  // 마크다운(**텍스트**, *텍스트*) 및 HTML 렌더링 헬퍼
+  function formatRichText(str) {
+    if (!str) return '';
+    let formatted = String(str);
+    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+    formatted = formatted.replace(/\*(.*?)\*/g, '<i>$1</i>');
+    return formatted;
+  }
 
   function renderFaq() {
     const container = document.getElementById('faqAccordion');
@@ -774,14 +783,14 @@
               <div class="d-flex w-100 justify-content-between align-items-center pe-3">
                 <div class="text-truncate pe-2">
                   <span class="badge bg-primary me-2">Q</span>
-                  <span class="fw-bold text-dark" style="font-size: 0.95rem;">${item.q}</span>
+                  <span class="fw-bold text-dark" style="font-size: 0.95rem;">${formatRichText(item.q)}</span>
                 </div>
               </div>
             </button>
           </h2>
           <div id="${accordionId}" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
             <div class="accordion-body bg-light" style="white-space: pre-line; line-height: 1.6; font-size: 0.9rem; border-top: 1px dashed #ced4da;">
-              <span class="badge bg-secondary me-2">A</span>${item.a}
+              <span class="badge bg-secondary me-2">A</span>${formatRichText(item.a)}
             </div>
           </div>
         </div>`;
@@ -823,7 +832,7 @@
           </h2>
           <div id="${accordionId}" class="accordion-collapse collapse" data-bs-parent="#noticeAccordion">
             <div class="accordion-body bg-light" style="white-space: pre-line; line-height: 1.6; font-size: 0.95rem; border-top: 1px dashed #ced4da;">
-              ${notice.content}
+              ${formatRichText(notice.content)}
             </div>
           </div>
         </div>`;
@@ -958,7 +967,7 @@
                         <div class="d-flex flex-column gap-2">`;
           
           html += items.map(f => {
-            let displayLabel = f.label;
+            let displayLabel = formatRichText(f.label);
             return `<div class="p-2.5 bg-light rounded-3 border d-flex align-items-center justify-content-between gap-2 mb-1" style="font-size: 0.85rem;">
                       <span class="fw-bold text-dark text-truncate" style="font-size: 0.85rem;"><i class="bi bi-file-earmark-text text-secondary me-2"></i>${displayLabel}</span>
                       <span class="badge bg-white text-secondary border px-2 py-1 flex-shrink-0" style="font-size: 0.75rem;">제출 요망</span>
@@ -973,7 +982,7 @@
         let html = `<div class="mb-3">
                       <div class="fw-bold text-muted small mb-2"><i class="bi bi-bookmark-check-fill me-1"></i>[${title}] 관련 서식</div>`;
         html += items.map(f => {
-          let displayLabel = f.label;
+          let displayLabel = formatRichText(f.label);
           const badgeClass = BADGE_STYLES[f.badge] || 'bg-apply';
           return `<a href="${f.path}" download class="btn btn-light border text-start fw-bold shadow-sm d-flex justify-content-between align-items-center mb-2" style="font-size: 0.85rem;">
                     <span><span class="badge-step ${badgeClass} me-2">${f.badge}</span>${displayLabel}</span>
