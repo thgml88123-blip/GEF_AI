@@ -756,10 +756,23 @@
     }
   };
 
-  // 마크다운(**굵게**, _기울임_) 및 HTML 렌더링 헬퍼
+  // 마크다운(**굵게**, _기울임_), HTML 및 주요 키워드 자동 하이라이트 헬퍼
   function formatRichText(str) {
     if (!str) return '';
     let formatted = String(str);
+    
+    // 1번: 별첨 및 제출 증빙 서류 키워드 자동 강조
+    formatted = formatted.replace(/\(필수\)/g, '<span class="text-danger fw-bold">(필수)</span>');
+    formatted = formatted.replace(/HRD4U증빙/g, '<b>HRD4U증빙</b>');
+    formatted = formatted.replace(/\(재직 증명서 등\)/g, '<b>(재직 증명서 등)</b>');
+    if (formatted.includes('기업HRD이음컨설팅 보고서')) {
+      formatted = formatted.replace('기업HRD이음컨설팅 보고서', '<b>기업HRD이음컨설팅 보고서</b>');
+    }
+
+    // 3번: 제출 기한 키워드 자동 강조
+    formatted = formatted.replace(/4주\(28일\) 이내/g, '<span class="text-danger fw-bold">4주(28일) 이내</span>');
+    formatted = formatted.replace(/1달 이내/g, '<span class="text-danger fw-bold">1달 이내</span>');
+
     // **굵게** -> <b>굵게</b>
     formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
     // _기울임_ -> <i>기울임</i> (단일 * 는 불릿 기호 * 로 사용되므로 _ 사용)
