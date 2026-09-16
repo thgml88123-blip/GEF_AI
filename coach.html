@@ -212,6 +212,49 @@
           <h2 class="fw-bold text-primary mb-2">코치 전용 업무 절차 및 자료실</h2>
           <p class="text-muted">컨설팅 표준 3단계 프로세스 및 필수 행정 서식을 일괄 제공합니다.</p>
         </div>
+
+        <!-- [신규 추가] 2026 경남형 AX 직무훈련 체계 배너 (landing.html 및 PDF 다운로드 연동) -->
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-5" style="background: linear-gradient(135deg, #0f172a 0%, #003366 60%, #1e3a8a 100%); color: white;">
+          <div class="card-body p-4 p-md-5">
+            <div class="row align-items-center g-4">
+              <div class="col-lg-8">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                  <span class="badge bg-warning text-dark fw-bold px-3 py-1.5 rounded-pill shadow-sm"><i class="bi bi-star-fill me-1"></i> 2026 경남형 AX 훈련 지침</span>
+                  <span class="badge bg-white bg-opacity-20 text-white px-2.5 py-1.5 rounded-pill small">GNHRD-GeAI(26v3)</span>
+                </div>
+                <h3 class="fw-bold mb-2 text-white">생성형 AI 활용 업무자동화 직무훈련 체계</h3>
+                <p class="text-white-50 mb-3" style="font-size: 0.95rem; line-height: 1.6;">
+                  현장 근로자가 코딩 없이 자기 업무를 직접 자동화하는 <strong>5대 직무 37개 표준 능력단위</strong> 및 <strong>NCS 연계 훈련과정 개발 활용 사례</strong>를 통합 안내합니다.
+                </p>
+                <div class="d-flex flex-wrap gap-2 text-white small fw-semibold">
+                  <span class="bg-white bg-opacity-10 border border-white border-opacity-25 rounded-pill px-3 py-1"><i class="bi bi-layers me-1 text-warning"></i> 5대 핵심 직무</span>
+                  <span class="bg-white bg-opacity-10 border border-white border-opacity-25 rounded-pill px-3 py-1"><i class="bi bi-grid-3x3-gap me-1 text-info"></i> 37개 표준 능력단위</span>
+                  <span class="bg-white bg-opacity-10 border border-white border-opacity-25 rounded-pill px-3 py-1"><i class="bi bi-journal-bookmark me-1 text-success"></i> NCS 연계 활용사례 탑재</span>
+                </div>
+              </div>
+              <div class="col-lg-4 text-lg-end">
+                <div class="d-grid gap-2">
+                  <!-- landing.html 연결 버튼 -->
+                  <a href="landing.html" target="_blank" class="btn btn-warning btn-lg rounded-pill fw-bold shadow px-4 py-3 text-dark">
+                    <i class="bi bi-window-sidebar me-2"></i>웹 리포트 자세히 보기
+                  </a>
+                  <!-- 자료 즉시 다운로드 드롭다운 -->
+                  <div class="dropdown">
+                    <button class="btn btn-outline-light rounded-pill w-100 py-2.5 fw-semibold dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                      <i class="bi bi-download me-1"></i> 관련 자료 다운로드
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-lg rounded-3 fs-7">
+                      <li><a class="dropdown-item py-2" href="3.AI 훈련코치/[별첨] 생성형 AI활용 업무자동화 직무훈련체계 (경남인적자원개발위원회).pdf" download><i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>[지침서] 직무훈련 체계(안) PDF</a></li>
+                      <li><a class="dropdown-item py-2" href="3.AI 훈련코치/GNHRD_GeAI_업무자동화_직무훈련체계_발표자료 _0710.pdf" download><i class="bi bi-file-earmark-slides-fill text-primary me-2"></i>[PPT] 발표자료 PDF</a></li>
+                      <li><a class="dropdown-item py-2" href="3.AI 훈련코치/(붙임)경남RSC 생성형AI 능력단위(GNHRD-GeAI_2026) 훈련과정 개발시 활용 사례_0723.pdf" download><i class="bi bi-file-earmark-excel-fill text-success me-2"></i>[사례] NCS 연계 활용사례 PDF</a></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="d-flex flex-column gap-4">
           <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
             <div class="card-body p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
@@ -469,45 +512,45 @@
   // 1. 구글 시트 웹 앱 URL (배포 후 받은 주소)
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzvApaSAT127s9G-vJ0tC92-gklDLzXdKBwCF2sV5Zt1XFEJqUy4UYyFFMq3E9rSZBH/exec";
 
-  // 기본 로컬 서식 패키지 데이터 (구글 시트 로딩 전 0초 즉시 렌더링용)
+  // 기본 로컬 서식 패키지 데이터 (구글 시트 로딩 전 0초 즉시 렌더링용 - 사용자 깃허브 경로 반영)
   let DEFAULT_FORM_PACKAGES = {
     1: {
-      zipFile: '3.AI훈련코치/AI훈련로드맵 서식/AI훈련로드맵 서식.zip',
+      zipFile: '3.AI 훈련코치/AI훈련로드맵 서식/AI훈련로드맵 서식.zip',
       files: [
         { badge: '필수', label: '도메인 전문가 증빙자료(학력/경력증명서, 자격증, HRD4U증빙 등)', path: '#' },
         { badge: '필수', label: '내부 전문가 증빙자료(재직 증명서 등)', path: '#' },
         { badge: '필수', label: '기업HRD이음컨설팅 보고서', path: '#' },
-        { badge: '신청', label: '(신청) 1-1. AI훈련로드맵 컨설팅 참여 기업 신청서', path: '3.AI훈련코치/AI훈련로드맵 서식/(신청) 1-1. AI훈련로드맵 컨설팅 참여 기업 신청서.hwp' },
-        { badge: '신청', label: '(신청) 1-2. AI훈련로드맵 컨설팅 신청서(코치매칭 후 작성)', path: '3.AI훈련코치/AI훈련로드맵 서식/(신청) 1-2. AI훈련로드맵 컨설팅 신청서(코치매칭 후 작성).hwp' },
-        { badge: '신청', label: '(신청) 2-1. AI훈련코치 컨설팅 승인 요청서(코치 작성)', path: '3.AI훈련코치/AI훈련로드맵 서식/(신청) 2-1. AI훈련코치 컨설팅 승인 요청서(코치 작성).hwp' },
-        { badge: '신청', label: '(신청) 2-2. AI훈련코치 컨설팅 팀 참여 약정서(코치 작성)', path: '3.AI훈련코치/AI훈련로드맵 서식/(신청) 2-2. AI훈련코치 컨설팅 팀 참여 약정서(코치 작성).hwp' },
-        { badge: '진행', label: '(진행) 1-1. AI훈련로드맵 기초진단표', path: '3.AI훈련코치/AI훈련로드맵 서식/(진행) 1-1. AI훈련로드맵 기초진단표.hwp' },
-        { badge: '진행', label: '(진행) 1-2. AI훈련로드맵 컨설팅일지', path: '3.AI훈련코치/AI훈련로드맵 서식/(진행) 1-2. AI훈련로드맵 컨설팅일지.hwp' },
-        { badge: '진행', label: '(진행) 1-3. AI훈련로드맵 컨설팅 출석부', path: '3.AI훈련코치/AI훈련로드맵 서식/(진행) 1-3. AI훈련로드맵 컨설팅 출석부.hwp' },
-        { badge: '진행', label: '(진행) 2-1. 컨설팅 참여 이행 및 정보 제공 활용 동의서', path: '3.AI훈련코치/AI훈련로드맵 서식/(진행) 2-1. 컨설팅 참여 이행 및 정보 제공 활용 동의서.hwp' },
-        { badge: '진행', label: '(진행) 2-2. 컨설팅 성과 창출 청렴 서약서', path: '3.AI훈련코치/AI훈련로드맵 서식/(진행) 2-2. 컨설팅 성과 창출 청렴 서약서.hwp' },
-        { badge: '진행', label: '(진행) 2-3. AI훈련로드맵 기업 확인서', path: '3.AI훈련코치/AI훈련로드맵 서식/(진행) 2-3. AI훈련로드맵 기업 확인서.hwp' },
-        { badge: '진행', label: '(진행) 2-4. AI훈련로드맵 컨설팅 보고서', path: '3.AI훈련코치/AI훈련로드맵 서식/(진행) 2-4. AI훈련로드맵 컨설팅 보고서.hwp' }
+        { badge: '신청', label: '(신청) 1-1. AI훈련로드맵 컨설팅 참여 기업 신청서', path: '3.AI 훈련코치/AI훈련로드맵 서식/(신청) 1-1. AI훈련로드맵 컨설팅 참여 기업 신청서.hwp' },
+        { badge: '신청', label: '(신청) 1-2. AI훈련로드맵 컨설팅 신청서(코치매칭 후 작성)', path: '3.AI 훈련코치/AI훈련로드맵 서식/(신청) 1-2. AI훈련로드맵 컨설팅 신청서(코치매칭 후 작성).hwp' },
+        { badge: '신청', label: '(신청) 2-1. AI훈련코치 컨설팅 승인 요청서(코치 작성)', path: '3.AI 훈련코치/AI훈련로드맵 서식/(신청) 2-1. AI훈련코치 컨설팅 승인 요청서(코치 작성).hwp' },
+        { badge: '신청', label: '(신청) 2-2. AI훈련코치 컨설팅 팀 참여 약정서(코치 작성)', path: '3.AI 훈련코치/AI훈련로드맵 서식/(신청) 2-2. AI훈련코치 컨설팅 팀 참여 약정서(코치 작성).hwp' },
+        { badge: '진행', label: '(진행) 1-1. AI훈련로드맵 기초진단표', path: '3.AI 훈련코치/AI훈련로드맵 서식/(진행) 1-1. AI훈련로드맵 기초진단표.hwp' },
+        { badge: '진행', label: '(진행) 1-2. AI훈련로드맵 컨설팅일지', path: '3.AI 훈련코치/AI훈련로드맵 서식/(진행) 1-2. AI훈련로드맵 컨설팅일지.hwp' },
+        { badge: '진행', label: '(진행) 1-3. AI훈련로드맵 컨설팅 출석부', path: '3.AI 훈련코치/AI훈련로드맵 서식/(진행) 1-3. AI훈련로드맵 컨설팅 출석부.hwp' },
+        { badge: '진행', label: '(진행) 2-1. 컨설팅 참여 이행 및 정보 제공 활용 동의서', path: '3.AI 훈련코치/AI훈련로드맵 서식/(진행) 2-1. 컨설팅 참여 이행 및 정보 제공 활용 동의서.hwp' },
+        { badge: '진행', label: '(진행) 2-2. 컨설팅 성과 창출 청렴 서약서', path: '3.AI 훈련코치/AI훈련로드맵 서식/(진행) 2-2. 컨설팅 성과 창출 청렴 서약서.hwp' },
+        { badge: '진행', label: '(진행) 2-3. AI훈련로드맵 기업 확인서', path: '3.AI 훈련코치/AI훈련로드맵 서식/(진행) 2-3. AI훈련로드맵 기업 확인서.hwp' },
+        { badge: '진행', label: '(진행) 2-4. AI훈련로드맵 컨설팅 보고서', path: '3.AI 훈련코치/AI훈련로드맵 서식/(진행) 2-4. AI훈련로드맵 컨설팅 보고서.hwp' }
       ]
     },
     2: {
-      zipFile: '3.AI훈련코치/PBL 과정 개발 서식/PBL 과정 개발 서식.zip',
+      zipFile: '3.AI 훈련코치/PBL 과정 개발 서식/PBL 과정 개발 서식.zip',
       files: [
-        { badge: '신청', label: '(신청) 1-1. 문제해결형(PBL) AI+직무 훈련 과정개발 컨설팅 신청서', path: '3.AI훈련코치/PBL 과정 개발 서식/(신청) 1-1. 문제해결형(PBL) AI+직무 훈련 과정개발 컨설팅 신청서.hwp' },
-        { badge: '신청', label: '(신청) 1-2. 문제해결형(PBL) AI+직무 훈련 참여 신청서', path: '3.AI훈련코치/PBL 과정 개발 서식/(신청) 1-2. 문제해결형(PBL) AI+직무 훈련 참여 신청서.hwp' },
-        { badge: '진행', label: '(진행) 1-1. 문제해결형(PBL) AI+직무 훈련 과정개발 컨설팅 일지', path: '3.AI훈련코치/PBL 과정 개발 서식/(진행) 1-1. 문제해결형(PBL) AI+직무 훈련 과정개발 컨설팅 일지.hwp' },
-        { badge: '진행', label: '(진행) 1-2. 문제해결형(PBL) AI+직무 훈련 실시 현황표', path: '3.AI훈련코치/PBL 과정 개발 서식/(진행) 1-2. 문제해결형(PBL) AI+직무 훈련 실시 현황표.hwp' },
-        { badge: '진행', label: '(진행) 2-1. 문제해결형(PBL) AI+직무 훈련 훈련과정 개발보고서', path: '3.AI훈련코치/PBL 과정 개발 서식/(진행) 2-1. 문제해결형(PBL) AI+직무 훈련 훈련과정 개발보고서.hwp' },
-        { badge: '진행', label: '(진행) 2-2. 문제해결형(PBL) AI+직무 훈련 훈련교재(안)', path: '3.AI훈련코치/PBL 과정 개발 서식/(진행) 2-2. 문제해결형(PBL) AI+직무 훈련 훈련교재(안).hwp' },
-        { badge: '진행', label: '(진행) 2-3. 문제해결형(PBL) AI+직무 훈련 훈련과정 개발 검토서', path: '3.AI훈련코치/PBL 과정 개발 서식/(진행) 2-3. 문제해결형(PBL) AI+직무 훈련 훈련과정 개발 검토서.hwp' },
-        { badge: '진행', label: '(진행) 2-4. 문제해결형(PBL) AI+직무 훈련 시간표', path: '3.AI훈련코치/PBL 과정 개발 서식/(진행) 2-4. 문제해결형(PBL) AI+직무 훈련 시간표.hwp' }
+        { badge: '신청', label: '(신청) 1-1. 문제해결형(PBL) AI+직무 훈련 과정개발 컨설팅 신청서', path: '3.AI 훈련코치/PBL 과정 개발 서식/(신청) 1-1. 문제해결형(PBL) AI+직무 훈련 과정개발 컨설팅 신청서.hwp' },
+        { badge: '신청', label: '(신청) 1-2. 문제해결형(PBL) AI+직무 훈련 참여 신청서', path: '3.AI 훈련코치/PBL 과정 개발 서식/(신청) 1-2. 문제해결형(PBL) AI+직무 훈련 참여 신청서.hwp' },
+        { badge: '진행', label: '(진행) 1-1. 문제해결형(PBL) AI+직무 훈련 과정개발 컨설팅 일지', path: '3.AI 훈련코치/PBL 과정 개발 서식/(진행) 1-1. 문제해결형(PBL) AI+직무 훈련 과정개발 컨설팅 일지.hwp' },
+        { badge: '진행', label: '(진행) 1-2. 문제해결형(PBL) AI+직무 훈련 실시 현황표', path: '3.AI 훈련코치/PBL 과정 개발 서식/(진행) 1-2. 문제해결형(PBL) AI+직무 훈련 실시 현황표.hwp' },
+        { badge: '진행', label: '(진행) 2-1. 문제해결형(PBL) AI+직무 훈련 훈련과정 개발보고서', path: '3.AI 훈련코치/PBL 과정 개발 서식/(진행) 2-1. 문제해결형(PBL) AI+직무 훈련 훈련과정 개발보고서.hwp' },
+        { badge: '진행', label: '(진행) 2-2. 문제해결형(PBL) AI+직무 훈련 훈련교재(안)', path: '3.AI 훈련코치/PBL 과정 개발 서식/(진행) 2-2. 문제해결형(PBL) AI+직무 훈련 훈련교재(안).hwp' },
+        { badge: '진행', label: '(진행) 2-3. 문제해결형(PBL) AI+직무 훈련 훈련과정 개발 검토서', path: '3.AI 훈련코치/PBL 과정 개발 서식/(진행) 2-3. 문제해결형(PBL) AI+직무 훈련 훈련과정 개발 검토서.hwp' },
+        { badge: '진행', label: '(진행) 2-4. 문제해결형(PBL) AI+직무 훈련 시간표', path: '3.AI 훈련코치/PBL 과정 개발 서식/(진행) 2-4. 문제해결형(PBL) AI+직무 훈련 시간표.hwp' }
       ]
     },
     3: {
-      zipFile: '3.AI훈련코치/PBL 훈련 서식/PBL 서식.zip',
+      zipFile: '3.AI 훈련코치/PBL 훈련 서식/PBL 서식.zip',
       files: [
-        { badge: '진행', label: '(진행) 1-1. PBL 훈련 실시 일지', path: '3.AI훈련코치/PBL 훈련 서식/(진행) 1-1. PBL 훈련 실시 일지.hwp' },
-        { badge: '진행', label: '(진행) 1-2. PBL 훈련 출석부 및 수료보고서', path: '3.AI훈련코치/PBL 훈련 서식/(진행) 1-2. PBL 훈련 출석부 및 수료보고서.hwp' }
+        { badge: '진행', label: '(진행) 1-1. PBL 훈련 실시 일지', path: '3.AI 훈련코치/PBL 훈련 서식/(진행) 1-1. PBL 훈련 실시 일지.hwp' },
+        { badge: '진행', label: '(진행) 1-2. PBL 훈련 출석부 및 수료보고서', path: '3.AI 훈련코치/PBL 훈련 서식/(진행) 1-2. PBL 훈련 출석부 및 수료보고서.hwp' }
       ]
     }
   };
@@ -517,7 +560,7 @@
   let FAQ_LIST = [];
   let QNA_LIST = [];
 
-  // 구글 시트 셀 값을 안전하게 추출하는 헬퍼 함수 (숫자/날짜 변환 및 null 처리)
+  // 구글 시트 셀 값을 안전하게 추출하는 헬퍼 함수
   function getCellValue(cell) {
     if (!cell) return '';
     const val = cell.f !== undefined ? cell.f : cell.v;
@@ -540,7 +583,7 @@
       const rows = data.table.rows;
       QNA_LIST = [];
       rows.forEach((row, idx) => {
-        if(idx === 0) return; // 무조건 첫 번째 줄(헤더) 무시
+        if(idx === 0) return;
         if(!row || !row.c || !row.c[0] || !row.c[0].v) return;
         const question = row.c[0].v;
         const answer = row.c[1] && row.c[1].v ? row.c[1].v : '';
@@ -656,7 +699,7 @@
       const rows = data.table.rows;
       NOTICES = [];
       rows.forEach((row, idx) => {
-        if(idx === 0) return; // 헤더 무시
+        if(idx === 0) return;
         if(!row || !row.c || !row.c[0] || !row.c[0].v) return;
         
         const title = String(row.c[0].v).trim();
@@ -688,7 +731,7 @@
       const rows = data.table.rows;
       FAQ_LIST = [];
       rows.forEach((row, idx) => {
-        if(idx === 0) return; // 헤더 무시
+        if(idx === 0) return;
         if(!row || !row.c || !row.c[0] || !row.c[0].v) return;
         const q = String(row.c[0].v).trim();
         const a = row.c[1] && row.c[1].v ? String(row.c[1].v).trim() : '';
@@ -803,9 +846,9 @@
     try {
       const rows = data.table.rows;
       let packageMap = {
-        1: { zipFile: '3.AI훈련코치/AI훈련로드맵 서식/AI훈련로드맵 서식.zip', files: [] },
-        2: { zipFile: '3.AI훈련코치/PBL 과정 개발 서식/PBL 과정 개발 서식.zip', files: [] },
-        3: { zipFile: '3.AI훈련코치/PBL 훈련 서식/PBL 서식.zip', files: [] }
+        1: { zipFile: '3.AI 훈련코치/AI훈련로드맵 서식/AI훈련로드맵 서식.zip', files: [] },
+        2: { zipFile: '3.AI 훈련코치/PBL 과정 개발 서식/PBL 과정 개발 서식.zip', files: [] },
+        3: { zipFile: '3.AI 훈련코치/PBL 훈련 서식/PBL 서식.zip', files: [] }
       };
       
       rows.forEach(row => {
@@ -997,7 +1040,7 @@
     }
   }
 
-  // 2. 로그인 처리 (신규 시트 연동 및 날짜/숫자 변환 예방 안전 처리)
+  // 2. 로그인 처리
   async function checkSecureLogin() {
     const id = document.getElementById('userName').value.trim();
     const pw = document.getElementById('userPw').value.trim();
@@ -1016,7 +1059,6 @@
     loginBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>인증 중...`;
     loginBtn.disabled = true;
 
-    // ★ [요청 사항 반영] 신규 부여된 회원가입/코치 관리용 구글 시트 ID
     const SHEET_ID = '1o7s-sHaJCGgzoXPzCpIe3cRxOsbukx-s7YYE_7SyZV0';
     const cb = 'loginCb_' + new Date().getTime();
     const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=responseHandler:${cb}&sheet=db`;
@@ -1027,14 +1069,12 @@
         let coachName = id;
         const rows = data.table.rows;
         
-        // 유저 입력 비번 및 시트 비번에서 하이픈, 공백 제거 후 비교
         const inputPwClean = pw.replace(/[^0-9a-zA-Z]/g, '');
 
         for (let i = 1; i < rows.length; i++) {
           const row = rows[i];
           if (!row || !row.c) continue;
           
-          // getCellValue() 헬퍼 함수를 통한 안전한 텍스트 추출
           const sheetId = getCellValue(row.c[0]);
           let sheetPw = getCellValue(row.c[1]);
           sheetPwClean = sheetPw.replace(/[^0-9a-zA-Z]/g, '');
