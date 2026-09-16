@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>2026 경남형 AX 직무훈련 체계 웹 리포트 | 중소기업 AI훈련 확산센터</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <meta name="description" content="생성형 AI 활용 업무자동화 직무훈련 체계 - 웹 리포트 뷰어">
+  <meta name="description" content="생성형 AI 활용 업무자동화 직무훈련 체계 - 5대 핵심 직무 및 37개 표준 능력단위 상세 안내">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
@@ -30,43 +30,129 @@
       padding: 60px 0 50px;
       border-radius: 0 0 35px 35px;
     }
-
-    /* PDF 뷰어 컨테이너 스타일 */
-    .pdf-viewer-card {
-      background: #ffffff;
-      border-radius: 20px;
+    
+    .card-feature {
       border: 1px solid #e2e8f0;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-      overflow: hidden;
+      border-radius: 16px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      background: white;
+    }
+    .card-feature:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.06);
     }
 
-    .pdf-frame {
-      width: 100%;
-      height: 820px;
-      border: none;
+    .job-card {
+      border-left: 4px solid var(--primary);
+      border-radius: 12px;
+      background: white;
     }
 
-    @media (max-width: 768px) {
-      .pdf-frame {
-        height: 550px;
-      }
+    /* ============================================================
+       스크롤형 발표자료 뷰어 (PDF 스크롤 뷰어)
+       - 파일 경로는 아래 <script>의 DECK_PDF / DECK_IMG 두 상수만 고치면 됩니다.
+       ============================================================ */
+    .deck-section { background: #fff; border-top: 1px solid #e2e8f0; }
+
+    /* 상단 고정 진행 바 */
+    .deck-bar {
+      position: sticky; top: 0; z-index: 40;
+      background: rgba(248,249,250,.94);
+      -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .deck-bar-inner { display: flex; align-items: center; gap: 14px; padding: 10px 0; }
+    .deck-num {
+      flex: none; font-weight: 800; font-size: 14px; color: var(--primary);
+      font-variant-numeric: tabular-nums; letter-spacing: -.01em;
+    }
+    .deck-num span { color: #94a3b8; font-weight: 600; }
+    .deck-track {
+      flex: 1 1 auto; height: 3px; border-radius: 999px; background: #e2e8f0; overflow: hidden;
+    }
+    .deck-fill {
+      height: 100%; width: 0; border-radius: 999px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      transition: width .15s linear;
+    }
+    .deck-now {
+      flex: none; max-width: 42%; color: #64748b; font-size: 13px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* 슬라이드 카드 */
+    .deck-list { display: flex; flex-direction: column; gap: 30px; }
+    .deck-card { margin: 0; opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+    .deck-card.is-in { opacity: 1; transform: none; }
+
+    .deck-shot {
+      display: block; position: relative; width: 100%; padding: 0;
+      border: 1px solid #e2e8f0; border-radius: 14px; overflow: hidden;
+      background: #fff; cursor: zoom-in; aspect-ratio: 16 / 9;
+      box-shadow: 0 10px 26px rgba(15,23,42,.07);
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    }
+    .deck-shot:hover { transform: translateY(-3px); box-shadow: 0 18px 36px rgba(0,51,102,.16); border-color: var(--primary); }
+    .deck-shot:focus-visible { outline: 3px solid rgba(32,201,151,.65); outline-offset: 3px; }
+    .deck-shot img,
+    .deck-shot canvas { display: block; width: 100%; height: 100%; object-fit: contain; background: #fff; }
+    .deck-shot.is-loading::before {
+      content: "페이지 불러오는 중…"; position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; color: #94a3b8; background: #f8fafc;
+    }
+    .deck-zoom {
+      position: absolute; right: 12px; bottom: 12px;
+      font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+      color: #fff; background: rgba(15,23,42,.78); border-radius: 999px; padding: 5px 11px;
+      opacity: 0; transform: translateY(6px); transition: opacity .25s ease, transform .25s ease;
+      pointer-events: none;
+    }
+    .deck-shot:hover .deck-zoom, .deck-shot:focus-visible .deck-zoom { opacity: 1; transform: none; }
+
+    .deck-card figcaption {
+      display: flex; align-items: baseline; gap: 12px; margin-top: 12px;
+      font-size: 14px; color: #64748b;
+    }
+    .deck-card figcaption b {
+      flex: none; font-size: 11.5px; font-weight: 700; letter-spacing: .04em;
+      color: var(--primary); background: #eff6ff; border: 1px solid #dbeafe;
+      border-radius: 6px; padding: 3px 8px;
+    }
+    .deck-card figcaption strong { color: #0f172a; font-weight: 700; }
+    .deck-card.is-pdf figcaption b { color: #0f766e; background: #ecfdf5; border-color: #ccfbf1; }
+
+    /* 확대 보기(모달) */
+    #deckModal .modal-body { background: #0f172a; min-height: 55vh; }
+    #deckModal img, #deckModal canvas {
+      max-width: 100%; height: auto; border-radius: 8px; background: #fff;
+    }
+    #deckModal .deck-modal-nav {
+      width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
+      border: 1px solid rgba(255,255,255,.35); color: #fff; background: rgba(255,255,255,.08);
+      transition: background .2s ease, border-color .2s ease;
+    }
+    #deckModal .deck-modal-nav:hover { background: rgba(32,201,151,.25); border-color: var(--accent); }
+
+    @media (max-width: 575.98px) {
+      .deck-now { display: none; }
+      .deck-list { gap: 22px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .deck-card { opacity: 1; transform: none; transition: none; }
+      .deck-fill { transition: none; }
     }
   </style>
 </head>
 <body>
 
-  <!-- 상단 헤더 / 네비게이션 (요청사항대로 유지) -->
+  <!-- 상단 헤더 / 네비게이션 -->
   <header class="hero-banner shadow-sm">
     <div class="container">
       <div class="d-flex justify-content-between align-items-center mb-4">
-        <div class="d-flex align-items-center gap-2">
-          <span class="badge bg-warning text-dark fw-bold px-3 py-2 rounded-pill shadow-sm">
-            <i class="bi bi-star-fill me-1"></i> 2026 경남형 AX 훈련 지침
-          </span>
-          <span class="badge bg-white text-dark fw-bold px-3 py-2 rounded-pill shadow-sm">
-            경남RSC
-          </span>
-        </div>
+        <span class="badge bg-warning text-dark fw-bold px-3 py-2 rounded-pill shadow-sm">
+          <i class="bi bi-star-fill me-1"></i> 2026 경남형 AX 훈련 지침
+        </span>
         <button onclick="window.close()" class="btn btn-sm btn-outline-light rounded-pill px-3">
           <i class="bi bi-x-lg me-1"></i> 닫기
         </button>
@@ -92,19 +178,24 @@
               <i class="bi bi-journal-bookmark text-success me-1"></i> NCS 연계 활용사례
             </span>
           </div>
+          <div class="mt-4">
+            <a href="#deckViewer" class="btn btn-light rounded-pill fw-bold px-4">
+              <i class="bi bi-arrows-vertical me-1 text-primary"></i> 발표자료 스크롤로 보기 (19페이지)
+            </a>
+          </div>
         </div>
 
         <div class="col-lg-4 mt-4 mt-lg-0 text-lg-end">
           <div class="card border-0 bg-white bg-opacity-10 backdrop-blur p-4 rounded-4 border border-white border-opacity-25">
             <h6 class="fw-bold text-white mb-3"><i class="bi bi-download me-1"></i> 관련 원본 서식 다운로드</h6>
             <div class="d-grid gap-2">
-              <a href="3.AI%20%ED%9B%8D%EB%A0%AC%EC%BD%94%EC%B9%98/%5B%EB%B3%84%EC%B2%A4%5D%20%EC%83%8D%EC%84%B1%ED%98%95%20AI%ED%99%9C%EC%9A%A9%20%EC%97%85%EB%AC%B4%EC%9E%90%EB%8F%99%ED%99%94%20%EC%A7%81%EB%AC%B4%ED%9B%8D%EB%A0%AC%EC%B2%B4%EA%B3%84%20(%EA%B2%BD%EB%8B%99%EC%9D%B8%EC%A0%81%EC%9E%90%EC%9B%90%EA%B0%9C%EB%B0%9C%EC%9C%84%EC%9B%90%ED%9A%8C).pdf" download="[별첨] 생성형 AI활용 업무자동화 직무훈련체계 (경남인적자원개발위원회).pdf" class="btn btn-light btn-sm rounded-pill fw-semibold text-start px-3 py-2">
+              <a href="3.AI 훈련코치/[별첨] 생성형 AI활용 업무자동화 직무훈련체계 (경남인적자원개발위원회).pdf" download class="btn btn-light btn-sm rounded-pill fw-semibold text-start px-3 py-2">
                 <i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>[지침서] 직무훈련 체계(안)
               </a>
-              <a href="3.AI%20%ED%9B%8D%EB%A0%AC%EC%BD%94%EC%B9%98/GNHRD_GeAI_%EC%97%85%EB%AC%B4%EC%9E%90%EB%8F%99%ED%99%94_%EC%A7%81%EB%AC%B4%ED%9B%8D%EB%A0%AC%EC%B2%B4%EA%B3%84_%EB%B0%9C%ED%91%9C%EC%9E%90%EB%A3%8C%20_0710.pdf" download="GNHRD_GeAI_업무자동화_직무훈련체계_발표자료 _0710.pdf" class="btn btn-light btn-sm rounded-pill fw-semibold text-start px-3 py-2">
+              <a href="3.AI 훈련코치/GNHRD_GeAI_업무자동화_직무훈련체계_발표자료 _0710.pdf" download class="btn btn-light btn-sm rounded-pill fw-semibold text-start px-3 py-2">
                 <i class="bi bi-file-earmark-slides-fill text-primary me-2"></i>[PPT] 발표자료 PDF
               </a>
-              <a href="3.AI%20%ED%9B%8D%EB%A0%AC%EC%BD%94%EC%B9%98/(%EB%B6%99%EC%9E%84)%EA%B2%BD%EB%8B%99RSC%20%EC%83%8D%EC%84%B1%ED%98%95AI%20%EB%8A%A5%EB%A0%A5%EB%8B%A8%EC%9C%84(GNHRD-GeAI_2026)%20%ED%9B%8D%EB%A0%AC%EA%B3%BC%EC%A0%95%20%EA%B0%9C%EB%B0%9C%EC%8B%9C%20%ED%99%9C%EC%9A%A9%20%EC%82%AC%EB%A1%80_0723.pdf" download="(붙임)경남RSC 생성형AI 능력단위(GNHRD-GeAI_2026) 훈련과정 개발시 활용 사례_0723.pdf" class="btn btn-light btn-sm rounded-pill fw-semibold text-start px-3 py-2">
+              <a href="3.AI 훈련코치/(붙임)경남RSC 생성형AI 능력단위(GNHRD-GeAI_2026) 훈련과정 개발시 활용 사례_0723.pdf" download class="btn btn-light btn-sm rounded-pill fw-semibold text-start px-3 py-2">
                 <i class="bi bi-file-earmark-excel-fill text-success me-2"></i>[사례] NCS 연계 활용사례
               </a>
             </div>
@@ -114,25 +205,213 @@
     </div>
   </header>
 
-  <!-- 본문 컨텐츠 (PDF 스크롤 뷰어로 변경) -->
+  <!-- 본문 컨텐츠 -->
   <main class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h4 class="fw-bold text-dark mb-0 border-start border-4 border-primary ps-3">
-        📄 생성형 AI 활용 업무자동화 직무훈련 체계 발표자료
-      </h4>
-      <a href="3.AI%20%ED%9B%8D%EB%A0%AC%EC%BD%94%EC%B9%98/GNHRD_GeAI_%EC%97%85%EB%AC%B4%EC%9E%90%EB%8F%99%ED%99%94_%EC%A7%81%EB%AC%B4%ED%9B%8D%EB%A0%AC%EC%B2%B4%EA%B3%84_%EB%B0%9C%ED%91%9C%EC%9E%90%EB%A3%8C%20_0710.pdf" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold">
-        <i class="bi bi-box-arrow-up-right me-1"></i> 새 창으로 열기
-      </a>
-    </div>
 
-    <!-- PDF 스크롤 뷰어 카드 -->
-    <div class="pdf-viewer-card">
-      <embed 
-        src="3.AI%20%ED%9B%8D%EB%A0%AC%EC%BD%94%EC%B9%98/GNHRD_GeAI_%EC%97%85%EB%AC%B4%EC%9E%90%EB%8F%99%ED%99%94_%EC%A7%81%EB%AC%B4%ED%9B%8D%EB%A0%AC%EC%B2%B4%EA%B3%84_%EB%B0%9C%ED%91%9C%EC%9E%90%EB%A3%8C%20_0710.pdf#toolbar=1&navpanes=0&scrollbar=1" 
-        type="application/pdf" 
-        class="pdf-frame">
-    </div>
+    <!-- 1. 핵심 개요 -->
+    <section class="mb-5">
+      <h3 class="fw-bold text-dark mb-4 border-start border-4 border-primary ps-3">
+        1. 추진 배경 및 직무훈련 체계 개요
+      </h3>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="card-feature p-4 h-100">
+            <div class="text-primary fs-3 mb-2"><i class="bi bi-lightning-charge-fill"></i></div>
+            <h5 class="fw-bold text-dark">노코드 기반 실무 자동화</h5>
+            <p class="text-muted small mb-0">
+              복잡한 코딩 지식 없이 현장 재직자가 생성형 AI를 활용하여 직접 업무 프로세스를 자동화하고 웹 대시보드를 구축합니다.
+            </p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card-feature p-4 h-100">
+            <div class="text-success fs-3 mb-2"><i class="bi bi-diagram-3-fill"></i></div>
+            <h5 class="fw-bold text-dark">5대 직무 37개 능력단위</h5>
+            <p class="text-muted small mb-0">
+              생산관리, 품질관리, 경영지원, 영업/마케팅, R&D/설계 등 중소기업 주요 5대 분야별 표준 능력단위를 체계화했습니다.
+            </p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card-feature p-4 h-100">
+            <div class="text-warning fs-3 mb-2"><i class="bi bi-award-fill"></i></div>
+            <h5 class="fw-bold text-dark">NCS 연계 및 실효성 확보</h5>
+            <p class="text-muted small mb-0">
+              기존 국가직무능력표준(NCS) 및 사업주 훈련과정 개발 기준과 매핑하여 공식적이고 검증된 과정 설계를 지원합니다.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. 5대 핵심 직무 체계 -->
+    <section class="mb-5">
+      <h3 class="fw-bold text-dark mb-4 border-start border-4 border-primary ps-3">
+        2. 5대 핵심 직무별 능력단위 구성
+      </h3>
+      
+      <div class="row g-3">
+        <!-- 생산/공정관리 -->
+        <div class="col-md-6 col-lg-4">
+          <div class="job-card p-4 shadow-sm h-100 border">
+            <div class="d-flex align-items-center mb-3">
+              <span class="badge bg-primary rounded-circle p-2 me-2"><i class="bi bi-gear-fill"></i></span>
+              <h5 class="fw-bold text-dark mb-0">생산 / 공정관리</h5>
+            </div>
+            <ul class="small text-muted ps-3 mb-0">
+              <li class="mb-1">생산 데이터 집계 및 AI 대시보드 구축</li>
+              <li class="mb-1">공정 병목 구간 분석 프롬프트 설계</li>
+              <li class="mb-1">재고 불일치 자동 감지 및 일지 작성</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 품질관리 -->
+        <div class="col-md-6 col-lg-4">
+          <div class="job-card p-4 shadow-sm h-100 border" style="border-left-color: #20c997 !important;">
+            <div class="d-flex align-items-center mb-3">
+              <span class="badge bg-success rounded-circle p-2 me-2"><i class="bi bi-check-circle-fill"></i></span>
+              <h5 class="fw-bold text-dark mb-0">품질관리 (QC / QA)</h5>
+            </div>
+            <ul class="small text-muted ps-3 mb-0">
+              <li class="mb-1">불량 유형별 AI 이미지/데이터 분류</li>
+              <li class="mb-1">검사 결과 리포트 자동 생성</li>
+              <li class="mb-1">품질 이상 발생 알람 웹보드 제작</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 경영지원 / HR -->
+        <div class="col-md-6 col-lg-4">
+          <div class="job-card p-4 shadow-sm h-100 border" style="border-left-color: #fd7e14 !important;">
+            <div class="d-flex align-items-center mb-3">
+              <span class="badge bg-warning text-dark rounded-circle p-2 me-2"><i class="bi bi-building-fill"></i></span>
+              <h5 class="fw-bold text-dark mb-0">경영지원 / HR / 총무</h5>
+            </div>
+            <ul class="small text-muted ps-3 mb-0">
+              <li class="mb-1">근태 및 급여 집계 서식 자동화</li>
+              <li class="mb-1">AI 활용 사내 규정 Q&A 봇 설계</li>
+              <li class="mb-1">각종 월간 보고서 원클릭 PDF 출력</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 마케팅 / 영업 -->
+        <div class="col-md-6 col-lg-4">
+          <div class="job-card p-4 shadow-sm h-100 border" style="border-left-color: #0d6efd !important;">
+            <div class="d-flex align-items-center mb-3">
+              <span class="badge bg-primary rounded-circle p-2 me-2"><i class="bi bi-graph-up-arrow"></i></span>
+              <h5 class="fw-bold text-dark mb-0">영업 / 마케팅</h5>
+            </div>
+            <ul class="small text-muted ps-3 mb-0">
+              <li class="mb-1">고객 요청서 분석 및 견적 자동 작성</li>
+              <li class="mb-1">매출 현황 실시간 파이프라인 시각화</li>
+              <li class="mb-1">타겟 고객군 AI 기반 시장 조사</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- R&D / 설계 -->
+        <div class="col-md-6 col-lg-4">
+          <div class="job-card p-4 shadow-sm h-100 border" style="border-left-color: #6f42c1 !important;">
+            <div class="d-flex align-items-center mb-3">
+              <span class="badge bg-secondary rounded-circle p-2 me-2"><i class="bi bi-cpu-fill"></i></span>
+              <h5 class="fw-bold text-dark mb-0">연구개발 / 설계</h5>
+            </div>
+            <ul class="small text-muted ps-3 mb-0">
+              <li class="mb-1">특허 및 연구 문헌 AI 자동 요약</li>
+              <li class="mb-1">설계 변경 이력 자동 트래킹 관리</li>
+              <li class="mb-1">연구 일지 및 실험 결과 보고서 생성</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 코칭 활용 팁 -->
+        <div class="col-md-6 col-lg-4">
+          <div class="p-4 rounded-4 bg-primary text-white h-100 d-flex flex-column justify-content-center">
+            <h6 class="fw-bold text-warning mb-2"><i class="bi bi-lightbulb-fill me-1"></i> 코칭 활용 Tip</h6>
+            <p class="small mb-0 opacity-90">
+              컨설팅 수행 시 대상 기업의 특성에 맞는 1~2개 핵심 직무를 타겟팅하여 맞춤형 PBL AI+ 직무 훈련과정을 유연하게 구성할 수 있습니다.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
+
+  <!-- ============================================================
+       3. 스크롤형 발표자료 뷰어
+       ============================================================ -->
+  <section class="deck-section py-5" id="deckViewer">
+    <div class="container">
+      <div class="row align-items-end g-3 mb-4">
+        <div class="col-lg-8">
+          <span class="badge rounded-pill text-bg-primary mb-2 px-3 py-2">발표자료 전문 · 스크롤 뷰어</span>
+          <h3 class="fw-bold text-dark mb-2 border-start border-4 border-primary ps-3">
+            3. 발표자료 스크롤로 보기
+          </h3>
+          <p class="text-muted mb-0">
+            별도 뷰어 설치 없이 19페이지가 세로로 이어서 펼쳐집니다. 페이지를 클릭하면 확대되고,
+            확대 화면에서 방향키(←/→)로 페이지를 넘길 수 있습니다.
+          </p>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+          <a href="3.AI 훈련코치/GNHRD_GeAI_업무자동화_직무훈련체계_발표자료 _0710.pdf" download
+             class="btn btn-outline-primary rounded-pill px-4">
+            <i class="bi bi-file-earmark-arrow-down me-1"></i> 원본 PDF 내려받기
+          </a>
+        </div>
+      </div>
+
+      <!-- 상단 고정 진행 바 -->
+      <div class="deck-bar">
+        <div class="deck-bar-inner">
+          <span class="deck-num"><b id="deckNum">01</b> <span>/ 19</span></span>
+          <div class="deck-track"><div class="deck-fill" id="deckFill"></div></div>
+          <span class="deck-now" id="deckNow">표지 — 경남 생성형 AI 활용 직무훈련 체계</span>
+        </div>
+      </div>
+
+      <!-- 슬라이드 목록 (스크립트가 자동 생성) -->
+      <div class="deck-list mt-4" id="deckList" aria-live="polite"></div>
+
+      <p class="text-center text-muted small mt-5 mb-0">
+        <i class="bi bi-info-circle me-1"></i>
+        원본 파일과 동일한 순서(1~19페이지)로 이어지며, 마지막 페이지까지 모두 포함되어 있습니다.
+      </p>
+    </div>
+  </section>
+
+  <!-- 확대 보기 모달 -->
+  <div class="modal fade" id="deckModal" tabindex="-1" aria-labelledby="deckModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fs-6" id="deckModalLabel">
+            <span class="fw-bold text-primary" id="deckModalNum">01</span> / 19
+            <span class="text-muted ms-2" id="deckModalTitle"></span>
+          </h5>
+          <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill" id="deckPrev" aria-label="이전 페이지">
+              <i class="bi bi-chevron-left"></i>
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill" id="deckNext" aria-label="다음 페이지">
+              <i class="bi bi-chevron-right"></i>
+            </button>
+            <button type="button" class="btn-close ms-2" data-bs-dismiss="modal" aria-label="닫기"></button>
+          </div>
+        </div>
+        <div class="modal-body text-center">
+          <div id="deckModalLoading" class="text-white-50 small py-5">페이지 불러오는 중…</div>
+          <img id="deckModalImg" class="d-none" alt="">
+          <canvas id="deckModalCanvas" class="d-none"></canvas>
+        </div>
+        <div class="modal-footer py-2">
+          <span class="text-muted small" id="deckModalCap"></span>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <footer class="bg-white border-top py-4 text-center text-muted small">
     <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
@@ -145,5 +424,227 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+/* ==========================================================
+   스크롤형 발표자료 뷰어
+   ──────────────────────────────────────────────────────────
+   ▶ 파일 경로 설정 (아래 두 줄만 수정)
+     DECK_PDF : 발표자료 PDF 경로 (확대 보기·폴백 렌더링에 사용)
+     DECK_IMG : 슬라이드 이미지 폴더 (없으면 자동으로 PDF 렌더링으로 전환)
+   ========================================================== */
+var DECK_PDF = '3.AI 훈련코치/GNHRD_GeAI_업무자동화_직무훈련체계_발표자료 _0710.pdf';
+var DECK_IMG = '3.AI 훈련코치/slides/';          // pg-01.webp ~ pg-19.webp
+var DECK_IMG_EXT = 'webp';                       // webp / jpg / png
+
+/* 페이지별 실제 슬라이드 제목 (순서 고정) */
+var DECK_PAGES = [
+  ["표지",             "경남 생성형 AI 활용 직무훈련 체계"],
+  ["1. 구축배경",      "왜 지금, 경남형 AX 직무훈련인가"],
+  ["1. 구축배경",      "기존 훈련체계의 공백과 현장 요구"],
+  ["1. 구축배경",      "현장 문제에서 출발한 훈련설계"],
+  ["2. 훈련이수체계",  "설계원칙: 쉬움·안전·실무·성장"],
+  ["2. 주요내용",      "전체 구조: 5대 직무 × 3수준 × 37개 능력단위"],
+  ["2. 훈련이수체계",  "이수경로: 사전진단 → PBL → PoC"],
+  ["3. 능력단위",      "능력단위 체계도 ① 공통·사무·품질"],
+  ["3. 능력단위",      "능력단위 체계도 ② 설계·마케팅·설비"],
+  ["3. 공통 리터러시", "초급 공통: 안전한 AI 업무 기반"],
+  ["3. 중급 실무활용", "중급 실무: 부서 자동화 산출물"],
+  ["3. 고급 현장문제해결", "고급 PoC: 현장 실데이터 연계"],
+  ["3. 수준별 산출물규격", "산출물 중심 이수 기준"],
+  ["공공기관·컨설턴트 활용안", "컨설팅 적용 모델"],
+  ["6. 결론 및 제언",  "운영 보완 방향"],
+  ["6. 향후 보완방향", "보완방향 ①: PBL + HITL 내재화"],
+  ["6. 향후 보완방향", "보완방향 ②: 동적 갱신 + 오픈 프레임워크"],
+  ["기대효과",         "데이터 지식노동자로의 전환"],
+  ["마무리",           "감사합니다"]
+];
+
+(function () {
+  var TOTAL = DECK_PAGES.length;
+  var list    = document.getElementById('deckList');
+  var numEl   = document.getElementById('deckNum');
+  var fillEl  = document.getElementById('deckFill');
+  var nowEl   = document.getElementById('deckNow');
+  var cards   = [];
+
+  /* ---------- 1) 카드 생성 ---------- */
+  var html = '';
+  for (var i = 0; i < TOTAL; i++) {
+    var no = ('0' + (i + 1)).slice(-2);
+    var kicker = DECK_PAGES[i][0], title = DECK_PAGES[i][1];
+    var alt = '발표자료 ' + (i + 1) + '페이지 — ' + title;
+    html +=
+      '<figure class="deck-card" id="deck-p' + no + '">' +
+        '<button class="deck-shot" type="button" data-index="' + i + '" aria-label="' + no + '페이지 확대 보기: ' + title + '">' +
+          '<img src="' + DECK_IMG + 'pg-' + no + '.' + DECK_IMG_EXT + '" alt="' + alt + '" loading="lazy" decoding="async" data-title="' + title + '">' +
+          '<span class="deck-zoom">확대</span>' +
+        '</button>' +
+        '<figcaption><b>P.' + no + '</b><span><strong>' + kicker + '</strong> — ' + title + '</span></figcaption>' +
+      '</figure>';
+  }
+  list.innerHTML = html;
+  cards = Array.prototype.slice.call(list.querySelectorAll('.deck-card'));
+
+  /* ---------- 2) PDF.js 지연 로딩 (이미지가 없을 때만) ---------- */
+  var pdfDoc = null, pdfPromise = null;
+  function loadPdf() {
+    if (pdfPromise) return pdfPromise;
+    pdfPromise = new Promise(function (resolve, reject) {
+      var s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+      s.onload = function () {
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+          'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        window.pdfjsLib.getDocument(decodeURI(encodeURI(DECK_PDF))).promise.then(function (doc) {
+          pdfDoc = doc; resolve(doc);
+        }).catch(reject);
+      };
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+    return pdfPromise;
+  }
+  /* 카드 폭에 맞춰 캔버스에 페이지를 그림 */
+  function paintPage(index, holder, maxWidth) {
+    return loadPdf().then(function (doc) {
+      return doc.getPage(index + 1);
+    }).then(function (page) {
+      var base = page.getViewport({ scale: 1 });
+      var dpr = Math.min(2, window.devicePixelRatio || 1);
+      var target = maxWidth || holder.clientWidth || 960;
+      var viewport = page.getViewport({ scale: (target * dpr) / base.width });
+      var canvas = document.createElement('canvas');
+      canvas.width = Math.floor(viewport.width);
+      canvas.height = Math.floor(viewport.height);
+      canvas.setAttribute('role', 'img');
+      canvas.setAttribute('aria-label', '발표자료 ' + (index + 1) + '페이지');
+      var ctx = canvas.getContext('2d');
+      return page.render({ canvasContext: ctx, viewport: viewport }).promise.then(function () {
+        return canvas;
+      });
+    });
+  }
+  function fallbackToPdf(card, img) {
+    var index = parseInt(card.querySelector('.deck-shot').getAttribute('data-index'), 10);
+    card.classList.add('is-pdf');
+    var holder = card.querySelector('.deck-shot');
+    holder.classList.add('is-loading');
+    paintPage(index, holder, holder.clientWidth).then(function (canvas) {
+      holder.classList.remove('is-loading');
+      img.replaceWith(canvas);
+      canvas.setAttribute('data-title', img.getAttribute('data-title') || '');
+      card.dataset.rendered = 'pdf';
+    }).catch(function () {
+      holder.classList.remove('is-loading');
+      img.alt = '페이지를 불러오지 못했습니다 — PDF를 확인해 주세요';
+    });
+  }
+  list.querySelectorAll('img').forEach(function (img) {
+    img.addEventListener('error', function () {
+      fallbackToPdf(img.closest('.deck-card'), img);
+    }, { once: true });
+  });
+
+  /* ---------- 3) 진입 애니메이션 + 지연 렌더 ---------- */
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('is-in');   /* 감속 모드에서는 CSS가 전환 효과를 끕니다 */
+        io.unobserve(e.target);
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
+    cards.forEach(function (c) { io.observe(c); });
+  } else {
+    cards.forEach(function (c) { c.classList.add('is-in'); });
+  }
+
+  /* ---------- 4) 진행 바 ---------- */
+  var ticking = false;
+  function paintProgress() {
+    ticking = false;
+    var y = window.pageYOffset || document.documentElement.scrollTop;
+    var listTop = list.getBoundingClientRect().top + y;
+    var span = Math.max(1, list.offsetHeight - window.innerHeight * 0.5);
+    var p = Math.min(1, Math.max(0, (y - listTop + window.innerHeight * 0.35) / span));
+    fillEl.style.width = (p * 100) + '%';
+
+    var mid = y + window.innerHeight * 0.4, cur = 0;
+    for (var i = 0; i < TOTAL; i++) {
+      if (cards[i].getBoundingClientRect().top + y < mid) cur = i;
+    }
+    numEl.textContent = ('0' + (cur + 1)).slice(-2);
+    nowEl.textContent = DECK_PAGES[cur][0] + ' — ' + DECK_PAGES[cur][1];
+  }
+  window.addEventListener('scroll', function () {
+    if (!ticking) { ticking = true; requestAnimationFrame(paintProgress); }
+  }, { passive: true });
+  window.addEventListener('resize', paintProgress);
+  paintProgress();
+
+  /* ---------- 5) 확대 보기(모달) ---------- */
+  var modalEl   = document.getElementById('deckModal');
+  var mNum      = document.getElementById('deckModalNum');
+  var mTitle    = document.getElementById('deckModalTitle');
+  var mCap      = document.getElementById('deckModalCap');
+  var mImg      = document.getElementById('deckModalImg');
+  var mCanvas   = document.getElementById('deckModalCanvas');
+  var mLoading  = document.getElementById('deckModalLoading');
+  var bsModal   = window.bootstrap ? new bootstrap.Modal(modalEl) : null;
+  var current   = 0;
+
+  function showInModal(i) {
+    current = (i + TOTAL) % TOTAL;
+    var card = cards[current];
+    var img  = card.querySelector('img');
+    var canvas = card.querySelector('canvas');
+    var no = ('0' + (current + 1)).slice(-2);
+    mNum.textContent = no;
+    mTitle.textContent = DECK_PAGES[current][1];
+    mCap.textContent = card.querySelector('figcaption').textContent.trim();
+
+    mLoading.classList.add('d-none');
+    if (canvas) {                       /* 이미 PDF로 렌더된 페이지 */
+      mCanvas.width = canvas.width; mCanvas.height = canvas.height;
+      mCanvas.getContext('2d').drawImage(canvas, 0, 0);
+      mCanvas.classList.remove('d-none'); mImg.classList.add('d-none');
+    } else if (img && img.naturalWidth > 0) {
+      mImg.src = img.getAttribute('src');
+      mImg.alt = img.getAttribute('alt') || '';
+      mImg.classList.remove('d-none'); mCanvas.classList.add('d-none');
+    } else {                            /* 이미지 로딩 실패 → 원본 렌더 */
+      mImg.classList.add('d-none'); mCanvas.classList.add('d-none');
+      mLoading.classList.remove('d-none');
+      paintPage(current, modalEl, Math.min(1900, window.innerWidth - 80)).then(function (c) {
+        mCanvas.width = c.width; mCanvas.height = c.height;
+        mCanvas.getContext('2d').drawImage(c, 0, 0);
+        mCanvas.classList.remove('d-none'); mLoading.classList.add('d-none');
+      }).catch(function () {
+        mLoading.textContent = '페이지를 불러오지 못했습니다.';
+      });
+    }
+  }
+  list.addEventListener('click', function (e) {
+    var btn = e.target.closest('.deck-shot');
+    if (!btn) return;
+    var i = parseInt(btn.getAttribute('data-index'), 10);
+    if (bsModal) { showInModal(i); bsModal.show(); }
+  });
+  document.getElementById('deckPrev').addEventListener('click', function () { showInModal(current - 1); });
+  document.getElementById('deckNext').addEventListener('click', function () { showInModal(current + 1); });
+  document.addEventListener('keydown', function (e) {
+    if (!modalEl.classList.contains('show')) return;   /* 모달 밖에서는 기본 스크롤 유지 */
+    if (e.key === 'ArrowLeft')  { showInModal(current - 1); e.preventDefault(); }
+    if (e.key === 'ArrowRight') { showInModal(current + 1); e.preventDefault(); }
+    if (e.key === 'Home')       { showInModal(0); e.preventDefault(); }
+    if (e.key === 'End')        { showInModal(TOTAL - 1); e.preventDefault(); }
+  });
+  modalEl.addEventListener('hidden.bs.modal', function () {
+    mImg.removeAttribute('src'); mImg.classList.add('d-none');
+    mCanvas.classList.add('d-none');
+  });
+})();
+  </script>
 </body>
 </html>
